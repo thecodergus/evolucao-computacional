@@ -18,7 +18,7 @@ gerarIndividuoInteiroBound num_genes por_entre = do
     return $ IndividuoInteiro inteiros
 
 -- Função para gerar um individuo de tamaho N com alelos aleatorios entre (a, b)
-gerarIndividuoFlutuante :: Int -> (Int, Int) -> IO Individuo
+gerarIndividuoFlutuante :: Int -> (Float, Float) -> IO Individuo
 gerarIndividuoFlutuante num_genes por_entre = do
-    flutuantes <- replicateM num_genes (randomRInt por_entre)
+    flutuantes <- replicateM num_genes (randomRFloat por_entre)
     return $ IndividuoFlutuante flutuantes
