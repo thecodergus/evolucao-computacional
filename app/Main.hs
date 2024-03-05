@@ -9,8 +9,11 @@ data TipagemGene =
     GeneFloat Float | 
     GeneBool Bool 
     deriving (Show)
+
 type Gene = [TipagemGene]
+
 data Individuo = Individuo {gene :: Gene, fitness :: Float} deriving (Show)
+
 type Populacao = [Individuo]
 
 -- Função auxiliar para converter um TipagemGene em um inteiro
@@ -21,7 +24,7 @@ toInt (GeneBool _) = error "Não é possível converter um GeneBool em inteiro"
 
 -- Função auxiliar para converter um TipagemGene em um float
 toFloat :: TipagemGene -> Float
-toFloat (GeneFloat i) = fromIntegral i
+toFloat (GeneFloat i) = i
 toFloat (GeneFloat r) = r
 toFloat (GeneBool _) = error "Não é possível converter um GeneBool em float"
 
@@ -62,23 +65,18 @@ gerarGeneRealAleatorioBounds range = do
   value <- randomRFloat range
   return [GeneFloat value]
 
-
--- Gerar Gene
--- gerarGene :: TipagemGene -> Int -> Gene
--- gerarGene (GeneFloat n) = gerarGeneInteiroAleatorioBounds (0, n)
--- gerarGene (GeneFloat n) = gerarGeneRealAleatorioBounds (0, n)
--- gerarGene (GeneBool n) = gerarGeneBinarioAleatorio n
-
 -- Gerar uma população aleatória
--- gerarPopulacaoAleatoria :: TipagemGene -> Int -> IO Populacao
--- gerarPopulacaoAleatoria rep popSize = do
---   genes <- replicate popSize (gerarGene rep)
---   return $ map (\g -> Individuo g 0) genes
+gerarPopulacaoAleatoria :: TipagemGene -> Int -> IO Populacao
+gerarPopulacaoAleatoria rep popSize = do
+  genes <- replicate popSize (gerarGene rep)
+  return $ map (\g -> Individuo g 0) genes
 
 main :: IO ()
 main = do
-  -- populacao <- gerarPopulacaoAleatoria (GeneFloat 10) 100
-  -- print populacao
-  -- print $ gerarGeneBinarioAleatorio
-  print $ gerarGeneInteiroAleatorioBounds (-10, 10)
-  print $ gerarGeneRealAleatorioBounds (-10, 10)
+  gene_binario <- gerarGeneBinarioAleatorio
+  gene_inteiro <- gerarGeneInteiroAleatorioBounds (-10, 10)
+  gene_real <- gerarGeneRealAleatorioBounds (-10, 10)
+  
+  print $ gene_binario
+  print $ gene_inteiro
+  print $ gene_real
