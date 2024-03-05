@@ -74,7 +74,8 @@ executable evolução-computacional
     -- Other library packages from which modules are imported.
     build-depends:  base ^>=4.17.2.1,
                     parallel >= 3.2 && < 4,
-                    split >= 0.2 && < 1
+                    split >= 0.2 && < 1,
+                    random >= 1.2 && < 2,
 
     -- Directories containing source files.
     hs-source-dirs:   app
