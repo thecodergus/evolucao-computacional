@@ -54,7 +54,7 @@ gerarGeneBinarioAleatorio = do
 gerarGeneInteiroAleatorioBounds :: (Int, Int) -> IO Gene
 gerarGeneInteiroAleatorioBounds range = do
   value <- randomRInt range
-  return [GeneFloat value]
+  return [GeneInt value]
 
 -- Gerar Gene real aleatório
 gerarGeneRealAleatorioBounds :: (Float, Float) -> IO Gene
@@ -64,18 +64,21 @@ gerarGeneRealAleatorioBounds range = do
 
 
 -- Gerar Gene
-gerarGene :: TipagemGene -> Int -> Gene
-gerarGene (GeneFloat n) = gerarGeneInteiroAleatorioBounds (0, n)
-gerarGene (GeneFloat n) = gerarGeneRealAleatorioBounds (0, n)
-gerarGene (GeneBool n) = gerarGeneBinarioAleatorio n
+-- gerarGene :: TipagemGene -> Int -> Gene
+-- gerarGene (GeneFloat n) = gerarGeneInteiroAleatorioBounds (0, n)
+-- gerarGene (GeneFloat n) = gerarGeneRealAleatorioBounds (0, n)
+-- gerarGene (GeneBool n) = gerarGeneBinarioAleatorio n
 
 -- Gerar uma população aleatória
-gerarPopulacaoAleatoria :: TipagemGene -> Int -> IO Populacao
-gerarPopulacaoAleatoria rep popSize = do
-  genes <- replicate popSize (gerarGene rep)
-  return $ map (\g -> Individuo g 0) genes
+-- gerarPopulacaoAleatoria :: TipagemGene -> Int -> IO Populacao
+-- gerarPopulacaoAleatoria rep popSize = do
+--   genes <- replicate popSize (gerarGene rep)
+--   return $ map (\g -> Individuo g 0) genes
 
 main :: IO ()
 main = do
-  populacao <- gerarPopulacaoAleatoria (GeneFloat 10) 100
-  print populacao
+  -- populacao <- gerarPopulacaoAleatoria (GeneFloat 10) 100
+  -- print populacao
+  -- print $ gerarGeneBinarioAleatorio
+  print $ gerarGeneInteiroAleatorioBounds (-10, 10)
+  print $ gerarGeneRealAleatorioBounds (-10, 10)
