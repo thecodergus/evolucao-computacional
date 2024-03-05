@@ -9,5 +9,5 @@ main = do
   print $ individuos_booleanos
   individos_inteiros_a <- gerarIndividuoInteiroBound 10 (-10, 10)
   print $ individos_inteiros_a
-  individo_flutuantes <- gerarIndividuoFlutuante 10 (10, 10)
+  individo_flutuantes <- gerarIndividuoFlutuante 10 (-10, 10)
   print $ individo_flutuantes
