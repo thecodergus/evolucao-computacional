@@ -5,9 +5,9 @@ import Data.List.Split
 import System.Random
 
 data TipagemGene = 
-    INTEIRO Int | 
-    REAL Float | 
-    BOLEANO Bool 
+    GeneInt Int | 
+    GeneFloat Float | 
+    GeneBool Bool 
     deriving (Show)
 type Gene = [TipagemGene]
 data Individuo = Individuo {gene :: Gene, fitness :: Float} deriving (Show)
@@ -15,21 +15,21 @@ type Populacao = [Individuo]
 
 -- Função auxiliar para converter um TipagemGene em um inteiro
 toInt :: TipagemGene -> Int
-toInt (INTEIRO i) = i
-toInt (REAL _) = error "Não é possível converter um REAL em inteiro"
-toInt (BOLEANO _) = error "Não é possível converter um BOLEANO em inteiro"
+toInt (GeneInt i) = i
+toInt (GeneFloat _) = error "Não é possível converter um GeneFloat em inteiro"
+toInt (GeneBool _) = error "Não é possível converter um GeneBool em inteiro"
 
 -- Função auxiliar para converter um TipagemGene em um float
 toFloat :: TipagemGene -> Float
-toFloat (INTEIRO i) = fromIntegral i
-toFloat (REAL r) = r
-toFloat (BOLEANO _) = error "Não é possível converter um BOLEANO em float"
+toFloat (GeneFloat i) = fromIntegral i
+toFloat (GeneFloat r) = r
+toFloat (GeneBool _) = error "Não é possível converter um GeneBool em float"
 
--- Função auxiliar para converter um TipagemGene em um BOLEANOeano
+-- Função auxiliar para converter um TipagemGene em um GeneBooleano
 toBool :: TipagemGene -> Bool
-toBool (INTEIRO _) = error "Não é possível converter um Int em booleano"
-toBool (REAL _) = error "Não é possível converter um Float em booleano"
-toBool (BOLEANO b) = b
+toBool (GeneFloat _) = error "Não é possível converter um Int em booleano"
+toBool (GeneFloat _) = error "Não é possível converter um Float em booleano"
+toBool (GeneBool b) = b
 
 
 -- Função auxiliar para gerar um valor inteiro aleatório entre dois valores
@@ -48,26 +48,26 @@ randomBool = randomRIO (False, True)
 gerarGeneBinarioAleatorio :: IO Gene
 gerarGeneBinarioAleatorio = do
   value <- randomBool
-  return [BOLEANO value]
+  return [GeneBool value]
 
 -- Gerar Gene inteiro aleatório
 gerarGeneInteiroAleatorioBounds :: (Int, Int) -> IO Gene
 gerarGeneInteiroAleatorioBounds range = do
   value <- randomRInt range
-  return [INTEIRO value]
+  return [GeneFloat value]
 
 -- Gerar Gene real aleatório
 gerarGeneRealAleatorioBounds :: (Float, Float) -> IO Gene
 gerarGeneRealAleatorioBounds range = do
   value <- randomRFloat range
-  return [REAL value]
+  return [GeneFloat value]
 
 
 -- Gerar Gene
 gerarGene :: TipagemGene -> Int -> Gene
-gerarGene (INTEIRO n) = gerarGeneInteiroAleatorioBounds (0, n)
-gerarGene (REAL n) = gerarGeneRealAleatorioBounds (0, n)
-gerarGene (BOLEANO n) = gerarGeneBinarioAleatorio n
+gerarGene (GeneFloat n) = gerarGeneInteiroAleatorioBounds (0, n)
+gerarGene (GeneFloat n) = gerarGeneRealAleatorioBounds (0, n)
+gerarGene (GeneBool n) = gerarGeneBinarioAleatorio n
 
 -- Gerar uma população aleatória
 gerarPopulacaoAleatoria :: TipagemGene -> Int -> IO Populacao
@@ -77,5 +77,5 @@ gerarPopulacaoAleatoria rep popSize = do
 
 main :: IO ()
 main = do
-  populacao <- gerarPopulacaoAleatoria (REAL 10) 100
+  populacao <- gerarPopulacaoAleatoria (GeneFloat 10) 100
   print populacao
