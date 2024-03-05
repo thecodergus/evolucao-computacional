@@ -1,7 +1,7 @@
 module GerarAleatoriedades where
 
 
-import System.Random
+import System.Random ( randomRIO )
 
 -- Função auxiliar para gerar um valor inteiro aleatório entre dois valores
 randomInt :: (Int, Int) -> IO Int

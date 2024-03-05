@@ -4,7 +4,7 @@ module GerarIndividuos where
 import Control.Monad (replicateM)
 import GerarAleatoriedades
     ( randomInt, randomFloat, randomBool )
-import Tipos
+import Tipos ( Individuo(..) )
 import Data.List (permutations)
 
 -- Função para gerar um individo de tamanho N com alelos aleatorios
