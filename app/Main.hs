@@ -3,7 +3,7 @@ module Main where
 import GerarPopulacao
     ( gerarPopulacaoBooleana,
       gerarPopulacaoInteiroBound,
-      gerarPopulacaoFlutuante, gerarPopulacaoInteiroPermutado )
+      gerarPopulacaoFlutuante )
 import GerarIndividuos
     ( gerarIndividuoBooleano,
       gerarIndividuoInteiroBound,
@@ -22,9 +22,6 @@ main = do
 
   individo_flutuantes <- gerarIndividuoFlutuante 10 (-10, 10)
   print individo_flutuantes
-
-  individos_inteiros_b <- gerarIndividuoInteiroPermutado 10
-  print individos_inteiros_b
 
   pop_a <- gerarPopulacaoInteiroBound 1 10 (-10, 10)
   print pop_a
