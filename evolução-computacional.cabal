@@ -56,7 +56,7 @@ extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 
 common flags
-    ghc-options: -Wall -O2 -fllvm -threaded -N -with-rtsopts=-N -feager-black-holes -fparallel
+    ghc-options: -Wall -O2 -fllvm -threaded -with-rtsopts=-N -feager-black-holes -fparallel
 
 executable evolução-computacional
     -- Import common flags.
