@@ -17,7 +17,8 @@ gerarPopulacaoInteiroBound num_individuos num_genes intervalo = replicateM num_i
 
 -- Função para gerar uma população de indivíduos inteiros permutados
 gerarPopulacaoInteiroPermutado :: Int -> Int -> IO (Populacao Int)
-gerarPopulacaoInteiroPermutado num_individuos num_genes = do
+gerarPopulacaoInteiroPermutado num_individuos num_genes | num_individuos > num_genes =  error "Número de indivíduos deve ser menor ou igual ao número de genes"
+                                                        | otherwise = do
   let por_entre = (1, num_genes)
   let inteiros = permutations [fst por_entre .. snd por_entre]
   let intervalo' = uncurry Intervalo por_entre
