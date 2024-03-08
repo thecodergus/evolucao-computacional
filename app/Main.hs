@@ -7,7 +7,6 @@ import GerarPopulacao
 import GerarIndividuos
     ( gerarIndividuoBooleano,
       gerarIndividuoInteiroBound,
-      gerarIndividuoInteiroPermutado,
       gerarIndividuoFlutuante )
 
 main :: IO ()
@@ -25,9 +24,6 @@ main = do
 
   pop_a <- gerarPopulacaoInteiroBound 1 10 (-10, 10)
   print pop_a
-
-  pop_b <- gerarPopulacaoInteiroPermutado 10 10
-  print pop_b
 
   pop_c <- gerarPopulacaoFlutuante 1 10 (-10, 10)
   print pop_c
