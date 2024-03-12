@@ -5,7 +5,6 @@ import Control.Monad (replicateM)
 import GerarAleatoriedades
     ( randomInt, randomFloat, randomBool )
 import Tipos ( Individuo(..), Intervalo (Intervalo) )
-import Data.List (permutations)
 
 -- Função para gerar um individuo de tamanho N com alelos aleatórios booleanos
 gerarIndividuoBooleano :: Int -> IO (Individuo Bool)

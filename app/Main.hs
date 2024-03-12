@@ -1,32 +1,17 @@
 module Main where
+import GerarPopulacao (gerarPopulacaoBooleana)
+import Sat (funcaoObjetivo)
+import Data.Foldable (maximumBy)
+import Data.Ord (comparing)
+import Tipos (Individuo(fitness))
 
-import GerarPopulacao
-    ( gerarPopulacaoBooleana,
-      gerarPopulacaoInteiroBound,
-      gerarPopulacaoFlutuante )
-import GerarIndividuos
-    ( gerarIndividuoBooleano,
-      gerarIndividuoInteiroBound,
-      gerarIndividuoFlutuante )
 
 main :: IO ()
 main = do
-  print "Ola"
+  pop_d <- gerarPopulacaoBooleana 30 5
+  let clausulas = [[True, False, False], [False, True, False], [False, False, True], [True, True, False], [True, False, True]]
+  let pop = map (`funcaoObjetivo` clausulas) pop_d
+  let melhor_individuo = maximumBy (comparing fitness) pop
 
-  individuos_booleanos <- gerarIndividuoBooleano 10
-  print individuos_booleanos
-
-  individos_inteiros_a <- gerarIndividuoInteiroBound 10 (-10, 10)
-  print individos_inteiros_a
-
-  individo_flutuantes <- gerarIndividuoFlutuante 10 (-10, 10)
-  print individo_flutuantes
-
-  pop_a <- gerarPopulacaoInteiroBound 1 10 (-10, 10)
-  print pop_a
-
-  pop_c <- gerarPopulacaoFlutuante 1 10 (-10, 10)
-  print pop_c
-
-  pop_d <- gerarPopulacaoBooleana 1 10
-  print pop_d
+  print pop
+  print $ "Melhor individuo: " ++ show melhor_individuo
