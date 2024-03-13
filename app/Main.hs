@@ -1,6 +1,6 @@
 module Main where
 import GerarPopulacao (gerarPopulacaoForSAT)
-import Sat(solve')
+import Sat (resolver')
 
 main :: IO ()
 main = do
@@ -8,4 +8,4 @@ main = do
 
   print pop
 
-  print $ solve' $ head pop
+  print $ resolver' $ head pop
