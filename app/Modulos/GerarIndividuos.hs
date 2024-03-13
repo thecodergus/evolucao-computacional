@@ -3,13 +3,13 @@ module GerarIndividuos where
 
 import Control.Monad (replicateM)
 import GerarAleatoriedades
-    ( randomInt, randomFloat, randomBool )
+    (randomInt, randomFloat, randomBoolLista)
 import Tipos ( Individuo(..), Intervalo (Intervalo) )
 
 -- Função para gerar um individuo de tamanho N com alelos aleatórios booleanos
 gerarIndividuoBooleano :: Int -> IO (Individuo Bool)
 gerarIndividuoBooleano num_genes = do
-  bools <- replicateM num_genes randomBool
+  bools <- randomBoolLista num_genes
   let intervalo' = Intervalo False True
   return $ Individuo bools num_genes intervalo' 0
 
