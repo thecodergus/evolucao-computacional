@@ -4,6 +4,7 @@
 {-# HLINT ignore "Use notElem" #-}
 
 module Sat (resolver'') where
+-- Modulo escrito baseado no artigo disponivel em: https://cs.uwaterloo.ca/~david/cl/dpll-abstract.pdf
 
 import Control.Monad ()
 import Data.Maybe ( listToMaybe )
