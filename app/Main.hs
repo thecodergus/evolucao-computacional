@@ -1,19 +1,12 @@
 module Main where
-import GerarPopulacao (gerarPopulacaoBooleana)
-import Sat (funcaoObjetivo)
-import Data.Foldable (maximumBy)
-import Data.Ord (comparing)
-import Tipos (Individuo(fitness))
-
+import GerarPopulacao (gerarPopulacaoInteiroBound)
+import Sat (solve)
+import Tipos (Individuo(fitness, genes))
+import GerarAleatoriedades (randomBoolMatriz)
 
 main :: IO ()
 main = do
-  pop_d <- gerarPopulacaoBooleana 30 5
-  let clausulas = [[True, False, False], [False, True, False], [False, False, True], [True, True, True], [False, True, True], [True, False, True], [True, True, False],
-                  [False, False, False], [True, True, True], [False, True, False], [True, False, True], [False, False, True], [True, True, False], [False, True, True],
-                  [True, False, False], [False, True, True], [True, True, False], [False, False, True], [True, False, True], [False, True, False]]
-  let pop = map (`funcaoObjetivo` clausulas) pop_d
-  let melhor_individuo = maximumBy (comparing fitness) pop
-
-  print pop
-  print $ "Melhor individuo: " ++ show melhor_individuo
+  pop <- gerarPopulacaoInteiroBound 1 30 (-100, 100)
+  let um_gene = genes (head pop)
+  print um_gene
+  print $ solve (map (: []) um_gene)
