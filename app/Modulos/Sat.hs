@@ -15,5 +15,4 @@ funcaoObjetivo individuo clausulas =
 
       -- Calcula o valor da função objetivo como a proporção de cláusulas satisfazidas
       fitness' = fromIntegral num_satisfeitas / fromIntegral (length clausulas)
-   in -- Atualiza o campo fitness do indivíduo com o valor da função objetivo
-      individuo {fitness = fitness'}
+   in individuo {fitness = fitness'}
