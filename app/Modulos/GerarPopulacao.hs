@@ -1,7 +1,7 @@
 module GerarPopulacao where
 
 
-import Tipos (Populacao, Intervalo (..), Individuo (Individuo))
+import Tipos (Populacao, Individuo (Individuo))
 import GerarIndividuos (gerarIndividuoBooleano, gerarIndividuoInteiroBound, gerarIndividuoFlutuante)
 import Control.Monad (replicateM)
 import Data.List (permutations)
@@ -23,10 +23,9 @@ gerarPopulacaoInteiroPermutado num_individuos num_genes | num_individuos > num_g
                                                         | otherwise = do
   let por_entre = (1, num_genes)
   let inteiros = permutations [fst por_entre .. snd por_entre]
-  let intervalo' = uncurry Intervalo por_entre
   let elementos = take num_individuos inteiros
-  
-  return $ map (\vetor -> Individuo vetor num_genes intervalo' 0) elementos
+
+  return $ map (`Individuo` 0) elementos
 
 
 -- Função para gerar uma população de indivíduos flutuantes
