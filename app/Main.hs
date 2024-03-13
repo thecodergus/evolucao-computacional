@@ -1,11 +1,11 @@
 module Main where
 import GerarPopulacao (gerarPopulacaoForSAT)
-import Sat (resolver')
+import Sat (resolver'')
 
 main :: IO ()
 main = do
-  pop <- gerarPopulacaoForSAT 30 5 (-10, 10)
+  pop <- gerarPopulacaoForSAT 30 10 (-10, 10)
 
-  print pop
+  let pop_2 = map resolver'' pop
 
-  print $ resolver' $ head pop
+  print pop_2

@@ -3,11 +3,11 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use notElem" #-}
 
-module Sat (resolver') where
+module Sat (resolver'') where
 
 import Control.Monad ()
 import Data.Maybe ( listToMaybe )
-import Tipos (Individuo(genes))
+import Tipos (Individuo(genes, Individuo))
 
 -- tipo para representar um literal
 type Literal = Int
@@ -70,3 +70,8 @@ resolver = dpll . flip EstadoSolucionador []
 
 resolver' :: Individuo [Int] -> Maybe Registro
 resolver' input = resolver $ genes input
+
+resolver'' :: Individuo [Int] -> Individuo [Int]
+resolver'' input = case resolver' input of
+  Nothing -> Individuo (genes input) 0
+  Just vetor -> Individuo (genes input) (fromIntegral (length vetor) / fromIntegral (length (genes input)))
