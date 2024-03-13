@@ -8,9 +8,25 @@ import Control.Monad (replicateM)
 randomInt :: (Int, Int) -> IO Int
 randomInt = randomRIO
 
+-- Função auxiliar para gerar uma lista de inteiros aleatórios
+randomIntLista :: (Int, Int) -> Int -> IO [Int]
+randomIntLista range num = replicateM num (randomRIO range)
+
+-- Função auxiliar para gerar uma matriz de inteiros aleatórios
+randomIntMatriz :: (Int, Int) -> Int -> Int -> IO [[Int]]
+randomIntMatriz range num_listas tam_lista = replicateM num_listas (randomIntLista range tam_lista)
+
 -- Função auxiliar para gerar um valor float aleatório entre dois valores
 randomFloat :: (Float, Float) -> IO Float
 randomFloat = randomRIO
+
+-- Função auxiliar para gerar uma lista de floats aleatórios
+randomFloatLista :: (Float, Float) -> Int -> IO [Float]
+randomFloatLista range num = replicateM num (randomRIO range)
+
+-- Função auxiliar para gerar uma matriz de floats aleatórios
+randomFloatMatriz :: (Float, Float) -> Int -> Int -> IO [[Float]]
+randomFloatMatriz range num_listas tam_lista = replicateM num_listas (randomFloatLista range tam_lista)
 
 -- Função auxiliar para gerar um valor booleano aleatório
 randomBool :: IO Bool
