@@ -83,7 +83,7 @@ executable evolução-computacional
                     random >= 1.2 && < 2,
 
     -- Directories containing source files.
-    hs-source-dirs:   app app/Modulos
+    hs-source-dirs:   app app/Modulos app/Modulos/Utils
 
     -- Base language which the package is written in.
     default-language: Haskell2010
