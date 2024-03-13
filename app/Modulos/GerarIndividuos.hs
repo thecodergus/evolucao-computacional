@@ -2,7 +2,7 @@ module GerarIndividuos where
 
 
 import GerarAleatoriedades
-    (randomBoolLista, randomIntLista, randomFloatLista, randomListaDeListas)
+    (randomBoolLista, randomIntLista, randomFloatLista, randomSublistas')
 import Tipos ( Individuo(..))
 
 -- Função para gerar um individuo de tamanho N com alelos aleatórios booleanos
@@ -18,7 +18,7 @@ gerarIndividuoInteiroBound num_genes por_entre =
 -- Função auxliar para gerar um individuo que se adeque ao problema SAT
 gerarIndividuoInteiroForSAT :: Int -> (Int, Int) -> IO (Individuo [Int])
 gerarIndividuoInteiroForSAT num_genes por_entre = 
-  Individuo <$> randomListaDeListas por_entre num_genes <*> pure 0
+  Individuo <$> randomSublistas' por_entre num_genes <*> pure 0
 
 -- Função para gerar um individuo de tamanho N com alelos floats aleatórios entre (a, b)
 gerarIndividuoFlutuante :: Int -> (Float, Float) -> IO (Individuo Float)

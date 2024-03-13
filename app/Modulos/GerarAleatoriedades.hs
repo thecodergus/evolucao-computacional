@@ -16,11 +16,18 @@ randomIntLista range num = replicateM num (randomRIO range)
 randomIntMatriz :: (Int, Int) -> Int -> Int -> IO [[Int]]
 randomIntMatriz range num_listas tam_lista = replicateM num_listas (randomIntLista range tam_lista)
 
--- Função auxliar para gear uma lista de listas com tamanhos variaveis e elementos aleatorios
+-- Função auxliar para gear uma lista de listas com elementos aleatorios
 randomSublistas :: (Int, Int) -> Int -> IO [[Int]]
 randomSublistas range num_sublistas = do
   num_elementos <- randomRIO (1, num_sublistas)
   replicateM num_sublistas (randomIntLista range num_elementos)
+
+-- Função auxliar para gear uma lista de listas com tamanhos variaveis e elementos aleatorios
+randomSublistas' :: (Int, Int) -> Int -> IO [[Int]]
+randomSublistas' range num_sublistas = do
+  replicateM num_sublistas $ do
+    num_elementos <- randomRIO (1, num_sublistas)
+    randomIntLista range num_elementos
 
 -- Função auxiliar para gerar um valor float aleatório entre dois valores
 randomFloat :: (Float, Float) -> IO Float
