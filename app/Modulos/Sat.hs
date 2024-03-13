@@ -3,10 +3,11 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use notElem" #-}
 
-module Sat (solve) where
+module Sat (solve') where
 
 import Control.Monad ()
 import Data.Maybe ( listToMaybe )
+import Tipos (Individuo(genes))
 
 -- tipo para representar um literal
 type Literal = Int
@@ -67,3 +68,6 @@ simplify !f !l = [simpClause x l | x <- f, not (l `elem` x)]
 -- | A função de alto nível que envolve `dpll` e esconde as internas da biblioteca. Aceita uma lista de listas de Inteiros, tratando a lista externa como uma conjunção e as listas internas como disjunções.
 solve :: Formula -> Maybe Record
 solve = dpll . flip SolverState []
+
+solve' :: Individuo [Int] -> Maybe Record
+solve' input = solve $ genes input
