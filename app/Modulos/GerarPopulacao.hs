@@ -2,7 +2,7 @@ module GerarPopulacao where
 
 
 import Tipos (Populacao, Individuo (Individuo))
-import GerarIndividuos (gerarIndividuoBooleano, gerarIndividuoInteiroBound, gerarIndividuoFlutuante)
+import GerarIndividuos (gerarIndividuoBooleano, gerarIndividuoInteiroBound, gerarIndividuoFlutuante, gerarIndividuoInteiroForSAT)
 import Control.Monad (replicateM)
 import Data.List (permutations)
 
@@ -31,3 +31,7 @@ gerarPopulacaoInteiroPermutado num_individuos num_genes | num_individuos > num_g
 -- Função para gerar uma população de indivíduos flutuantes
 gerarPopulacaoFlutuante :: Int -> Int -> (Float, Float) -> IO (Populacao Float)
 gerarPopulacaoFlutuante num_individuos num_genes intervalo = replicateM num_individuos (gerarIndividuoFlutuante num_genes intervalo)
+
+-- Função para gerar uma população que satisfaça o problema do 3-SAT
+gerarPopulacaoForSAT :: Int -> Int -> (Int, Int) -> IO (Populacao [Int])
+gerarPopulacaoForSAT num_individuos num_genes intervalo = replicateM num_individuos (gerarIndividuoInteiroForSAT num_genes intervalo)
