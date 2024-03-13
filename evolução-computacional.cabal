@@ -72,6 +72,7 @@ executable evolução-computacional
         Tipos
         GerarPopulacao
         Sat
+        Avaliacoes
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
