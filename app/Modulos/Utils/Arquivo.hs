@@ -10,13 +10,15 @@ fileToIntLists filePath = do
   where
     stringsToIntLists :: [String] -> [[Int]]
     stringsToIntLists = map stringToIntList
+      where
+        stringToIntList :: String -> [Int]
+        stringToIntList input = filter (/= 0) $ mapMaybe safeRead $ filter (not . null) $ concatMap words $ takeWhile ((/=) '%' . head) $ lines input
+          where
+            safeRead s = case reads s of
+                          [(x, "")] -> Just x
+                          _ -> Nothing
 
     removeEmptySublists :: [[a]] -> [[a]]
     removeEmptySublists = filter (not . null)
 
-    stringToIntList :: String -> [Int]
-    stringToIntList input = filter (/= 0) $ mapMaybe safeRead $ filter (not . null) $ concatMap words $ takeWhile ((/=) '%' . head) $ lines input
-      where
-        safeRead s = case reads s of
-                      [(x, "")] -> Just x
-                      _ -> Nothing
+    
