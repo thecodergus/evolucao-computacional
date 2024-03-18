@@ -1,25 +1,23 @@
 module Arquivo where
+import Data.Maybe (mapMaybe)
 
--- Converte uma string em uma lista de inteiros, descartando os zeros e os não numéricos
 stringToIntList :: String -> [Int]
-stringToIntList input =
-  let lines' = takeWhile ((/=) '%' . head) $ lines input
-      words' = concatMap words lines'
-      nums = filter (not . null) words'
-      ints = map read nums
-   in filter (/= 0) ints
+stringToIntList input = filter (/= 0) $ mapMaybe safeRead $ filter (not . null) $ concatMap words $ takeWhile ((/=) '%' . head) $ lines input
+  where
+    safeRead s = case reads s of
+                   [(x, "")] -> Just x
+                   _ -> Nothing
 
--- Converte uma lista de strings em uma lista de lista de inteiros
+
 stringsToIntLists :: [String] -> [[Int]]
 stringsToIntLists = map stringToIntList
 
--- Lê o arquivo e transforma em uma lista de lista de inteiros
 fileToIntLists :: FilePath -> IO [[Int]]
 fileToIntLists filePath = do
   content <- readFile filePath
-  let lines' = tail $ lines content -- Remove a primeira linha
+  let lines' = drop 2 $ lines content -- Remove as duas primeiras linhas
   return $ removeEmptySublists $ stringsToIntLists lines'
 
--- Remover Sublistas vazias
+
 removeEmptySublists :: [[a]] -> [[a]]
 removeEmptySublists = filter (not . null)
