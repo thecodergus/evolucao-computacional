@@ -1,14 +1,18 @@
 module Main where
-import GerarPopulacao (gerarPopulacaoForSAT)
-import Sat (resolver'')
+import GerarPopulacao (gerarPopulacaoBooleana)
 import Avaliacoes (maiorFitness)
+import Arquivo (stringToIntList, stringsToIntLists, fileToIntLists)
+import Tipos(genes)
+import Sat (replaceWithBools)
 
 main :: IO ()
 main = do
-  pop <- gerarPopulacaoForSAT 30 10 (-10, 10)
+  pop <- gerarPopulacaoBooleana 10 100
 
-  let pop_2 = map resolver'' pop
+  intLists <- fileToIntLists "/home/udesc/Documentos/evolucao-computacional-main/arquivoSAT.txt"
+  
+  print "Ola"
 
-  print pop_2
-  print "Melhor avaliacao: "
-  print $ maiorFitness pop_2
+
+  let resultado  = replaceWithBools intLists (map genes pop)
+  print resultado
