@@ -13,13 +13,13 @@ avaliarSAT individuo disjuncao = Individuo (genes individuo) $ avaliar $ contaBo
         contaBools = foldl (\(trueCount, totalCount) x -> if x then (trueCount + 1, totalCount + 1) else (trueCount, totalCount + 1)) (0, 0)
 
         replaceWithBools :: [[Int]] -> [Bool] -> [[Bool]]
-        replaceWithBools intLists boolList = map (map (replace boolList)) intLists
+        replaceWithBools intLists boolList = map (map replace) intLists
             where
-                replace :: [Bool] -> Int -> Bool
-                replace boolList i
+                replace :: Int -> Bool
+                replace i
                     | i < 0 = not (boolList !! (abs i - 1))
                     | otherwise = boolList !! (i - 1)
 
-                    
+
 avaliarSATs :: [Individuo Bool] -> [[Int]] -> [Individuo Bool]
 avaliarSATs individuos disjuncao = parMap rpar (`avaliarSAT` disjuncao) individuos
