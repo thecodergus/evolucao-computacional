@@ -1,6 +1,5 @@
 module Main where
 import GerarPopulacao (gerarPopulacaoBooleana)
-import Avaliacoes (maiorFitness)
 import Arquivo (stringToIntList, stringsToIntLists, fileToIntLists)
 import Tipos(genes)
 import Sat (replaceWithBools)
@@ -14,5 +13,5 @@ main = do
   print "Ola"
 
 
-  let resultado  = replaceWithBools intLists (map genes pop)
-  print resultado
+  -- let resultado  = replaceWithBools intLists (map genes pop)
+  print $ replaceWithBools intLists (genes (head pop))
