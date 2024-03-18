@@ -1,5 +1,5 @@
 module Avaliacoes where
-import Tipos (Individuo(genes, Individuo))
+import Tipos (Individuo(genes, Individuo, fitness), Populacao)
 import Control.Parallel.Strategies (parMap, rpar)
 
 
@@ -21,5 +21,15 @@ avaliarSAT individuo disjuncao = Individuo (genes individuo) $ avaliar $ contaBo
                     | otherwise = boolList !! (i - 1)
 
 
-avaliarSATs :: [Individuo Bool] -> [[Int]] -> [Individuo Bool]
+avaliarSATs :: Populacao Bool -> [[Int]] -> Populacao Bool
 avaliarSATs individuos disjuncao = parMap rpar (`avaliarSAT` disjuncao) individuos
+
+
+melhorIndividuo :: Ord a => Populacao a -> Maybe (Individuo a)
+melhorIndividuo [] = Nothing
+melhorIndividuo (x:xs) = Just (foldl1 maxIndividuo (x:xs))
+  where
+    maxIndividuo :: Ord a => Individuo a -> Individuo a -> Individuo a
+    maxIndividuo i1 i2
+      | fitness i1 > fitness i2 = i1
+      | otherwise = i2
