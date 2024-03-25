@@ -74,6 +74,7 @@ executable evolução-computacional
         Sat
         Avaliacoes
         Arquivo
+        Crosssover
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
