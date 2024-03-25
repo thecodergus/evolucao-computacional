@@ -12,7 +12,7 @@ crossoverUmPontoAleatorio pai mae | length (genes pai) /= length (genes mae) = e
     where
         crossover :: IO (Individuo (*), Individuo (*))
         crossover = do
-            numero_aleatorio <- randomInt (1, length (genes pai))
+            numero_aleatorio <- randomInt (0, length (genes pai) - 1)
             let (pai_1, pai_2) = splitAt numero_aleatorio (genes pai)
             let (mae_1, mae_2) = splitAt numero_aleatorio (genes mae)
 
