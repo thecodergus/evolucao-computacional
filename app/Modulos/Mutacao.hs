@@ -9,9 +9,9 @@ import GerarAleatoriedades (randomFloat, randomInt)
 mutacao :: Individuo (*) -> Float -> IO (Individuo (*))
 mutacao individuo probabilidade_mutacao = do
   -- Aplica a função 'mutacao'' aos genes do indivíduo.
-  novo_individuo <- mutacao' (genes individuo)
+  novo_gene <- mutacao' (genes individuo)
   -- Retorna um novo indivíduo com os genes mutados e fitness 0.
-  return (Individuo novo_individuo 0)
+  return (Individuo novo_gene 0)
   where
     -- A função 'mutacao'' recebe uma lista de genes e retorna uma nova lista de genes
     -- onde cada gene foi possivelmente mutado.
