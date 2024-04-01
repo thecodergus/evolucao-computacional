@@ -10,7 +10,7 @@ avaliarSAT individuo disjuncao = Individuo (genes individuo) $ avaliar $ contaBo
     where
         -- avaliar calcula a aptidão (fitness) como a razão entre a quantidade de Trues e o total de valores
         avaliar :: (Int, Int) -> Float
-        avaliar (quantidade_True, quantidade_total) = fromIntegral quantidade_True / fromIntegral quantidade_total
+        avaliar (trueCount, totalCount) = fromIntegral trueCount / fromIntegral totalCount
 
         -- contaBools conta o número de Trues e o total de valores booleanos em uma lista de booleanos
         contaBools :: [Bool] -> (Int, Int)
