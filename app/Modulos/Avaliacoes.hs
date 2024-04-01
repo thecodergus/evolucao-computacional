@@ -14,7 +14,11 @@ avaliarSAT individuo disjuncao = Individuo (genes individuo) $ avaliar $ contaBo
 
         -- contaBools conta o número de Trues e o total de valores booleanos em uma lista de booleanos
         contaBools :: [Bool] -> (Int, Int)
-        contaBools = foldl (\(trueCount, totalCount) x -> if x then (trueCount + 1, totalCount + 1) else (trueCount, totalCount + 1)) (0, 0)
+        contaBools = foldl contaBools' (0, 0)
+          where
+            contaBools' :: (Int, Int) -> Bool -> (Int, Int)
+            contaBools' (trueCount, totalCount) True = (trueCount + 1, totalCount + 1)
+            contaBools' (trueCount, totalCount) False = (trueCount, totalCount + 1)
 
         -- replaceWithBools substitui os inteiros nas listas de disjunções pelos correspondentes valores booleanos
         replaceWithBools :: [[Int]] -> [Bool] -> [[Bool]]
