@@ -1,19 +1,14 @@
 module Main where
-import GerarPopulacao (gerarPopulacaoBooleana)
-import Arquivo (fileToIntLists)
-import Avaliacoes (avaliarSATs, melhorIndividuo)
+import Avaliacoes(avaliarFuncaoBool)
 
 main :: IO ()
 main = do
-  pop <- gerarPopulacaoBooleana 10 100
-  intLists <- fileToIntLists "/home/udesc/Documentos/evolucao-computacional-main/arquivoSAT.cnf"
-  
-  print "Individuos:"
+    let funcao x = (cos 20 * x) - (abs x / 2) + ((x ** 3) / 4)
 
-  let individuos_avaliados = avaliarSATs pop intLists
+    let escopo = (-2, 2)
 
-  print individuos_avaliados
+    let binarios = [False, False, True, False]
 
-  print "Melhor individuo:"
+    let resultado = avaliarFuncaoBool funcao escopo binarios
 
-  print $ melhorIndividuo individuos_avaliados
+    putStrLn $ "Resultado: " ++ show resultado
