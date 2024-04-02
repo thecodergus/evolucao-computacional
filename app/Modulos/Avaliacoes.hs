@@ -74,9 +74,8 @@ avaliarFuncaoBool funcao escopo binarios = funcao decimal
 
     -- boolListToInt converte uma lista de Bool representando um número binário em um inteiro.
     boolListToInt :: [Bool] -> Int
-    boolListToInt = foldl (\acc x -> acc * 2 + boolToInt x) 0
-
-    -- boolToInt converte um valor Bool em um inteiro (1 para True e 0 para False).
-    boolToInt :: Bool -> Int
-    boolToInt True = 1
-    boolToInt False = 0
+    boolListToInt = foldl f 0
+      where
+        f :: Int -> Bool -> Int
+        f acc True = acc * 2 + 1
+        f acc False = acc * 2
