@@ -43,3 +43,40 @@ melhorIndividuo (x:xs) = Just (foldl1 maxIndividuo (x:xs))
     maxIndividuo i1 i2
       | fitness i1 > fitness i2 = i1
       | otherwise = i2
+
+
+-- A função avaliarFuncaoBool recebe como parâmetros uma função (Float -> Float), uma tupla
+-- representando o escopo (intervalo) da função original, e uma lista de Bool representando
+-- um número binárizado. A função retorna o resultado da aplicação da função original no
+-- valor decimal correspondente ao número binário fornecido.
+avaliarFuncaoBool :: (Float -> Float) -> (Float, Float) -> [Bool] -> Float
+avaliarFuncaoBool funcao escopo binarios = funcao decimal
+  where
+    -- O intervalo representa o tamanho de cada subintervalo no escopo da função original.
+    intervalo :: Float
+    intervalo = uncurry (-) escopo / (2 ** fromIntegral numBits)
+
+    -- numBits é o número de dígitos binários no número fornecido.
+    numBits :: Int
+    numBits = length binarios
+
+    -- minimo é o valor mínimo do escopo da função original.
+    minimo :: Float
+    minimo = fst escopo
+
+    -- decimal é o valor decimal correspondente ao número binário fornecido.
+    decimal :: Float
+    decimal = minimo + intervalo * valorDecimal
+
+    -- valorDecimal é o valor decimal equivalente ao número binário fornecido.
+    valorDecimal :: Float
+    valorDecimal = fromIntegral (boolListToInt binarios)
+
+    -- boolListToInt converte uma lista de Bool representando um número binário em um inteiro.
+    boolListToInt :: [Bool] -> Int
+    boolListToInt = foldl (\acc x -> acc * 2 + boolToInt x) 0
+
+    -- boolToInt converte um valor Bool em um inteiro (1 para True e 0 para False).
+    boolToInt :: Bool -> Int
+    boolToInt True = 1
+    boolToInt False = 0
