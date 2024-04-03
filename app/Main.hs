@@ -1,14 +1,13 @@
 module Main where
-import Avaliacoes(avaliarFuncaoBool)
+
+import Avaliacoes.Matematica (fitnessMax, fitnessMin)
+import GerarAleatoriedades (randomBoolLista)
+
+f :: Float -> Float
+f x = cos (20 * x) - abs x / 2 + x ** 3 / 4
 
 main :: IO ()
 main = do
-    let funcao x = (cos 20 * x) - (abs x / 2) + ((x ** 3) / 4)
-
-    let escopo = (-2, 2)
-
-    let binarios = [False, False, True, False]
-
-    let resultado = avaliarFuncaoBool funcao escopo binarios
-
-    putStrLn $ "Resultado: " ++ show resultado
+    inputBinary <- randomBoolLista 16
+    putStrLn $ "Fitness para maximização: " ++ show (fitnessMax f inputBinary)
+    putStrLn $ "Fitness para minimização: " ++ show (fitnessMin f inputBinary)
