@@ -1,14 +1,14 @@
 module Avaliacoes.Matematica where
 
--- Função f(x)
-
-
+-- Converte uma lista de booleanos para um valor decimal após a vírgula.
 boolListToDecimal :: [Bool] -> Float
 boolListToDecimal bools = fromIntegral (boolToInt (take 4 bools)) + boolToFloat (drop 4 bools)
    where
+      -- Converte uma lista de booleanos para um valor inteiro.
       boolToInt :: [Bool] -> Int
       boolToInt lista = foldl (\acc b -> acc * 2 + fromEnum b) 0  (reverse lista)
-
+      
+      -- Converte uma lista de booleanos para um valor de ponto flutuante.
       boolToFloat :: [Bool] -> Float
       boolToFloat lista = foldr (\b acc -> (acc + fromIntegral (fromEnum b)) / 2) 0.0 lista
 
