@@ -9,17 +9,20 @@ boolListToDecimal bools = fromIntegral (boolToInt (take 4 bools)) + boolToFloat 
       boolToInt lista = foldl lambda 0 (reverse lista)
          where
             lambda acc b = acc * 2 + fromEnum b
-      
+
       -- Converte uma lista de booleanos para um valor de ponto flutuante.
       boolToFloat :: [Bool] -> Float
       boolToFloat lista = foldr lambda 0.0 lista
          where
             lambda b acc = (acc + fromIntegral (fromEnum b)) / 2
 
+f :: Float -> Float
+f x = cos (20 * x) - abs x / 2 + x ** 3 / 4
+
 -- Fitness para maximização (usando f(x))
-fitnessMax :: (Float -> Float) -> [Bool] -> Float
-fitnessMax f bools = f (boolListToDecimal bools)
+fitnessMax :: [Bool] -> Float
+fitnessMax bools = f (boolListToDecimal bools) / 360
 
 -- Fitness para minimização (usando -f(x))
-fitnessMin :: (Float -> Float) -> [Bool] -> Float
-fitnessMin f bools = - f (boolListToDecimal bools)
+fitnessMin :: [Bool] -> Float
+fitnessMin bools = - f (boolListToDecimal bools) / 360
