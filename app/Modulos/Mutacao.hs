@@ -1,7 +1,7 @@
 module Mutacao where
 
 import Tipos (Individuo(genes, Individuo))
-import GerarAleatoriedades (randomFloat, randomInt)
+import Aleatoriedades (randomFloat, randomInt)
 
 
 -- A função 'mutacao' recebe um indivíduo e uma probabilidade de mutação como entrada.

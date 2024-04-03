@@ -1,4 +1,4 @@
-module GerarAleatoriedades where
+module Aleatoriedades where
 
 
 import System.Random ( randomRIO )

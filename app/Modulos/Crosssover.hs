@@ -2,7 +2,7 @@ module Crosssover where
 
 
 import Tipos (Individuo(genes, Individuo))
-import GerarAleatoriedades (randomInt)
+import Aleatoriedades (randomInt)
 
 
 -- A função 'crossoverUmPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.

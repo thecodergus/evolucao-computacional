@@ -1,7 +1,7 @@
 module Main where
 
 import Avaliacoes.Matematica (fitnessMax, fitnessMin)
-import GerarAleatoriedades (randomBoolLista)
+import Aleatoriedades (randomBoolLista)
 
 f :: Float -> Float
 f x = cos (20 * x) - abs x / 2 + x ** 3 / 4
