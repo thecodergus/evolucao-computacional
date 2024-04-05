@@ -21,8 +21,8 @@ f x = cos (20 * x) - abs x / 2 + x ** 3 / 4
 
 -- Fitness para maximização (usando f(x))
 fitnessMax :: [Bool] -> Float
-fitnessMax bools = f (boolListToDecimal bools) / 360
+fitnessMax bools = f (boolListToDecimal bools)
 
 -- Fitness para minimização (usando -f(x))
 fitnessMin :: [Bool] -> Float
-fitnessMin bools = - f (boolListToDecimal bools) / 360
+fitnessMin bools = 1 / (f (boolListToDecimal bools) + 1)
