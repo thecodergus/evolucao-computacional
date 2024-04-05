@@ -88,7 +88,8 @@ executable evolução-computacional
                     parallel >= 3.2 && < 4,
                     split >= 0.2 && < 1,
                     random >= 1.2 && < 2,
-                    unordered-containers >= 0.2.13.0
+                    -- unordered-containers >= 0.2.13.0,
+                    -- hashable
 
     -- Directories containing source files.
     hs-source-dirs:   

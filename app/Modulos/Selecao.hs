@@ -1,8 +1,12 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
 module Selecao where
 
 import Tipos (Individuo(fitness, Individuo), Populacao)
 import Aleatoriedades (randomFloat)
 import Data.List(sort)
+
+
 
 roletaViciada :: Populacao a -> IO (Populacao a)
 roletaViciada pop = do
@@ -10,27 +14,24 @@ roletaViciada pop = do
     valorAleatorio <- randomFloat (0, 1)
     let valorAleatorio = valorAleatorio * somarFitness
 
-    -- Criando população intermediaria
-    let poplacaIntermediaria = selecionar valorAleatorio 0 pop
+    -- Criando população Intermediária
+    let popIntermediaria = selecao valorAleatorio 0 pop
 
-    -- Gerando valor limite da população intermediaria
-    valorAleatorio <- randomFloat (0, 1)
-    let valorAleatorio = valorAleatorio * somarFitness
+    -- Gerando novo valor limite
+    valorAleatorio2 <- randomFloat (0, 1)
+    let valorAleatorio2 = valorAleatorio2 * somarFitness
 
-    return $ selecionar valorAleatorio 0 poplacaIntermediaria
-        where
-            -- Somando todos os valores das fitness
-            somarFitness :: Float
-            somarFitness = foldl (\b acc -> b + fitness acc) 0.0 pop
+    -- Criando população final
+    let popFinal = selecao valorAleatorio2 0 popIntermediaria
 
-            -- Faz a seleção de individuos
-            selecionar :: Float -> Float -> Populacao a -> Populacao a
-            selecionar _ _ [] = []
-            selecionar valorAleatorio contador todos = selecionar' valorAleatorio contador todos []
-                where
-                    selecionar' :: Ord a => Float -> Float -> Populacao a -> Populacao a -> Populacao a
-                    selecionar' valorAleatorio contador todos@(indi:individuos) selecionados
-                                | contador > valorAleatorio = selecionados
-                                | length (filter (== indi) selecionados) > 2 = selecionar' valorAleatorio contador individuos selecionados
-                                | contador > fitness indi = selecionar' valorAleatorio contador individuos selecionados
-                                | otherwise = selecionar' valorAleatorio (contador + fitness indi) todos (selecionados ++ [indi])
+    return popFinal
+    where
+        somarFitness :: Float
+        somarFitness = foldl (\b acc -> b + fitness acc) 0.0 pop
+
+        selecao :: Float -> Float -> Populacao a -> Populacao a
+        selecao _ _ [] = []
+        selecao valorLimite contador todos@(um:resto)
+            | contador > valorLimite = []
+            | length (filter (\x -> fitness x == fitness um) todos) > 1 = um : selecao valorLimite (contador + fitness um) resto
+            | otherwise = um : selecao valorLimite (contador + fitness um) todos

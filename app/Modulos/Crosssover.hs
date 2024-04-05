@@ -7,7 +7,7 @@ import Aleatoriedades (randomInt)
 
 -- A função 'crossoverUmPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-crossoverUmPontoAleatorio :: Individuo (*) -> Individuo (*) -> IO (Individuo (*), Individuo (*))
+crossoverUmPontoAleatorio :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
 crossoverUmPontoAleatorio pai mae 
   -- Verifica se o tamanho dos genes do pai e da mãe são iguais. Se não forem, lança um erro.
   | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
@@ -18,7 +18,6 @@ crossoverUmPontoAleatorio pai mae
     where
         -- A função 'crossover' não recebe nenhum argumento.
         -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-        crossover :: IO (Individuo (*), Individuo (*))
         crossover = do
             -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
             numero_aleatorio <- randomInt (0, length (genes pai) - 1)
