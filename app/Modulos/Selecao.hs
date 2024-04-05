@@ -1,10 +1,7 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Eta reduce" #-}
 module Selecao where
 
-import Tipos (Individuo(fitness, Individuo, genes), Populacao)
+import Tipos (Individuo(fitness, genes), Populacao)
 import Aleatoriedades (randomFloat)
-import Data.List(sort)
 
 
 
