@@ -33,5 +33,5 @@ roletaViciada pop = do
         selecao _ _ [] _ = []
         selecao valorLimite contador todos@(um:resto) pop
             | contador > valorLimite = pop
-            | length (filter (\x -> genes x == genes um) pop) > 1 = selecao valorLimite contador resto (um:pop)
+            | length (filter (\x -> genes x == genes um) pop) > 1 = selecao valorLimite contador resto pop
             | otherwise = selecao valorLimite (contador + fitness um) todos pop
