@@ -6,7 +6,7 @@ import Aleatoriedades (randomFloat, randomInt)
 
 -- A função 'mutacao' recebe um indivíduo e uma probabilidade de mutação como entrada.
 -- Ela retorna um novo indivíduo que é o resultado da aplicação da mutação ao indivíduo de entrada.
-mutacao :: Individuo (*) -> Float -> IO (Individuo (*))
+mutacao :: Individuo a -> Float -> IO (Individuo a)
 mutacao individuo probabilidade_mutacao = do
   -- Aplica a função 'mutacao'' aos genes do indivíduo.
   novo_gene <- mutacao' (genes individuo)
@@ -15,13 +15,11 @@ mutacao individuo probabilidade_mutacao = do
   where
     -- A função 'mutacao'' recebe uma lista de genes e retorna uma nova lista de genes
     -- onde cada gene foi possivelmente mutado.
-    mutacao' :: [*] -> IO [*]
-    mutacao' xs = mapM mutar xs
+    mutacao' = mapM mutar
 
     -- A função 'mutar' recebe um gene e retorna um novo gene.
     -- Com probabilidade 'probabilidade_mutacao', o gene é substituído por um gene aleatório.
     -- Caso contrário, o gene original é retornado.
-    mutar :: * -> IO *
     mutar item = do
       -- Gera um número aleatório entre 0 e 1.
       prob <- randomFloat (0, 1)
