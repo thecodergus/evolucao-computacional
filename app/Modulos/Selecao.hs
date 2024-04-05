@@ -2,24 +2,28 @@ module Selecao where
 
 import Tipos (Individuo(fitness, genes), Populacao)
 import Aleatoriedades (randomFloat)
+import Avaliacoes.Utils (melhorIndividuo)
+import Data.Maybe (maybeToList)
 
 
-
-roletaViciada :: Eq a => Populacao a -> IO (Populacao a)
+roletaViciada :: (Eq a, Ord a) => Populacao a -> IO (Populacao a)
 roletaViciada pop = do
+    -- Extraindo o melhor indivíduo
+    let elitismo = maybeToList $ melhorIndividuo pop
+
     -- Gerando valor limite 
     valorAleatorio <- randomFloat (0, 1)
     let valorAleatorio = valorAleatorio * somarFitness
 
     -- Criando população Intermediária
-    let popIntermediaria = selecao valorAleatorio 0 pop []
+    let popIntermediaria = selecao valorAleatorio 0 pop elitismo
 
     -- Gerando novo valor limite
     valorAleatorio2 <- randomFloat (0, 1)
     let valorAleatorio2 = valorAleatorio2 * somarFitness
 
     -- Criando população final
-    let popFinal = selecao valorAleatorio2 0 popIntermediaria []
+    let popFinal = selecao valorAleatorio2 0 popIntermediaria elitismo
 
     return popFinal
     where
