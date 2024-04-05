@@ -26,9 +26,11 @@ roletaViciada pop = do
 
     return popFinal
     where
+        -- Função que soma o fitness de todos os indivíduos
         somarFitness :: Float
         somarFitness = foldl (\b acc -> b + fitness acc) 0.0 pop
 
+        -- Função que seleciona os indivíduos que irão para a próxima geração
         selecao :: Eq a => Float -> Float -> Populacao a -> Populacao a -> Populacao a
         selecao _ _ [] _ = []
         selecao valorLimite contador todos@(um:resto) pop
