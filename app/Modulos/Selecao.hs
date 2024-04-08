@@ -1,40 +1,43 @@
 module Selecao where
 
 import Tipos (Individuo(fitness, genes), Populacao)
-import Aleatoriedades (randomFloat)
+import Aleatoriedades (randomFloat, randomInt)
 import Avaliacoes.Utils (melhorIndividuo)
 import Data.Maybe (maybeToList)
 
 
-roletaViciada :: (Eq a, Ord a) => Populacao a -> IO (Populacao a)
-roletaViciada pop = do
-    -- Extraindo o melhor indivíduo
-    let elitismo = maybeToList $ melhorIndividuo pop
-
-    -- Gerando valor limite 
+roletaViciada :: Eq a => Populacao a -> IO (Populacao a)
+roletaViciada populacao = do
+    -- Gerando valor limite 1
     valorAleatorio <- randomFloat (0, 1)
     let valorAleatorio = valorAleatorio * somarFitness
 
     -- Criando população Intermediária
-    let popIntermediaria = selecao valorAleatorio 0 pop elitismo
+    popIntermediaria <- selecao valorAleatorio 0 populacao
 
-    -- Gerando novo valor limite
-    valorAleatorio2 <- randomFloat (0, 1)
-    let valorAleatorio2 = valorAleatorio2 * somarFitness
+    -- Gerando valor limite 2
+    valorAleatorio <- randomFloat (0, 1)
+    let valorAleatorio = valorAleatorio * somarFitness
 
     -- Criando população final
-    let popFinal = selecao valorAleatorio2 0 popIntermediaria elitismo
-
-    return popFinal
+    selecao valorAleatorio 0 popIntermediaria
     where
         -- Função que soma o fitness de todos os indivíduos
         somarFitness :: Float
-        somarFitness = foldl (\b acc -> b + fitness acc) 0.0 pop
+        somarFitness = foldl (\b acc -> b + fitness acc) 0.0 populacao
 
         -- Função que seleciona os indivíduos que irão para a próxima geração
-        selecao :: Eq a => Float -> Float -> Populacao a -> Populacao a -> Populacao a
-        selecao _ _ [] _ = []
-        selecao valorLimite contador todos@(um:resto) pop
-            | contador > valorLimite = pop
-            | length (filter (\x -> genes x == genes um) pop) > 1 = selecao valorLimite contador resto pop
-            | otherwise = selecao valorLimite (contador + fitness um) todos pop
+        selecao :: Eq a => Float -> Float -> Populacao a -> IO (Populacao a)
+        selecao _ _ [] = return []
+        selecao valorLimite contador pop
+            | contador > valorLimite = return []
+            | otherwise = do
+                individuoAleatorio <- randomInt (0, length pop - 1)
+
+                let individuo = pop !! individuoAleatorio
+
+                restante <- selecao valorLimite (contador + fitness individuo) (filter (/= individuo) pop)
+
+                return (individuo : restante)
+
+
