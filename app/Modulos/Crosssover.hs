@@ -20,7 +20,7 @@ crossoverUmPontoAleatorio pai mae
         -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
         crossover = do
             -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
-            numero_aleatorio <- randomInt (0, length (genes pai) - 1)
+            numero_aleatorio <- randomInt (1, length (genes pai) - 1)
             -- Divide a lista de genes do pai no ponto aleatório.
             let (pai_1, pai_2) = splitAt numero_aleatorio (genes pai)
             -- Divide a lista de genes da mãe no ponto aleatório.
