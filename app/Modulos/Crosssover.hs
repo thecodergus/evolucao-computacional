@@ -29,10 +29,10 @@ crossoverUmPontoAleatorio pai mae
             -- O segundo indivíduo tem a primeira parte dos genes do pai e a segunda parte dos genes da mãe.
             return (Individuo (mae_1 ++ pai_2) 0, Individuo (pai_1 ++ mae_2) 0)
 
-crossover :: Ord a => Populacao a -> IO (Populacao a)
-crossover [] = return []
-crossover [a] = return []
-crossover populacao = do
+crossover :: Ord a => Populacao a -> (Individuo a -> Individuo a -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
+crossover [] _ = return []
+crossover [a] _ = return []
+crossover populacao estrategiaCrossover  = do
   -- Escolher Pai
   individuoPosicao <- randomInt (0, length populacao - 1)
   let pai = populacao !! individuoPosicao
@@ -48,8 +48,8 @@ crossover populacao = do
   let populacao = filter (/= mae) populacao
   
   -- Realiza o crossover entre o pai e a mãe
-  (maisVelho, maisNovo) <- crossoverUmPontoAleatorio pai mae
+  (maisVelho, maisNovo) <- estrategiaCrossover pai mae
 
-  restante <- crossover populacao
+  restante <- crossover populacao estrategiaCrossover
 
   return $ maisVelho : maisNovo : restante
