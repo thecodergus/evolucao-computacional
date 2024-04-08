@@ -79,6 +79,8 @@ executable evolução-computacional
         Crosssover
         Mutacao
         Selecao
+        Radio
+        RotinaEvolutiva
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
