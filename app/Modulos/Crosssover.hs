@@ -1,7 +1,7 @@
 module Crosssover where
 
 
-import Tipos (Individuo(genes, Individuo))
+import Tipos (Individuo(genes, Individuo), Populacao)
 import Aleatoriedades (randomInt)
 
 
@@ -28,3 +28,28 @@ crossoverUmPontoAleatorio pai mae
             -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes da mãe e a segunda parte dos genes do pai.
             -- O segundo indivíduo tem a primeira parte dos genes do pai e a segunda parte dos genes da mãe.
             return (Individuo (mae_1 ++ pai_2) 0, Individuo (pai_1 ++ mae_2) 0)
+
+crossover :: Ord a => Populacao a -> IO (Populacao a)
+crossover [] = return []
+crossover [a] = return []
+crossover populacao = do
+  -- Escolher Pai
+  individuoPosicao <- randomInt (0, length populacao - 1)
+  let pai = populacao !! individuoPosicao
+
+  -- Removendo Pai da Populacao
+  let populacao = filter (/= pai) populacao
+
+  -- Escolher mãe
+  individuoPosicao <- randomInt (0, length populacao - 1)
+  let mae = populacao !! individuoPosicao
+
+  -- Removendo Mãe da População
+  let populacao = filter (/= mae) populacao
+  
+  -- Realiza o crossover entre o pai e a mãe
+  (maisVelho, maisNovo) <- crossoverUmPontoAleatorio pai mae
+
+  restante <- crossover populacao
+
+  return $ maisVelho : maisNovo : restante
