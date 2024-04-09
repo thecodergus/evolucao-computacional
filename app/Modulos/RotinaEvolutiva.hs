@@ -9,9 +9,10 @@ import Selecao(roletaViciada)
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 
-evolutivaEnumerada :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> Float -> Int -> IO (Populacao a)
-evolutivaEnumerada populacao _ _ 0 = return populacao
-evolutivaEnumerada populacao funcaoAvaliacao taxaMutacao contador = do
+-- Retorna a ultima População e o historico de melhores individuos
+loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> Float -> Int -> IO (Populacao a, Populacao a)
+loopEvolutivoEnumerado populacao _ _ 0 = return (populacao, [])
+loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
     -- Avaliacao
     let populacaoAvaliada = parMap rpar funcaoAvaliacao populacao
 
@@ -29,4 +30,6 @@ evolutivaEnumerada populacao funcaoAvaliacao taxaMutacao contador = do
     novaPopulacao'' <- sequence novaPopulacao'
 
 
-    evolutivaEnumerada (individuoEletista ++ novaPopulacao'') funcaoAvaliacao taxaMutacao (contador - 1)
+    (retorno, elitistas) <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao'') funcaoAvaliacao taxaMutacao (contador - 1)
+
+    return (retorno, elitistas ++ individuoEletista)
