@@ -90,6 +90,7 @@ executable evolução-computacional
                     parallel >= 3.2 && < 4,
                     split >= 0.2 && < 1,
                     random >= 1.2 && < 2,
+                    Chart >= 1.9.5
                     -- unordered-containers >= 0.2.13.0,
                     -- hashable
 
