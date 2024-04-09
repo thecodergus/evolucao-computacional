@@ -2,8 +2,9 @@ module Selecao where
 
 import Tipos (Individuo(fitness, genes), Populacao)
 import Aleatoriedades (randomFloat, randomInt)
-import Avaliacoes.Utils (melhorIndividuo)
-import Data.Maybe (maybeToList)
+import Data.Foldable (maximumBy)
+import Data.Ord (comparing)
+import Control.Monad (replicateM)
 
 
 roletaViciada :: Eq a => Populacao a -> IO (Populacao a)
@@ -41,3 +42,14 @@ roletaViciada populacao = do
                 return (individuo : restante)
 
 
+torneioEstocastico :: Eq a => Int -> Float -> Populacao a -> IO (Populacao a)
+torneioEstocastico k kp populacao = do
+  let tamanhoPopulacao = length populacao
+      qtdSelecionados = ceiling (fromIntegral tamanhoPopulacao * kp)
+
+  torneios <- replicateM qtdSelecionados (replicateM k (randomInt (0, tamanhoPopulacao - 1)))
+
+  mapM (selecionarMelhor populacao) torneios
+  where
+    selecionarMelhor :: Eq a => Populacao a -> [Int] -> IO (Individuo a)
+    selecionarMelhor populacao' indices = return $ maximumBy (comparing fitness) [populacao' !! i | i <- indices]
