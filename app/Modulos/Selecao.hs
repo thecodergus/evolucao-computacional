@@ -10,17 +10,17 @@ roletaViciada :: Eq a => Populacao a -> IO (Populacao a)
 roletaViciada populacao = do
     -- Gerando valor limite 1
     valorAleatorio <- randomFloat (0, 1)
-    let valorAleatorio = valorAleatorio * somarFitness
+    let valorAleatorio' = valorAleatorio * somarFitness
 
     -- Criando população Intermediária
-    popIntermediaria <- selecao valorAleatorio 0 populacao
+    popIntermediaria <- selecao valorAleatorio' 0 populacao
 
     -- Gerando valor limite 2
-    valorAleatorio <- randomFloat (0, 1)
-    let valorAleatorio = valorAleatorio * somarFitness
+    valorAleatorio'' <- randomFloat (0, 1)
+    let valorAleatorio''' = valorAleatorio'' * somarFitness
 
     -- Criando população final
-    selecao valorAleatorio 0 popIntermediaria
+    selecao valorAleatorio''' 0 popIntermediaria
     where
         -- Função que soma o fitness de todos os indivíduos
         somarFitness :: Float
