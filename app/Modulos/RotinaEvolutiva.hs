@@ -13,12 +13,14 @@ import Data.Maybe (maybeToList)
 loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> Float -> Int -> IO (Populacao a, Populacao a)
 loopEvolutivoEnumerado populacao _ _ 0 = return (populacao, [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
+    print $ "-----------" ++ show contador ++ "-----------"
+
     -- Avaliacao
     let populacaoAvaliada = parMap rpar funcaoAvaliacao populacao
 
     -- Encontrar o melhor individuo
     let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada
-
+    
     -- Selecao
     selecaoIndividuos <- roletaViciada populacao
 
