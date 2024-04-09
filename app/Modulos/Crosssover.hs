@@ -14,11 +14,11 @@ crossoverUmPontoAleatorio pai mae
   -- Verifica se a lista de genes do pai é vazia. Se for, lança um erro.
   | null (genes pai) = error "O numero de genes devem ser maiores que zero"
   -- Se nenhuma das condições acima for verdadeira, realiza o crossover.
-  | otherwise = crossover
+  | otherwise = crossover'
     where
         -- A função 'crossover' não recebe nenhum argumento.
         -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-        crossover = do
+        crossover' = do
             -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
             numero_aleatorio <- randomInt (1, length (genes pai) - 1)
             -- Divide a lista de genes do pai no ponto aleatório.
@@ -31,25 +31,24 @@ crossoverUmPontoAleatorio pai mae
 
 crossover :: Ord a => Populacao a -> (Individuo a -> Individuo a -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
 crossover [] _ = return []
-crossover [a] _ = return []
 crossover populacao estrategiaCrossover  = do
   -- Escolher Pai
   individuoPosicao <- randomInt (0, length populacao - 1)
   let pai = populacao !! individuoPosicao
 
   -- Removendo Pai da Populacao
-  let populacao = filter (/= pai) populacao
+  let populacao2 = filter (/= pai) populacao
 
   -- Escolher mãe
-  individuoPosicao <- randomInt (0, length populacao - 1)
-  let mae = populacao !! individuoPosicao
+  individuoPosicao2 <- randomInt (0, length populacao2 - 1)
+  let mae = populacao !! individuoPosicao2
 
   -- Removendo Mãe da População
-  let populacao = filter (/= mae) populacao
+  let populacao3 = filter (/= mae) populacao
   
   -- Realiza o crossover entre o pai e a mãe
   (maisVelho, maisNovo) <- estrategiaCrossover pai mae
 
-  restante <- crossover populacao estrategiaCrossover
+  restante <- crossover populacao3 estrategiaCrossover
 
   return $ maisVelho : maisNovo : restante
