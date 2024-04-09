@@ -81,6 +81,7 @@ executable evolução-computacional
         Selecao
         Radio
         RotinaEvolutiva
+        Grafico
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -90,7 +91,8 @@ executable evolução-computacional
                     parallel >= 3.2 && < 4,
                     split >= 0.2 && < 1,
                     random >= 1.2 && < 2,
-                    Chart >= 1.9.5
+                    Chart >= 1.9.5,
+                    Chart-cairo >= 1.9.4.1
                     -- unordered-containers >= 0.2.13.0,
                     -- hashable
 
