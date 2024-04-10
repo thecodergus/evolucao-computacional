@@ -10,9 +10,9 @@ import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 
 -- Retorna a ultima População e o historico de melhores individuos
-loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> Float -> Int -> IO (GeracaoInfo a)
-loopEvolutivoEnumerado _ _ _ 0 = return (GeracaoInfo [] [])
-loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
+loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> Float -> Float -> Int -> IO (GeracaoInfo a)
+loopEvolutivoEnumerado _ _ _ _ _ 0 = return (GeracaoInfo [] [])
+loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao probabilidadeCrossover contador = do
     print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
 
     -- Avaliacao
@@ -22,16 +22,16 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
     let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada
 
     -- Selecao
-    selecaoIndividuos <- roletaViciada populacao
+    individuosSelecionados <- funcaoSelecao populacao
 
     -- Crossover
-    novaPopulacao <- crossover selecaoIndividuos umPontoAleatorio
+    novaPopulacao <- crossover individuosSelecionados umPontoAleatorio probabilidadeCrossover
 
     -- Mutacao
     novaPopulacao' <- mutarPopulacao novaPopulacao
 
     -- Ordernar nova interação no Loop evolutivo
-    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao taxaMutacao (contador - 1)
+    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao funcaoSelecao probabilidadeCrossover taxaMutacao (contador - 1)
 
     -- Retornando valores
     return $ GeracaoInfo (individuoEletista ++ elitistas proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaFitness proximaGeracao)
