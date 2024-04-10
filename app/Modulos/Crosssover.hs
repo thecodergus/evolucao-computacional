@@ -53,3 +53,29 @@ crossover populacao estrategiaCrossover  = do
   restante <- crossover populacao3 estrategiaCrossover
 
   return $ maisVelho : maisNovo : restante
+
+
+-- A função 'doisPontosAleatorios' recebe dois indivíduos (pai e mãe) como entrada.
+-- Ela retorna um par de novos indivíduos que são o resultado do crossover de dois pontos aleatórios entre o pai e a mãe.
+doisPontosAleatorios :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
+doisPontosAleatorios pai mae
+  | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
+  | null (genes pai) = error "O numero de genes devem ser maiores que zero"
+  | otherwise = crossover'
+  where
+    crossover' = do
+      -- Gera dois números aleatórios entre as posições válidas dos genes do pai.
+      numero_aleatorio1 <- randomInt (0, length (genes pai) - 1)
+      numero_aleatorio2 <- randomInt (0, length (genes pai) - (numero_aleatorio1 + 1))
+
+      -- Divide a lista de genes do pai nos dois pontos aleatórios.
+      let (pai_1, pai_2) = splitAt numero_aleatorio1 (genes pai)
+          (pai_3, pai_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) pai_2
+
+      -- Divide a lista de genes da mãe nos dois pontos aleatórios.
+      let (mae_1, mae_2) = splitAt numero_aleatorio1 (genes mae)
+          (mae_3, mae_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) mae_2
+
+      -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes do pai, a parte do meio dos genes da mãe e a última parte dos genes do pai.
+      -- O segundo indivíduo tem a primeira parte dos genes da mãe, a parte do meio dos genes do pai e a última parte dos genes da mãe.
+      return (Individuo (pai_1 ++ mae_3 ++ pai_4) 0, Individuo (mae_1 ++ pai_3 ++ mae_4) 0)
