@@ -14,11 +14,11 @@ umPontoAleatorio pai mae
   -- Verifica se a lista de genes do pai é vazia. Se for, lança um erro.
   | null (genes pai) = error "O numero de genes devem ser maiores que zero"
   -- Se nenhuma das condições acima for verdadeira, realiza o crossover.
-  | otherwise = crossover'
+  | otherwise = umPontoAleatorio'
     where
-        -- A função 'crossover' não recebe nenhum argumento.
+        -- A função 'umPontoAleatorio' não recebe nenhum argumento.
         -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-        crossover' = do
+        umPontoAleatorio' = do
             -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
             numero_aleatorio <- randomInt (0, length (genes pai) - 1)
             -- Divide a lista de genes do pai no ponto aleatório.
@@ -61,9 +61,9 @@ doisPontosAleatorios :: Individuo a -> Individuo a -> IO (Individuo a, Individuo
 doisPontosAleatorios pai mae
   | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
   | null (genes pai) = error "O numero de genes devem ser maiores que zero"
-  | otherwise = crossover'
+  | otherwise = doisPontosAleatorios'
   where
-    crossover' = do
+    doisPontosAleatorios' = do
       -- Gera dois números aleatórios entre as posições válidas dos genes do pai.
       numero_aleatorio1 <- randomInt (0, length (genes pai) - 1)
       numero_aleatorio2 <- randomInt (0, length (genes pai) - (numero_aleatorio1 + 1))
