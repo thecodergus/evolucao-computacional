@@ -6,6 +6,8 @@ import Arquivo (fileToIntLists)
 import GerarPopulacao (gerarPopulacaoBooleana)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Avaliacoes.Sat (avaliarSAT)
+import Grafico (gravarHistorico)
+import Tipos (Individuo(fitness))
 
 
 
@@ -14,6 +16,8 @@ main = do
     arquivo <- fileToIntLists "/home/udesc/Documentos/evolucao-computacional-main/arquivoSAT.cnf"
     pop_incial <- gerarPopulacaoBooleana 30 100
 
-    (pop_final, historico) <- loopEvolutivoEnumerado pop_incial (`avaliarSAT` arquivo) 0.05 500
+    geracaoInfo <- loopEvolutivoEnumerado pop_incial (`avaliarSAT` arquivo) 0.05 1000
 
-    print historico
+    -- print historico
+    gravarHistorico geracaoInfo "Grafico.png"
+

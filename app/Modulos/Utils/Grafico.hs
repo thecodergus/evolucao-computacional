@@ -13,13 +13,20 @@ import Graphics.Rendering.Chart.Easy
       Default(def) )
 import Graphics.Rendering.Chart.Backend.Cairo ( toFile )
 import Graphics.Rendering.Chart (laxis_title, layout_x_axis)
+import Tipos (GeracaoInfo (GeracaoInfo, elitistas), Individuo (fitness))
 
 
-gravarHistorico :: [Float] -> String -> IO ()
-gravarHistorico historico nomeArquivo =
+gravarHistorico :: GeracaoInfo a -> String -> IO ()
+gravarHistorico (GeracaoInfo historicoMelhorIndividuo mediaFitnees) nomeArquivo =
   toFile def nomeArquivo $ do
     layout_title .= "Historico"
     layout_y_axis . laxis_override .= axisGridHide
-    layout_y_axis . laxis_title .= "Melhor individuo (Valor fitness)"
+    layout_y_axis . laxis_title .= "Valor fitness"
     layout_x_axis . laxis_title .= "Geração"
-    plot (line "Melhor individuo" [zip [1 .. length historico] historico])
+    plot (line "Melhor individuo" [zip [1 .. length historicoMelhorIndividuo] (extrairDadosMelhorIndividuo historicoMelhorIndividuo)])
+    plot (line "Media Fitness" [zip [1 .. length historicoMelhorIndividuo] mediaFitnees])
+
+    where
+      -- Função auxiliar para extrair os valores de fitness dos individuos elitistas
+      extrairDadosMelhorIndividuo :: [Individuo a] -> [Float]
+      extrairDadosMelhorIndividuo = map fitness
