@@ -2,7 +2,7 @@ module RotinaEvolutiva where
 
 
 import Mutacao(mutacao)
-import Crosssover(crossoverUmPontoAleatorio, crossover)
+import Crosssover(umPontoAleatorio, crossover)
 import Tipos (GeracaoInfo (GeracaoInfo, elitistas, mediaFitness), Individuo (Individuo), Populacao)
 import Avaliacoes.Utils(melhorIndividuo)
 import Selecao(roletaViciada)
@@ -25,7 +25,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
     selecaoIndividuos <- roletaViciada populacao
 
     -- Crossover
-    novaPopulacao <- crossover selecaoIndividuos crossoverUmPontoAleatorio
+    novaPopulacao <- crossover selecaoIndividuos umPontoAleatorio
 
     -- Mutacao
     novaPopulacao' <- mutarPopulacao novaPopulacao

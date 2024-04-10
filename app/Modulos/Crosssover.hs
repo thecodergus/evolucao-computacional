@@ -5,10 +5,10 @@ import Tipos (Individuo(genes, Individuo), Populacao)
 import Aleatoriedades (randomInt)
 
 
--- A função 'crossoverUmPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
+-- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-crossoverUmPontoAleatorio :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-crossoverUmPontoAleatorio pai mae 
+umPontoAleatorio :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
+umPontoAleatorio pai mae 
   -- Verifica se o tamanho dos genes do pai e da mãe são iguais. Se não forem, lança um erro.
   | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
   -- Verifica se a lista de genes do pai é vazia. Se for, lança um erro.
