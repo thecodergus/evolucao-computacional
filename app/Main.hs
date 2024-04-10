@@ -11,17 +11,17 @@ import Selecao (roletaViciada)
 
 main :: IO ()
 main = do
-  arquivo <- fileToIntLists "/home/udesc/Documentos/evolucao-computacional-main/arquivoSAT.cnf"
+  arquivo <- fileToIntLists "arquivoSAT.cnf"
   pop_incial <- gerarPopulacaoBooleana 50 100
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`avaliarSAT` arquivo) roletaViciada 0.05 0.8 10
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`avaliarSAT` arquivo) roletaViciada 0.05 0.8 10000
 
   endTime <- getCPUTime
 
   let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
 
-  print $ "Tempo de execução: " ++ show execTime ++ " segundos"
+  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
   gravarHistorico geracaoInfo "Grafico.png"
