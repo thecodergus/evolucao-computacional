@@ -3,6 +3,7 @@ module Crosssover where
 
 import Tipos (Individuo(genes, Individuo), Populacao)
 import Aleatoriedades (randomInt)
+import System.Random (uniform)
 
 
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
@@ -79,3 +80,26 @@ doisPontosAleatorios pai mae
       -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes do pai, a parte do meio dos genes da mãe e a última parte dos genes do pai.
       -- O segundo indivíduo tem a primeira parte dos genes da mãe, a parte do meio dos genes do pai e a última parte dos genes da mãe.
       return (Individuo (pai_1 ++ mae_3 ++ pai_4) 0, Individuo (mae_1 ++ pai_3 ++ mae_4) 0)
+
+uniforme :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
+uniforme (Individuo lista_1 _) (Individuo lista_2 _)  
+  | length lista_1 /= length lista_2 = error "O tamanhos dos genes do pai_1 e da mae devem ser iguais"
+  | null lista_1 = error "O numero de genes devem ser maiores que zero"
+  | otherwise = do
+    (filho_1, filho_2) <- uniforme' lista_1 lista_2
+
+    return (Individuo filho_1 0, Individuo filho_2 0)
+    where
+      uniforme' :: [a] -> [a] -> IO ([a], [a])
+      uniforme' [] [] = return ([], [])
+      uniforme' a [] = return (a, [])
+      uniforme' [] b = return ([], b)
+      uniforme' (x:xs) (y:ys) = do
+        valorAleatorio <- randomInt (0, 1) -- Gera um valor aleatório entre 0 e 1
+        (filho_1, filho_2) <- uniforme' xs ys -- Realiza o crossover uniforme nas caudas das listas
+
+        -- Decide quais elementos serão adicionados aos filhos com base no valor aleatório
+        let filho_1' = if valorAleatorio == 1 then x : filho_1 else y : filho_1
+        let filho_2' = if valorAleatorio == 1 then y : filho_2 else x : filho_2
+
+        return (filho_1', filho_2')
