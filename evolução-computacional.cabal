@@ -71,7 +71,6 @@ executable evolução-computacional
         GerarIndividuos
         Tipos
         GerarPopulacao
-        Sat
         Avaliacoes.Matematica
         Avaliacoes.Sat
         Avaliacoes.Utils
