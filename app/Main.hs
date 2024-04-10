@@ -1,13 +1,10 @@
 module Main where
 
-import Avaliacoes.Matematica (fitnessMax, fitnessMin)
-import Aleatoriedades (randomBoolLista)
 import Arquivo (fileToIntLists)
 import GerarPopulacao (gerarPopulacaoBooleana)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Avaliacoes.Sat (avaliarSAT)
 import Grafico (gravarHistorico)
-import Tipos (Individuo(fitness))
 import System.CPUTime ( getCPUTime )
 import Selecao (roletaViciada)
 

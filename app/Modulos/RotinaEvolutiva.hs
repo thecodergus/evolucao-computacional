@@ -5,7 +5,6 @@ import Mutacao(mutacao)
 import Crosssover(umPontoAleatorio, crossover)
 import Tipos (GeracaoInfo (GeracaoInfo, elitistas, mediaFitness), Individuo (Individuo), Populacao)
 import Avaliacoes.Utils(melhorIndividuo)
-import Selecao(roletaViciada)
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 
