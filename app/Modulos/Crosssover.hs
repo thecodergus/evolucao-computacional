@@ -2,7 +2,7 @@ module Crosssover where
 
 
 import Tipos (Individuo(genes, Individuo), Populacao)
-import Aleatoriedades (randomInt)
+import Aleatoriedades (randomInt, randomFloat)
 import System.Random (uniform)
 
 
@@ -30,10 +30,13 @@ umPontoAleatorio pai mae
             -- O segundo indivíduo tem a primeira parte dos genes do pai e a segunda parte dos genes da mãe.
             return (Individuo (mae_1 ++ pai_2) 0, Individuo (pai_1 ++ mae_2) 0)
 
-crossover :: Ord a => Populacao a -> (Individuo a -> Individuo a -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
-crossover [] _ = return []
-crossover [a] _ = return [a]
-crossover populacao estrategiaCrossover  = do
+crossover :: Ord a => Populacao a -> (Individuo a -> Individuo a -> IO (Individuo a, Individuo a)) -> Float -> IO (Populacao a)
+crossover [] _ _= return []
+crossover [a] _ _= return [a]
+crossover populacao estrategiaCrossover probabilidade  = do
+  -- Escolher um valor aleaorio para avaliar se fazemos crossover
+  valorAleatorio <- randomFloat (0, 1)
+  
   -- Escolher Pai
   individuoPosicao <- randomInt (0, length populacao - 1)
   let pai = populacao !! individuoPosicao
@@ -48,12 +51,16 @@ crossover populacao estrategiaCrossover  = do
   -- Removendo Mãe da População
   let populacao3 = filter (/= mae) populacao
   
-  -- Realiza o crossover entre o pai e a mãe
-  (maisVelho, maisNovo) <- estrategiaCrossover pai mae
+  restante <- crossover populacao3 estrategiaCrossover probabilidade
 
-  restante <- crossover populacao3 estrategiaCrossover
+  if valorAleatorio <= probabilidade then do
+    -- Realiza o crossover entre o pai e a mãe
+    (maisVelho, maisNovo) <- estrategiaCrossover pai mae
 
-  return $ maisVelho : maisNovo : restante
+
+    return $ maisVelho : maisNovo : restante
+  else
+    return $ pai : mae : restante
 
 
 -- A função 'doisPontosAleatorios' recebe dois indivíduos (pai e mãe) como entrada.
