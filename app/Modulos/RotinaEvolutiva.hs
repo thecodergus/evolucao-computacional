@@ -34,4 +34,4 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
 
     (retorno, elitistas) <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao'') funcaoAvaliacao taxaMutacao (contador - 1)
 
-    return (retorno, elitistas ++ individuoEletista)
+    return (retorno, individuoEletista ++ elitistas)
