@@ -3,19 +3,20 @@ module Grafico where
 
 
 import Graphics.Rendering.Chart.Easy
-import Tipos (Populacao)
-import Graphics.Rendering.Chart.Backend.Cairo
+    ( axisGridHide,
+      line,
+      laxis_override,
+      layout_title,
+      layout_y_axis,
+      plot,
+      (.=),
+      Default(def) )
+import Graphics.Rendering.Chart.Backend.Cairo ( toFile )
 
 
-gravarHistorico :: [Float] -> IO String
-gravarHistorico historico = 
-    toFile def "grafico.png" $ do
-        layoutlr_title .= "Grafico"
-        layoutlr_left_axis . laxis_override .= axisGridHide
-        layoutlr_right_axis . laxis_override .= axisGridHide
-        plotLeft (line "Melhor Individuo" [[(d, v) | (d, v) <- evolucao]])
-
-        where
-            evolucao :: [Float] -> [(Int, Float)]
-            evolucao xs = zip [1..] xs
-
+gravarHistorico :: [Float] -> String -> IO ()
+gravarHistorico historico nomeArquivo =
+  toFile def nomeArquivo $ do
+    layout_title .= "Historico"
+    layout_y_axis . laxis_override .= axisGridHide
+    plot (line "Melhor individuo" [zip [1 .. length historico] historico])
