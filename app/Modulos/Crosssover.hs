@@ -34,9 +34,6 @@ crossover :: Ord a => Populacao a -> (Individuo a -> Individuo a -> IO (Individu
 crossover [] _ _= return []
 crossover [a] _ _= return [a]
 crossover populacao estrategiaCrossover probabilidade  = do
-  -- Escolher um valor aleaorio para avaliar se fazemos crossover
-  valorAleatorio <- randomFloat (0, 1)
-  
   -- Escolher Pai
   individuoPosicao <- randomInt (0, length populacao - 1)
   let pai = populacao !! individuoPosicao
@@ -53,14 +50,12 @@ crossover populacao estrategiaCrossover probabilidade  = do
   
   restante <- crossover populacao3 estrategiaCrossover probabilidade
 
-  if valorAleatorio <= probabilidade then do
-    -- Realiza o crossover entre o pai e a mãe
-    (maisVelho, maisNovo) <- estrategiaCrossover pai mae
+  -- Realiza o crossover entre o pai e a mãe
+  (maisVelho, maisNovo) <- estrategiaCrossover pai mae
 
 
-    return $ maisVelho : maisNovo : restante
-  else
-    return $ pai : mae : restante
+  return $ maisVelho : maisNovo : restante
+  
 
 
 -- A função 'doisPontosAleatorios' recebe dois indivíduos (pai e mãe) como entrada.
