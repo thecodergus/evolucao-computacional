@@ -7,3 +7,9 @@ data Individuo a = Individuo
   } deriving (Show, Eq)
 
 type Populacao a = [Individuo a]
+
+
+data GeracaoInfo a = GeracaoInfo {
+  elitistas :: [Individuo a],
+  mediaFitness :: [Float]
+} deriving Show

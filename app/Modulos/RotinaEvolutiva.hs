@@ -3,24 +3,24 @@ module RotinaEvolutiva where
 
 import Mutacao(mutacao)
 import Crosssover(crossoverUmPontoAleatorio, crossover)
-import Tipos(Populacao, Individuo)
+import Tipos (GeracaoInfo (GeracaoInfo, elitistas, mediaFitness), Individuo (Individuo), Populacao)
 import Avaliacoes.Utils(melhorIndividuo)
 import Selecao(roletaViciada)
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 
 -- Retorna a ultima População e o historico de melhores individuos
-loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> Float -> Int -> IO (Populacao a, Populacao a)
-loopEvolutivoEnumerado populacao _ _ 0 = return (populacao, [])
+loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> Float -> Int -> IO (GeracaoInfo a)
+loopEvolutivoEnumerado _ _ _ 0 = return (GeracaoInfo [] [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
     print $ "----------- Loop Evolutivo Enumerado Nº" ++ show contador ++ "-----------"
 
     -- Avaliacao
-    let populacaoAvaliada = parMap rpar funcaoAvaliacao populacao
+    let populacaoAvaliada = avaliarPopoulacao populacao
 
     -- Encontrar o melhor individuo
     let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada
-    
+
     -- Selecao
     selecaoIndividuos <- roletaViciada populacao
 
@@ -28,10 +28,25 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao taxaMutacao contador = do
     novaPopulacao <- crossover selecaoIndividuos crossoverUmPontoAleatorio
 
     -- Mutacao
-    let novaPopulacao' = parMap rpar (`mutacao` taxaMutacao) novaPopulacao
-    novaPopulacao'' <- sequence novaPopulacao'
+    novaPopulacao' <- mutarPopulacao novaPopulacao
+
+    -- Ordernar nova interação no Loop evolutivo
+    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao taxaMutacao (contador - 1)
+
+    -- Retornando valores
+    return $ GeracaoInfo (individuoEletista ++ elitistas proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaFitness proximaGeracao)
 
 
-    (retorno, elitistas) <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao'') funcaoAvaliacao taxaMutacao (contador - 1)
+    where
+        -- Função auxiliar para calcular a media de fitness de cada geração
+        calcularMediaFitness :: Populacao a -> Float
+        calcularMediaFitness pop = foldl (\acc (Individuo _ fitness') -> acc + fitness' ) 0.0 pop / fromIntegral (length pop)
 
-    return (retorno, individuoEletista ++ elitistas)
+        -- Função auxiliar para calcular o fitness de uma população de forma paralela
+        avaliarPopoulacao pop = parMap rpar funcaoAvaliacao pop
+
+        -- Função auxliar para realizar a mutação em uma determinada população
+        mutarPopulacao :: Populacao a -> IO (Populacao a)
+        mutarPopulacao pop = do
+            let novaPopulacao = parMap rpar (`mutacao` taxaMutacao) pop
+            sequence novaPopulacao
