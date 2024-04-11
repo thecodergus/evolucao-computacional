@@ -4,9 +4,9 @@ module RotinaEvolutiva where
 import Mutacao(mutacao)
 import Crosssover(umPontoAleatorio, crossover)
 import Tipos (GeracaoInfo (GeracaoInfo, elitistas, mediaFitness), Individuo (Individuo), Populacao)
-import Avaliacoes.Utils(melhorIndividuo)
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
+import Utils.Avaliacoes (melhorIndividuo)
 
 -- Retorna a ultima População e o historico de melhores individuos
 loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> Float -> Float -> Int -> IO (GeracaoInfo a)
