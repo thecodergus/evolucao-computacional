@@ -1,7 +1,7 @@
 module GerarIndividuos where
 
 
-import Aleatoriedades
+import Utils.Aleatoriedades
     (randomBoolLista, randomIntLista, randomFloatLista, randomSublistas')
 import Tipos ( Individuo(..))
 

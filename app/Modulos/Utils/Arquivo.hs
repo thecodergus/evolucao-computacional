@@ -1,4 +1,4 @@
-module Arquivo where
+module Utils.Arquivo where
 import Data.Maybe (mapMaybe)
 
 

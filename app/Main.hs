@@ -1,6 +1,6 @@
 module Main where
 
-import Arquivo (fileToIntLists)
+import Utils.Arquivo (fileToIntLists)
 import GerarPopulacao (gerarPopulacaoBooleana)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Avaliacoes.Sat (avaliarSAT)

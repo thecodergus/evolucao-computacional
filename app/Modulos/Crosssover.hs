@@ -2,7 +2,7 @@ module Crosssover where
 
 
 import Tipos (Individuo(genes, Individuo), Populacao)
-import Aleatoriedades (randomInt, randomFloat)
+import Utils.Aleatoriedades (randomFloat, randomInt)
 import System.Random (uniform)
 
 
