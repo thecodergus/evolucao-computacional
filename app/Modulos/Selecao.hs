@@ -5,6 +5,7 @@ import Utils.Aleatoriedades (randomFloat, randomInt)
 import Data.Foldable (maximumBy)
 import Data.Ord (comparing)
 import Control.Monad (replicateM)
+import Utils.Avaliacoes (vencedorDoTorneio)
 
 
 roletaViciada :: Eq a => Populacao a -> IO (Populacao a)
@@ -42,29 +43,31 @@ roletaViciada populacao = do
                 return (individuo : restante)
 
 
-torneioEstocastico :: Eq a => Int -> Float -> Populacao a -> IO (Populacao a)
+-- A função torneioEstocastico recebe o tamanho do torneio (k), a taxa de seleção (kp) e uma população como parâmetros
+torneioEstocastico :: (Eq a, Ord a) => Int -> Float -> Populacao a -> IO (Populacao a)
 torneioEstocastico k kp populacao
-    | k < 2 = error "O valor minimo de k eh igual a 2"
-    | otherwise = do
-        let tamanhoPopulacao = length populacao
-            qtdSelecionados = ceiling (fromIntegral tamanhoPopulacao * kp)
+  -- Se k for menor que 2, retorna um erro informando que o valor mínimo é 2
+  | k < 2 = error "O valor minimo de k eh igual a 2"
+  | otherwise = do
+    -- Calcula o tamanho da população e a quantidade de indivíduos a serem selecionados com base na taxa de seleção
+    let tamanhoPopulacao = length populacao
+        qtdSelecionados = ceiling (fromIntegral tamanhoPopulacao * kp)
 
-        torneios <- replicateM qtdSelecionados (replicateM k (randomInt (0, tamanhoPopulacao - 1)))
+    -- Para cada indivíduo a ser selecionado, seleciona k índices aleatoriamente para formar um torneio
+    torneios <- replicateM qtdSelecionados (replicateM k (randomInt (0, tamanhoPopulacao - 1)))
 
-        mapM (selecionarMelhor populacao) torneios
-        where
-            selecionarMelhor :: Eq a => Populacao a -> [Int] -> IO (Individuo a)
-            selecionarMelhor populacao' indices = return $ maximumBy (comparing fitness) [populacao' !! i | i <- indices]
+    -- Realiza o torneio para cada grupo de índices selecionados e retorna a lista de vencedores
+    mapM (vencedorDoTorneio populacao) torneios
 
 torneio :: (Ord a) => Int -> Populacao a -> IO (Populacao a)
 torneio k populacao
   | k < 2 = error "O valor minimo de k eh igual a 2"
   | otherwise = do
+    -- Calcula o tamanho da população
     let tamanhoPopulacao = length populacao
 
+    -- Para cada indivíduo da população, seleciona k índices aleatoriamente para formar um torneio
     torneios <- replicateM tamanhoPopulacao (replicateM k (randomInt (0, tamanhoPopulacao - 1)))
 
-    mapM (selecionarMelhor populacao) torneios
-  where
-    selecionarMelhor :: (Ord a) => Populacao a -> [Int] -> IO (Individuo a)
-    selecionarMelhor populacao' indices = return $ maximumBy (comparing fitness) [populacao' !! i | i <- indices]
+    -- Realiza o torneio para cada grupo de índices selecionados e retorna a lista de vencedores
+    mapM (vencedorDoTorneio populacao) torneios
