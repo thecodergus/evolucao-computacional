@@ -1,4 +1,4 @@
-module Grafico where
+module Utils.Grafico where
 
 
 
