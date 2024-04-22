@@ -67,20 +67,20 @@ executable evolução-computacional
 
     -- Modules included in this executable, other than Main.
     other-modules:    
-        Aleatoriedades
+        Utils.Aleatoriedades
         GerarIndividuos
         Tipos
         GerarPopulacao
         Avaliacoes.Matematica
         Avaliacoes.Sat
-        Avaliacoes.Utils
-        Arquivo
+        Utils.Arquivo
+        Utils.Avaliacoes
+        Utils.Grafico
         Crosssover
         Mutacao
         Selecao
         Radio
         RotinaEvolutiva
-        Grafico
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
