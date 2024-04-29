@@ -109,3 +109,31 @@ uniforme (Individuo lista_1 _) (Individuo lista_2 _)
         let filho_2' = if valorAleatorio == 1 then y : filho_2 else x : filho_2
 
         return (filho_1', filho_2')
+
+
+pmx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
+  chanceMutar <- randomFloat (0, 1)
+
+  (gene_filho_mais_velho, gene_filho_mais_novo) <- mutar (chanceMutar <= probabildiade) gene_pai gene_mae
+
+  return (Individuo gene_filho_mais_velho 0, Individuo gene_filho_mais_novo 0)
+
+  where
+    mutar :: Eq a => Bool -> [a] -> [a] -> IO ([a], [a])
+    mutar False gene_pai' gene_mae' = return (gene_pai', gene_mae')
+    mutar True gene_pai' gene_mae' = do
+      ponto_a <- randomInt (0, length gene_pai' -1)
+      ponto_b <- randomInt (0, length gene_pai' -1)
+
+      return $ mutar' (ponto_a, ponto_b) gene_pai' gene_mae'
+
+      where
+        mutar' :: Eq a => (Int, Int) -> [a] -> [a] -> ([a], [a])
+        mutar' (a, b)
+          | a > b = mutar'' b a
+          | otherwise = mutar'' a b
+          where
+            mutar'' :: Eq a => (Int, Int) -> [a] -> [a] -> ([a], [a])
+            mutar'' (a, b) gene_a gene_b 
+
