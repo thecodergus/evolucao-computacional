@@ -1,4 +1,4 @@
-module Mutacao where 
+module Mutacao where
 
 import Tipos (Individuo(genes, Individuo))
 import Utils.Aleatoriedades (randomFloat, randomInt)
