@@ -1,11 +1,9 @@
 module Selecao where
 
-import Tipos (Individuo(fitness, genes), Populacao)
 import Utils.Aleatoriedades (randomFloat, randomInt)
-import Data.Foldable (maximumBy)
-import Data.Ord (comparing)
 import Control.Monad (replicateM)
 import Utils.Avaliacoes (vencedorDoTorneio)
+import Tipos (Populacao, Individuo (fitness))
 
 
 roletaViciada :: Eq a => Populacao a -> IO (Populacao a)

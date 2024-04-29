@@ -3,7 +3,6 @@ module Crosssover where
 
 import Tipos (Individuo(genes, Individuo), Populacao)
 import Utils.Aleatoriedades (randomFloat, randomInt)
-import System.Random (uniform)
 
 
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
