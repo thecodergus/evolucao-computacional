@@ -3,6 +3,8 @@ module Crosssover where
 
 import Tipos (Individuo(genes, Individuo), Populacao)
 import Utils.Aleatoriedades (randomFloat, randomInt)
+import Data.Maybe (fromJust)
+import Data.List (elemIndex)
 
 
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
@@ -123,17 +125,52 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
     mutar :: Eq a => Bool -> [a] -> [a] -> IO ([a], [a])
     mutar False gene_pai' gene_mae' = return (gene_pai', gene_mae')
     mutar True gene_pai' gene_mae' = do
-      ponto_a <- randomInt (0, length gene_pai' -1)
-      ponto_b <- randomInt (0, length gene_pai' -1)
+      pontos_corte <- gerarNumeroAleatorio 0 (length gene_pai' - 1)
 
-      return $ mutar' (ponto_a, ponto_b) gene_pai' gene_mae'
+      return $ mutar' pontos_corte gene_pai' gene_mae'
 
       where
         mutar' :: Eq a => (Int, Int) -> [a] -> [a] -> ([a], [a])
-        mutar' (a, b)
-          | a > b = mutar'' b a
-          | otherwise = mutar'' a b
-          where
-            mutar'' :: Eq a => (Int, Int) -> [a] -> [a] -> ([a], [a])
-            mutar'' (a, b) gene_a gene_b 
+        mutar' pontos pai mae = do
+          let (pai_parte_1, pai_matching_section, pai_parte_2) = cortarLista pontos pai
+          let (mae_parte_1, mae_matching_section, mae_parte_2) = cortarLista pontos mae
 
+          (fazerMatching (pai_parte_1, mae_matching_section, pai_parte_2) pai_matching_section, fazerMatching (mae_parte_1, pai_matching_section, mae_parte_2) mae_matching_section)
+
+          where
+            cortarLista :: (Int, Int) -> [a] -> ([a], [a], [a])
+            cortarLista (a, b) lista = do
+              let (parte_1, resto) = splitAt a lista
+                  (parte_2, parte_3) = splitAt (b - a) resto
+
+              (parte_1, parte_2, parte_3)
+
+            fazerMatching :: Eq a => ([a], [a], [a]) -> [a] -> [a]
+            fazerMatching (parte_1, match, parte_2) matchSection = fazerMatching' parte_1 matchSection ++ match ++ fazerMatching' parte_2 matchSection
+              where
+                fazerMatching' :: Eq a => [a] -> [a] -> [a]
+                fazerMatching' [] _ = []
+                fazerMatching' (a:as) matchSection' 
+                  | Just i <- elemIndex a matchSection' = [matchSection' !! i]
+                  | otherwise = a : fazerMatching' as matchSection'
+
+
+    gerarNumeroAleatorio :: Int -> Int -> IO (Int, Int)
+    gerarNumeroAleatorio a b 
+      | a == b = error "Ta de sacanagem mane, dois numeros iguais?"
+      | otherwise = gerarNumeroAleatorio' a b
+      where
+        gerarNumeroAleatorio' :: Int -> Int -> IO (Int, Int)
+        gerarNumeroAleatorio' a b = do
+          a' <- randomInt (a, b)
+          b' <- randomInt (a, b)
+
+          if a' == b' then
+            gerarNumeroAleatorio' a b
+          else
+            return $ retornarMaior a' b'
+
+        retornarMaior :: Int -> Int -> (Int, Int)
+        retornarMaior a b 
+          | a > b = (b, a)
+          | otherwise = (a, b)
