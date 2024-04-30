@@ -9,7 +9,7 @@ import Data.List (elemIndex)
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
 umPontoAleatorio :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-umPontoAleatorio pai mae 
+umPontoAleatorio pai mae
   -- Verifica se o tamanho dos genes do pai e da mãe são iguais. Se não forem, lança um erro.
   | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
   -- Verifica se a lista de genes do pai é vazia. Se for, lança um erro.
@@ -36,7 +36,7 @@ crossover [a] _ _= return [a]
 crossover populacao estrategiaCrossover probabilidade  = do
   -- Escolher um valor aleaorio para avaliar se fazemos crossover
   valorAleatorio <- randomFloat (0, 1)
-  
+
   -- Escolher Pai
   individuoPosicao <- randomInt (0, length populacao - 1)
   let pai = populacao !! individuoPosicao
@@ -50,7 +50,7 @@ crossover populacao estrategiaCrossover probabilidade  = do
 
   -- Removendo Mãe da População
   let populacao3 = filter (/= mae) populacao
-  
+
   restante <- crossover populacao3 estrategiaCrossover probabilidade
 
   if valorAleatorio <= probabilidade then do
@@ -89,7 +89,7 @@ doisPontosAleatorios pai mae
       return (Individuo (pai_1 ++ mae_3 ++ pai_4) 0, Individuo (mae_1 ++ pai_3 ++ mae_4) 0)
 
 uniforme :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-uniforme (Individuo lista_1 _) (Individuo lista_2 _)  
+uniforme (Individuo lista_1 _) (Individuo lista_2 _)
   | length lista_1 /= length lista_2 = error "O tamanhos dos genes do pai_1 e da mae devem ser iguais"
   | null lista_1 = error "O numero de genes devem ser maiores que zero"
   | otherwise = do
@@ -183,3 +183,41 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
         retornarMaior a' b'
           | a' > b' = (b', a')
           | otherwise = (a', b')
+
+
+cx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+cx pai mae probabilidade = do
+  chanceMutar <- randomFloat (0, 1)
+
+
+  cx' pai mae (chanceMutar <= probabilidade)
+
+  where
+    cx' :: Eq a => Individuo a -> Individuo a -> Bool -> IO (Individuo a, Individuo a)
+    cx' pai' mae' False = return (pai', mae')
+    cx' (Individuo gene_pai _) (Individuo gene_mae _) True = do
+      let comparacoes = compararListas gene_pai gene_mae
+
+      -- let (filho_mais_velho, filho_mais_novo) = trocarPosicao pai mae comparacoes 0
+
+      -- return (Individuo filho_mais_velho 0, Individuo filho_mais_novo 0)
+      return (pai, mae)
+
+      where
+        compararListas :: (Eq a) => [a] -> [a] -> [Int]
+        compararListas xs ys = procurarCompartibilidade  [(i, j) | (i, x) <- zip [0 ..] xs, (j, y) <- zip [0 ..] ys, x == y]
+          where
+            procurarCompartibilidade :: [(Int, Int)] -> [Int]
+            procurarCompartibilidade [] = []
+            procurarCompartibilidade ((a, b) : xs')
+              | a == b = a : procurarCompartibilidade xs'
+              | a `elem` map snd xs' = a : procurarCompartibilidade xs'
+              | b `elem` map fst xs' = b : procurarCompartibilidade xs'
+              | otherwise = procurarCompartibilidade xs'
+
+
+
+        -- trocarPosicao :: Eq a => [a] -> [a] -> [(a, Int, Int)] -> Int -> ([a], [a])
+        -- trocarPosicao (p : ps) (m : ms) ((elem_repetido, indice_lista_p, indice_lista_m) : comps) contador
+        --   | 
+
