@@ -112,31 +112,39 @@ uniforme (Individuo lista_1 _) (Individuo lista_2 _)
         return (filho_1', filho_2')
 
 
+-- Função que realiza o crossover PMX entre dois indivíduos com probabilidade de mutação
 pmx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
 pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
+  -- Gera um número aleatório entre 0 e 1 para decidir se a mutação ocorrerá ou não
   chanceMutar <- randomFloat (0, 1)
 
+  -- Realiza a mutação dos genes dos pais para gerar os filhos, caso a chance gerada seja menor ou igual à probabilidade
   (gene_filho_mais_velho, gene_filho_mais_novo) <- mutar (chanceMutar <= probabildiade) gene_pai gene_mae
 
+  -- Retorna os filhos gerados
   return (Individuo gene_filho_mais_velho 0, Individuo gene_filho_mais_novo 0)
-
   where
+    -- Função que realiza a mutação dos genes dos pais para gerar os filhos
     mutar :: Eq a => Bool -> [a] -> [a] -> IO ([a], [a])
-    mutar False gene_pai' gene_mae' = return (gene_pai', gene_mae')
+    mutar False gene_pai' gene_mae' = return (gene_pai', gene_mae') -- Se a mutação não ocorrer, retorna os pais como filhos
     mutar True gene_pai' gene_mae' = do
+      -- Gera dois pontos de corte aleatórios para a realização do crossover
       pontos_corte <- gerarNumeroAleatorio 0 (length gene_pai' - 1)
 
+      -- Realiza o crossover PMX entre os pais e retorna os filhos gerados
       return $ mutar' pontos_corte gene_pai' gene_mae'
-
       where
+        -- Função que realiza o crossover PMX entre os pais
         mutar' :: Eq a => (Int, Int) -> [a] -> [a] -> ([a], [a])
         mutar' pontos pai mae = do
+          -- Corta as listas dos pais em três partes cada uma com base nos pontos de corte
           let (pai_parte_1, pai_matching_section, pai_parte_2) = cortarLista pontos pai
           let (mae_parte_1, mae_matching_section, mae_parte_2) = cortarLista pontos mae
 
+          -- Realiza o matching das seções dos pais e gera os filhos
           (fazerMatching (pai_parte_1, mae_matching_section, pai_parte_2) pai_matching_section, fazerMatching (mae_parte_1, pai_matching_section, mae_parte_2) mae_matching_section)
-
           where
+            -- Função que corta uma lista em três partes com base nos pontos de corte
             cortarLista :: (Int, Int) -> [a] -> ([a], [a], [a])
             cortarLista (a, b) lista = do
               let (parte_1, resto) = splitAt a lista
@@ -144,18 +152,20 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
 
               (parte_1, parte_2, parte_3)
 
+            -- Função que realiza o matching das seções dos pais para gerar os filhos
             fazerMatching :: Eq a => ([a], [a], [a]) -> [a] -> [a]
             fazerMatching (parte_1, match, parte_2) matchSection = fazerMatching' parte_1 matchSection ++ match ++ fazerMatching' parte_2 matchSection
               where
+                -- Função auxiliar para realizar o matching das seções dos pais
                 fazerMatching' :: Eq a => [a] -> [a] -> [a]
                 fazerMatching' [] _ = []
-                fazerMatching' (a:as) matchSection' 
+                fazerMatching' (a : as) matchSection'
                   | Just i <- elemIndex a matchSection' = [matchSection' !! i]
                   | otherwise = a : fazerMatching' as matchSection'
 
-
+    -- Função que gera dois números aleatórios diferentes entre si para os pontos de corte
     gerarNumeroAleatorio :: Int -> Int -> IO (Int, Int)
-    gerarNumeroAleatorio a b 
+    gerarNumeroAleatorio a b
       | a == b = error "Ta de sacanagem mane, dois numeros iguais?"
       | otherwise = gerarNumeroAleatorio' a b
       where
@@ -164,12 +174,12 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
           a'' <- randomInt (a', b')
           b'' <- randomInt (a', b')
 
-          if a'' == b'' then
-            gerarNumeroAleatorio' a b
-          else
-            return $ retornarMaior a'' b''
+          if a'' == b''
+            then gerarNumeroAleatorio' a b
+            else return $ retornarMaior a'' b''
 
+        -- Função auxiliar que retorna os dois números gerados em ordem decrescente
         retornarMaior :: Int -> Int -> (Int, Int)
-        retornarMaior a' b' 
+        retornarMaior a' b'
           | a' > b' = (b', a')
           | otherwise = (a', b')
