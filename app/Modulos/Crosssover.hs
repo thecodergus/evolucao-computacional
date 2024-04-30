@@ -3,7 +3,6 @@ module Crosssover where
 
 import Tipos (Individuo(genes, Individuo), Populacao)
 import Utils.Aleatoriedades (randomFloat, randomInt)
-import Data.Maybe (fromJust)
 import Data.List (elemIndex)
 
 
@@ -161,16 +160,16 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
       | otherwise = gerarNumeroAleatorio' a b
       where
         gerarNumeroAleatorio' :: Int -> Int -> IO (Int, Int)
-        gerarNumeroAleatorio' a b = do
-          a' <- randomInt (a, b)
-          b' <- randomInt (a, b)
+        gerarNumeroAleatorio' a' b' = do
+          a'' <- randomInt (a', b')
+          b'' <- randomInt (a', b')
 
-          if a' == b' then
+          if a'' == b'' then
             gerarNumeroAleatorio' a b
           else
-            return $ retornarMaior a' b'
+            return $ retornarMaior a'' b''
 
         retornarMaior :: Int -> Int -> (Int, Int)
-        retornarMaior a b 
-          | a > b = (b, a)
-          | otherwise = (a, b)
+        retornarMaior a' b' 
+          | a' > b' = (b', a')
+          | otherwise = (a', b')
