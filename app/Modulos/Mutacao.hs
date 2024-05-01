@@ -1,7 +1,8 @@
 module Mutacao where
 
 import Tipos (Individuo(genes, Individuo))
-import Utils.Aleatoriedades (randomFloat, randomInt)
+import Utils.Aleatoriedades (randomFloat, randomInt, randomFloatLista)
+import Outros (swapElementsAt)
 
 
 -- A função 'mutacao' recebe um indivíduo e uma probabilidade de mutação como entrada.
@@ -58,3 +59,33 @@ bitflip (Individuo gene _) probabilidade = do
         then return $ not x : resto
         else -- Senão, mantém o bit atual e adiciona aos bits restantes
           return $ x : resto
+
+
+
+-- Função que realiza swap em um individuo com probabilidade definida
+swap :: Individuo a -> Float -> IO (Individuo a)
+swap (Individuo gene _) probabilidade = do
+  -- Gera uma lista de chances aleatórias entre 0 e 1 para cada gene
+  chances <- randomFloatLista (0, 1) (length gene)
+  -- Verifica se cada chance é menor ou igual à probabilidade de swap
+  let chances' = map (<= probabilidade) chances
+
+  -- Realiza o swap em cada gene com base nas chances
+  novo_gene <- swap' gene chances' 0
+
+  -- Retorna o novo individuo com o gene alterado
+  return (Individuo novo_gene 0)
+  where
+    -- Função auxiliar que realiza o swap recursivamente
+    swap' :: [a] -> [Bool] -> Int -> IO [a]
+    swap' [] _ _ = return []
+    swap' _ [] _ = return []
+    swap' itens (b : bs) contador
+      -- Se a chance for verdadeira, realiza o swap de dois elementos aleatórios da lista
+      | b = do
+          indice_a <- randomInt (0, length itens - 1)
+          indice_b <- randomInt (0, length itens - 1)
+
+          swap' (swapElementsAt indice_a indice_b itens) bs (contador + 1)
+      -- Se a chance for falsa, passa para o próximo elemento da lista
+      | otherwise = swap' itens bs (contador + 1)
