@@ -4,7 +4,7 @@ module Crosssover where
 import Tipos (Individuo(genes, Individuo), Populacao)
 import Utils.Aleatoriedades (randomFloat, randomInt)
 import Data.List (elemIndex)
-
+import Data.Bifunctor(bimap)
 
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
@@ -185,39 +185,45 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
           | otherwise = (a', b')
 
 
+-- cx é uma função que recebe dois indivíduos (pai e mãe) e uma probabilidade, e realiza o cruzamento entre eles
 cx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
 cx pai mae probabilidade = do
-  chanceMutar <- randomFloat (0, 1)
-
+  chanceMutar <- randomFloat (0, 1) -- gera um número aleatório entre 0 e 1 para decidir se o cruzamento ocorrerá ou não
 
   cx' pai mae (chanceMutar <= probabilidade)
-
   where
+    -- cx' é uma função auxiliar que realiza o cruzamento em si, caso a chance de mutar seja menor ou igual à probabilidade
     cx' :: Eq a => Individuo a -> Individuo a -> Bool -> IO (Individuo a, Individuo a)
-    cx' pai' mae' False = return (pai', mae')
-    cx' (Individuo gene_pai _) (Individuo gene_mae _) True = do
-      let comparacoes = compararListas gene_pai gene_mae
+    cx' pai' mae' False = return (pai', mae') -- se não houver cruzamento, retorna os indivíduos originais
+    cx' (Individuo [] _) (Individuo [] _) _ = return (Individuo [] 0, Individuo [] 0) -- se ambos os indivíduos estiverem vazios, retorna dois indivíduos vazios
+    cx' (Individuo [] _) (Individuo mae' _) True = return (Individuo mae' 0, Individuo mae' 0) -- se o pai estiver vazio, retorna dois indivíduos idênticos à mãe
+    cx' (Individuo pai' _) (Individuo [] _) True = return (Individuo pai' 0, Individuo pai' 0) -- se a mãe estiver vazia, retorna dois indivíduos idênticos ao pai
+    cx' (Individuo (p:ps) _) (Individuo (m:ms) _) True = do
+      let comparacoes = compararListas ps ms -- compara as listas de genes dos indivíduos para encontrar os genes comuns
 
-      -- let (filho_mais_velho, filho_mais_novo) = trocarPosicao pai mae comparacoes 0
+      let (filho_mais_velho, filho_mais_novo) = trocarPosicao ps ms comparacoes 0 -- troca a posição dos genes comuns nos indivíduos
 
-      -- return (Individuo filho_mais_velho 0, Individuo filho_mais_novo 0)
-      return (pai, mae)
+      return (Individuo  (p : filho_mais_velho) 0, Individuo (m : filho_mais_novo) 0) -- retorna os dois novos indivíduos resultantes do cruzamento
 
       where
-        compararListas :: (Eq a) => [a] -> [a] -> [Int]
+        -- função auxiliar que compara as listas de genes e retorna as posições dos genes comuns
+        compararListas :: (Eq a) => [a] -> [a] -> [Int] 
         compararListas xs ys = procurarCompartibilidade  [(i, j) | (i, x) <- zip [0 ..] xs, (j, y) <- zip [0 ..] ys, x == y]
           where
+            -- função auxiliar que procura as posições dos genes comuns
             procurarCompartibilidade :: [(Int, Int)] -> [Int]
-            procurarCompartibilidade [] = []
+            procurarCompartibilidade [] = [] -- se não houver genes comuns, retorna uma lista vazia
             procurarCompartibilidade ((a, b) : xs')
-              | a == b = a : procurarCompartibilidade xs'
-              | a `elem` map snd xs' = a : procurarCompartibilidade xs'
-              | b `elem` map fst xs' = b : procurarCompartibilidade xs'
-              | otherwise = procurarCompartibilidade xs'
+              | a == b = a : procurarCompartibilidade xs' -- se as posições forem iguais, adiciona a posição à lista de resultados
+              | a `elem` map snd xs' = a : procurarCompartibilidade xs' -- se a primeira posição já estiver na lista de resultados, adiciona a segunda posição
+              | b `elem` map fst xs' = b : procurarCompartibilidade xs' -- se a segunda posição já estiver na lista de resultados, adiciona a primeira posição
+              | otherwise = procurarCompartibilidade xs' -- senão, continua procurando
 
-
-
-        -- trocarPosicao :: Eq a => [a] -> [a] -> [(a, Int, Int)] -> Int -> ([a], [a])
-        -- trocarPosicao (p : ps) (m : ms) ((elem_repetido, indice_lista_p, indice_lista_m) : comps) contador
-        --   | 
-
+        -- função auxiliar que troca as posições dos genes comuns nos indivíduos
+        trocarPosicao :: [a] -> [a] -> [Int] -> Int -> ([a], [a]) 
+        trocarPosicao [] _ _ _ = ([], []) -- se uma das listas estiver vazia, retorna duas listas vazias
+        trocarPosicao _ [] _ _ = ([], [])
+        trocarPosicao _ _ [] _ = ([], [])
+        trocarPosicao (p':ps') (m':ms') posicoes i
+          | i `elem` posicoes = bimap (p' :) (m' :) (trocarPosicao ps' ms' posicoes (i + 1)) -- se a posição atual for uma posição de gene comum, troca os genes nos indivíduos
+          | otherwise = bimap (m' :) (p' :) (trocarPosicao ps' ms' posicoes (i + 1)) -- senão, mantém os genes nos indivíduos originais
