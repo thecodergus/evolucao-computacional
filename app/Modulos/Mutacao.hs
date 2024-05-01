@@ -2,7 +2,7 @@ module Mutacao where
 
 import Tipos (Individuo(genes, Individuo))
 import Utils.Aleatoriedades (randomFloat, randomInt, randomFloatLista)
-import Outros (swapElementsAt)
+import Utils.Outros (swapElementsAt)
 
 
 -- A função 'mutacao' recebe um indivíduo e uma probabilidade de mutação como entrada.
