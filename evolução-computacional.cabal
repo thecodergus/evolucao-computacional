@@ -81,6 +81,7 @@ executable evolução-computacional
         Selecao
         Radio
         RotinaEvolutiva
+        Outros
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
