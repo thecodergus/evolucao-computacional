@@ -1,8 +1,9 @@
 module Utils.Outros where
 
-import Control.Monad
+import Control.Monad ( forM )
 import Data.Array.IO
-import System.Random
+    ( newListArray, readArray, writeArray, IOArray )
+import System.Random ( randomRIO )
 
 
 -- Função que troca dois elementos de uma lista em posições específicas
@@ -31,9 +32,9 @@ shuffle xs = do
             return vj
   where
     n = length xs
-    
+
     -- Cria um array com os elementos da lista
     newArray :: Int -> [a] -> IO (IOArray Int a)
-    newArray n xs =  newListArray (1,n) xs
+    newArray n' = newListArray (1,n')
 
 
