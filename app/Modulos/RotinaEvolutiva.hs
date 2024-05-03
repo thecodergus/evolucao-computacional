@@ -56,4 +56,4 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
 
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
         selecionarElitistas :: Float -> Populacao a -> (Populacao a, Populacao a)
-        selecionarElitistas generatioGap pop = splitAt (round $ generatioGap * fromIntegral (length pop)) pop
+        selecionarElitistas gap pop = splitAt (round $ gap * fromIntegral (length pop)) pop
