@@ -16,7 +16,7 @@ main = do
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`avaliarSAT` arquivo) roletaViciada 0.05 0.8 10000
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`avaliarSAT` arquivo) roletaViciada 0.05 0.8 0.1 10000
 
   endTime <- getCPUTime
 
