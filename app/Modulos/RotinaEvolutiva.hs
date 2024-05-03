@@ -21,7 +21,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
     let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada
 
     -- Ativando a questão do generatioGap
-    let (veios, novinhos) = selecionarElitistas generatioGap populacaoAvaliada
+    let (veios, novinhos) = selecionarQuemFica generatioGap populacaoAvaliada
 
 
     -- Selecao
@@ -55,5 +55,5 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
             sequence novaPopulacao
 
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
-        selecionarElitistas :: Float -> Populacao a -> (Populacao a, Populacao a)
-        selecionarElitistas gap pop = splitAt (round $ gap * fromIntegral (length pop)) pop
+        selecionarQuemFica :: Float -> Populacao a -> (Populacao a, Populacao a)
+        selecionarQuemFica gap pop = splitAt (round $ gap * fromIntegral (length pop)) pop
