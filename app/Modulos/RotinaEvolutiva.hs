@@ -7,6 +7,7 @@ import Tipos (GeracaoInfo (GeracaoInfo, elitistas, mediaFitness), Individuo (Ind
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 import Utils.Avaliacoes (melhorIndividuo)
+import Utils.Outros (shuffle)
 
 -- Retorna a ultima População e o historico de melhores individuos
 loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> Float -> Float -> Float -> Int -> IO (GeracaoInfo a)
@@ -21,9 +22,8 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
     let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada
 
     -- Ativando a questão do generatioGap
-    let (veios, novinhos) = selecionarQuemFica generatioGap populacaoAvaliada
-
-
+    (veios, novinhos) <- selecionarQuemFica generatioGap populacaoAvaliada
+    
     -- Selecao
     individuosSelecionados <- funcaoSelecao novinhos
 
@@ -55,5 +55,8 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
             sequence novaPopulacao
 
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
-        selecionarQuemFica :: Float -> Populacao a -> (Populacao a, Populacao a)
-        selecionarQuemFica gap pop = splitAt (round $ gap * fromIntegral (length pop)) pop
+        selecionarQuemFica :: Float -> Populacao a -> IO (Populacao a, Populacao a)
+        selecionarQuemFica gap pop = do
+            pop' <- shuffle pop
+            
+            return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
