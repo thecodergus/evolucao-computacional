@@ -56,6 +56,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
 
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
         selecionarQuemFica :: Float -> Populacao a -> IO (Populacao a, Populacao a)
+        selecionarQuemFica 1 pop = return ([], pop)
         selecionarQuemFica gap pop = do
             pop' <- shuffle pop
             
