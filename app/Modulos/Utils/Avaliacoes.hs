@@ -23,3 +23,14 @@ vencedorDoTorneio populacao' indices = return $ maximumBy (comparing fitness) [p
 -- * [populacao' !! i | i <- indices] é uma lista comprehension que seleciona os indivíduos da população correspondentes aos índices fornecidos
 -- * maximumBy (comparing fitness) encontra o indivíduo com a maior aptidão na lista de indivíduos selecionados
 -- * return envolve o resultado em um IO para que a função possa ser usada em um contexto de IO
+
+-- piorIndividuo encontra o indivíduo com a menor aptidão (fitness) em uma população
+piorIndividuo :: (Ord a) => Populacao a -> Maybe (Individuo a)
+piorIndividuo [] = Nothing
+piorIndividuo (x : xs) = Just (foldl1 minIndividuo (x : xs))
+  where
+    -- minIndividuo retorna o indivíduo com a menor aptidão (fitness) entre dois indivíduos
+    minIndividuo :: Ord a => Individuo a -> Individuo a -> Individuo a
+    minIndividuo i1 i2
+      | fitness i1 < fitness i2 = i1
+      | otherwise = i2
