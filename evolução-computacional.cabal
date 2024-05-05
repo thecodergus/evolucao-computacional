@@ -83,6 +83,7 @@ executable evolução-computacional
         RotinaEvolutiva
         Outros
         Utils.Outros
+        Avaliacoes.NRainhas
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
