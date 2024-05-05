@@ -1,12 +1,11 @@
 module Avaliacoes.Sat where
 
-import Control.Parallel.Strategies (parMap, rpar)
-import Tipos (Individuo (Individuo, genes), Populacao)
+import Tipos (Individuo (Individuo, genes))
 
--- avaliarSAT recebe um indivíduo booleano e uma lista de disjunções (representadas por listas de inteiros)
+-- avaliacao recebe um indivíduo booleano e uma lista de disjunções (representadas por listas de inteiros)
 -- e retorna o indivíduo booleano com uma nova avaliação de aptidão (fitness)
-avaliarSAT :: Individuo Bool -> [[Int]] -> Individuo Bool
-avaliarSAT individuo disjuncao = Individuo (genes individuo) $ avaliar $ contaBools $ replaceWithBools disjuncao $ genes individuo
+avaliacao :: Individuo Bool -> [[Int]] -> Individuo Bool
+avaliacao individuo disjuncao = Individuo (genes individuo) $ avaliar $ contaBools $ replaceWithBools disjuncao $ genes individuo
   where
     -- avaliar calcula a aptidão (fitness) como a razão entre a quantidade de Trues e o total de valores
     avaliar :: (Int, Int) -> Float
@@ -29,7 +28,3 @@ avaliarSAT individuo disjuncao = Individuo (genes individuo) $ avaliar $ contaBo
         replace i
           | i < 0 = not (boolList !! (abs i - 1))
           | otherwise = boolList !! (i - 1)
-
--- avaliarSATs avalia uma população de indivíduos booleanos em relação a uma lista de disjunções
-avaliarSATs :: Populacao Bool -> [[Int]] -> Populacao Bool
-avaliarSATs individuos disjuncao = parMap rpar (`avaliarSAT` disjuncao) individuos
