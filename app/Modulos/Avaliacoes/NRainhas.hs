@@ -11,7 +11,7 @@ avaliacao n (Individuo gene _) = Individuo gene fitness
   where
     -- A aptidão (fitness) é calculada a partir da quantidade de rainhas não atacando entre si.
     fitness :: Float
-    fitness = fromIntegral (n - length (rainhasAtacando gene))
+    fitness = fromIntegral (n - length (rainhasAtacando gene)) / fromIntegral n
 
     -- Esta função verifica as rainhas que estão se atacando no tabuleiro.
     rainhasAtacando :: [Int] -> [(Int, Int)]
