@@ -19,7 +19,7 @@ fileToIntLists filePath = do
 
     -- A função stringToIntList converte uma string em uma lista de inteiros.
     stringToIntList :: String -> [Int]
-    stringToIntList input = filter (/= 0) $ mapMaybe safeRead $ filter (not . null) $ concatMap words $ takeWhile ((/=) '%' . head) $ lines input
+    stringToIntList input = concatMap (filter (/= 0) . mapMaybe safeRead . filter (not . null) . words) (takeWhile ((/=) '%' . head) $ lines input)
     -- Lê as linhas da string de entrada até encontrar um caractere '%',
     -- separa as palavras, filtra as palavras vazias,
     -- converte as palavras em inteiros usando safeRead
