@@ -12,8 +12,8 @@ import Crosssover (doisPontosAleatorios, umPontoAleatorio)
 
 main :: IO ()
 main = do
-  let n = 16
-  pop_incial <- gerarPopulacaoInteiroPermutado 12 n (1, n)
+  let n = 32
+  pop_incial <- gerarPopulacaoInteiroPermutado 8 n (1, n)
 
   -- print pop_incial
   -- print $ map (n `avaliacao`) pop_incial
