@@ -11,20 +11,23 @@ avaliacao n (Individuo gene _) = Individuo gene fitness
     fitness :: Float
     fitness = fromIntegral (n * (n - 1) `div` 2 - length (rainhasAtacando gene))
 
-    -- Esta função verifica as rainhas que estão se atacando na mesma linha.
-    rainhasAtacandoNaLinha :: [Int] -> Int -> [(Int, Int)]
-    rainhasAtacandoNaLinha xs y = [(i, y) | (i, x) <- zip [0 ..] xs, x == y]
-
-    -- Esta função verifica as rainhas que estão se atacando na mesma coluna.
-    rainhasAtacandoNaColuna :: [Int] -> [(Int, Int)]
-    rainhasAtacandoNaColuna xs = [(i, j) | (i, x) <- zip [0 ..] xs, (j, y) <- zip [0 ..] xs, i /= j, x == y]
-
-    -- Esta função verifica as rainhas que estão se atacando na mesma diagonal.
-    rainhasAtacandoNaDiagonal :: [Int] -> [(Int, Int)]
-    rainhasAtacandoNaDiagonal xs = [(i, j) | (i, x) <- zip [0 ..] xs, (j, y) <- zip [0 ..] xs, i /= j, abs (x - y) == abs (i - j)]
-
     -- Esta função verifica as rainhas que estão se atacando no tabuleiro.
     rainhasAtacando :: [Int] -> [(Int, Int)]
-    rainhasAtacando xs = concat [rainhasAtacandoNaLinha xs y | y <- [0 .. n' - 1]] ++ rainhasAtacandoNaColuna xs ++ rainhasAtacandoNaDiagonal xs
-        where
-            n' = length xs
+    rainhasAtacando xs = rainhasAtacando' (tranformarCoordenadaCartesiana' xs)
+      where
+        -- Esta função verifica as rainhas que estão se atacando na mesma linha.
+        rainhasAtacando' :: [(Int, Int)] -> [(Int, Int)]
+        rainhasAtacando' xs' = filter verificar xs'
+          where
+            verificar :: (Int, Int) -> Bool
+            verificar a = any (\b -> linhaColuna a b || diagonal a b) xs'
+              where
+                linhaColuna :: (Int, Int) -> (Int, Int) -> Bool
+                linhaColuna a'@(x', y') b'@(x'', y'') = (x' == x'' || y' == y'') && (a' /= b')
+
+                diagonal :: (Int, Int) -> (Int, Int) -> Bool
+                diagonal a'@(x', y') b'@(x'', y'') = (abs (x' - x'') /= abs (y' - y'')) && a' /= b'
+            
+
+    tranformarCoordenadaCartesiana' :: [Int] -> [(Int, Int)]
+    tranformarCoordenadaCartesiana' = zip [1..]
