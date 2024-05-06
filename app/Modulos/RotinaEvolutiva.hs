@@ -2,12 +2,13 @@ module RotinaEvolutiva where
 
 
 import Mutacao(mutacao)
-import Crosssover(umPontoAleatorio, crossover)
+import Crosssover(umPontoAleatorio)
 import Tipos (GeracaoInfo (GeracaoInfo, elitistas, mediaFitness), Individuo (Individuo), Populacao)
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 import Utils.Avaliacoes (melhorIndividuo)
 import Utils.Outros (shuffle)
+import Utils.Aleatoriedades (selecionarRemoverRandom)
 
 -- Retorna a ultima População e o historico de melhores individuos
 loopEvolutivoEnumerado :: (Ord a) => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> (Individuo a -> IO (Individuo a)) -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Float -> Int -> IO (GeracaoInfo a)
@@ -60,3 +61,21 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
             pop' <- shuffle pop
             
             return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
+
+        crossover :: Ord a => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
+        crossover [] _ = return []
+        crossover [a] _ = return [a]
+        crossover pop estrategiaCrossover = do
+            -- Escolher Pai
+            (pai, pop') <- selecionarRemoverRandom pop
+
+            -- Escolher mãe
+            (mae, pop'') <- selecionarRemoverRandom pop'
+
+            -- Iterar sobre o resto da população
+            restante <- crossover pop'' estrategiaCrossover
+
+            -- Realizar o crossover entre o pai e a mãe
+            (maisVelho, maisNovo) <- estrategiaCrossover (pai, mae)
+
+            return $ maisVelho : maisNovo : restante

@@ -6,24 +6,6 @@ import Utils.Aleatoriedades (randomFloat, randomInt, selecionarRemoverRandom)
 import Data.List (elemIndex)
 import Data.Bifunctor(bimap)
 
-crossover :: Ord a => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
-crossover [] _ = return []
-crossover [a] _ = return [a]
-crossover populacao estrategiaCrossover = do
-  -- Escolher Pai
-  (pai, populacao') <- selecionarRemoverRandom populacao
-
-  -- Escolher mãe
-  (mae, populacao'') <- selecionarRemoverRandom populacao'
-
-  -- Iterar sobre o resto da população
-  restante <- crossover populacao'' estrategiaCrossover
-
-  -- Realizar o crossover entre o pai e a mãe
-  (maisVelho, maisNovo) <- estrategiaCrossover (pai, mae)
-
-  return $ maisVelho : maisNovo : restante
-
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
 umPontoAleatorio :: (Individuo a, Individuo a ) -> Float -> IO (Individuo a, Individuo a)
