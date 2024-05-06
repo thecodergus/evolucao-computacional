@@ -7,18 +7,15 @@ import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
 import Selecao (roletaViciada)
 import Avaliacoes.NRainhas(avaliacao)
-import Mutacao (swap)
 
 main :: IO ()
 main = do
-  let n = 32
+  let n = 8
   pop_incial <- gerarPopulacaoInteiroPermutado 8 n (1, n)
 
-  -- print pop_incial
-  -- print $ map (n `avaliacao`) pop_incial
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada (`swap` 0.05)  0.9 0.01 10000
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada 0.05 0.9 0.01 10000
 
   endTime <- getCPUTime
 
