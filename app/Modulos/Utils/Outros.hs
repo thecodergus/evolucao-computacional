@@ -4,6 +4,7 @@ import Control.Monad ( forM )
 import Data.Array.IO
     ( newListArray, readArray, writeArray, IOArray )
 import System.Random ( randomRIO )
+import Utils.Aleatoriedades (randomInt)
 
 
 -- Função que troca dois elementos de uma lista em posições específicas
@@ -38,3 +39,14 @@ shuffle xs = do
     newArray n' = newListArray (1,n')
 
 
+selecionarRemover :: [a] -> IO (a, [a])
+selecionarRemover itens = do
+  random <- randomInt (0, tam - 1)
+
+  return (itens !! random, removeAt random itens)
+  where
+    tam :: Int
+    tam = length itens
+
+    removeAt :: Int -> [a] -> [a]
+    removeAt n xs = let (as, bs) = splitAt n xs in as ++ tail bs
