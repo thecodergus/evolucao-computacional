@@ -62,6 +62,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
             
             return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
 
+        -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
         crossover :: Ord a => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
         crossover [] _ = return []
         crossover [a] _ = return [a]
