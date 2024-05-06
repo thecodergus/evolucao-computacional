@@ -8,7 +8,7 @@ import System.CPUTime ( getCPUTime )
 import Selecao (roletaViciada)
 import Avaliacoes.NRainhas(avaliacao)
 import Mutacao (swap)
-import Crosssover (doisPontosAleatorios)
+import Crosssover (doisPontosAleatorios, umPontoAleatorio)
 
 main :: IO ()
 main = do
@@ -19,7 +19,7 @@ main = do
   -- print $ map (n `avaliacao`) pop_incial
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada (`swap` 0.05) doisPontosAleatorios  0.9 0.01 10000
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada (`swap` 0.05) (0.9 `umPontoAleatorio`)  0.01 10000
 
   endTime <- getCPUTime
 
