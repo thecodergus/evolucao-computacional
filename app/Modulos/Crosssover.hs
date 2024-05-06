@@ -113,19 +113,21 @@ uniforme (Individuo lista_1 _) (Individuo lista_2 _)
 
 
 -- Função que realiza o crossover PMX entre dois indivíduos com probabilidade de mutação
-pmx :: Eq a => Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-pmx (Individuo gene_pai _) (Individuo gene_mae _) = do
+pmx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
   -- Gera um número aleatório entre 0 e 1 para decidir se a mutação ocorrerá ou não
+  chanceMutar <- randomFloat (0, 1)
 
   -- Realiza a mutação dos genes dos pais para gerar os filhos, caso a chance gerada seja menor ou igual à probabilidade
-  (gene_filho_mais_velho, gene_filho_mais_novo) <- mutar gene_pai gene_mae
+  (gene_filho_mais_velho, gene_filho_mais_novo) <- mutar (chanceMutar <= probabildiade) gene_pai gene_mae
 
   -- Retorna os filhos gerados
   return (Individuo gene_filho_mais_velho 0, Individuo gene_filho_mais_novo 0)
   where
     -- Função que realiza a mutação dos genes dos pais para gerar os filhos
-    mutar :: Eq a => [a] -> [a] -> IO ([a], [a])
-    mutar gene_pai' gene_mae' = do
+    mutar :: Eq a => Bool -> [a] -> [a] -> IO ([a], [a])
+    mutar False gene_pai' gene_mae' = return (gene_pai', gene_mae') -- Se a mutação não ocorrer, retorna os pais como filhos
+    mutar True gene_pai' gene_mae' = do
       -- Gera dois pontos de corte aleatórios para a realização do crossover
       pontos_corte <- gerarNumeroAleatorio 0 (length gene_pai' - 1)
 
@@ -184,15 +186,19 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) = do
 
 
 -- cx é uma função que recebe dois indivíduos (pai e mãe) e uma probabilidade, e realiza o cruzamento entre eles
-cx :: Eq a => Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-cx pai mae = do
-  cx' pai mae
+cx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+cx pai mae probabilidade = do
+  chanceMutar <- randomFloat (0, 1) -- gera um número aleatório entre 0 e 1 para decidir se o cruzamento ocorrerá ou não
+
+  cx' pai mae (chanceMutar <= probabilidade)
   where
     -- cx' é uma função auxiliar que realiza o cruzamento em si, caso a chance de mutar seja menor ou igual à probabilidade
-    cx' :: Eq a => Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-    cx' (Individuo [] _) (Individuo mae' _) = return (Individuo mae' 0, Individuo mae' 0) -- se o pai estiver vazio, retorna dois indivíduos idênticos à mãe
-    cx' (Individuo pai' _) (Individuo [] _)  = return (Individuo pai' 0, Individuo pai' 0) -- se a mãe estiver vazia, retorna dois indivíduos idênticos ao pai
-    cx' (Individuo (p:ps) _) (Individuo (m:ms) _) = do
+    cx' :: Eq a => Individuo a -> Individuo a -> Bool -> IO (Individuo a, Individuo a)
+    cx' pai' mae' False = return (pai', mae') -- se não houver cruzamento, retorna os indivíduos originais
+    cx' (Individuo [] _) (Individuo [] _) _ = return (Individuo [] 0, Individuo [] 0) -- se ambos os indivíduos estiverem vazios, retorna dois indivíduos vazios
+    cx' (Individuo [] _) (Individuo mae' _) True = return (Individuo mae' 0, Individuo mae' 0) -- se o pai estiver vazio, retorna dois indivíduos idênticos à mãe
+    cx' (Individuo pai' _) (Individuo [] _) True = return (Individuo pai' 0, Individuo pai' 0) -- se a mãe estiver vazia, retorna dois indivíduos idênticos ao pai
+    cx' (Individuo (p:ps) _) (Individuo (m:ms) _) True = do
       let comparacoes = compararListas ps ms -- compara as listas de genes dos indivíduos para encontrar os genes comuns
 
       let (filho_mais_velho, filho_mais_novo) = trocarPosicao ps ms comparacoes 0 -- troca a posição dos genes comuns nos indivíduos
