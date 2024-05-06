@@ -10,9 +10,9 @@ import Utils.Avaliacoes (melhorIndividuo)
 import Utils.Outros (shuffle)
 
 -- Retorna a ultima População e o historico de melhores individuos
-loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> Float -> Float -> Float -> Int -> IO (GeracaoInfo a)
+loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> (Individuo a -> IO (Individuo a)) -> Float -> Float -> Int -> IO (GeracaoInfo a)
 loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [])
-loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao probabilidadeCrossover generatioGap contador = do
+loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaoMutacao probabilidadeCrossover generatioGap contador = do
     print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
 
     -- Avaliacao
@@ -34,7 +34,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
     novaPopulacao' <- mutarPopulacao novaPopulacao
 
     -- Ordernar nova interação no Loop evolutivo
-    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao funcaoSelecao probabilidadeCrossover taxaMutacao generatioGap (contador - 1)
+    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao funcaoSelecao funcaoMutacao probabilidadeCrossover generatioGap (contador - 1)
 
     -- Retornando valores
     return $ GeracaoInfo (individuoEletista ++ veios ++ elitistas proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaFitness proximaGeracao)
@@ -49,10 +49,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao taxaMutacao proba
         avaliarPopoulacao = parMap rpar funcaoAvaliacao
 
         -- Função auxliar para realizar a mutação em uma determinada população
-        mutarPopulacao :: Populacao a -> IO (Populacao a)
-        mutarPopulacao pop = do
-            let novaPopulacao = parMap rpar (`mutacao` taxaMutacao) pop
-            sequence novaPopulacao
+        mutarPopulacao pop = sequence (parMap rpar funcaoMutacao pop)
 
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
         selecionarQuemFica :: Float -> Populacao a -> IO (Populacao a, Populacao a)
