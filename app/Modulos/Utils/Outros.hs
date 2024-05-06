@@ -4,11 +4,11 @@ import Control.Monad ( forM )
 import Data.Array.IO
     ( newListArray, readArray, writeArray, IOArray )
 import System.Random ( randomRIO )
-import Utils.Aleatoriedades (randomInt)
 
 
 -- Função que troca dois elementos de uma lista em posições específicas
 swapElementsAt :: Int -> Int -> [a] -> [a]
+swapElementsAt _ _ [] = []
 swapElementsAt i j xs =
   -- Recupera os elementos a serem trocados e as partes da lista antes e depois deles
   let elemI = xs !! i
@@ -23,6 +23,7 @@ swapElementsAt i j xs =
 
 -- Função que embaralha uma lista qualquer
 shuffle :: [a] -> IO [a]
+shuffle [] = return []
 shuffle xs = do
         ar <- newArray n xs
         forM [1..n] $ \i -> do
