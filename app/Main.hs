@@ -7,6 +7,7 @@ import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
 import Selecao (roletaViciada)
 import Avaliacoes.NRainhas(avaliacao)
+import Crosssover (umPontoAleatorio)
 
 main :: IO ()
 main = do
@@ -15,7 +16,7 @@ main = do
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada 0.05 0.9 0.01 10000
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada 0.05 (`umPontoAleatorio` 0.9) 0.01 10000
 
   endTime <- getCPUTime
 

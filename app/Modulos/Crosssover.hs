@@ -6,37 +6,10 @@ import Utils.Aleatoriedades (randomFloat, randomInt)
 import Data.List (elemIndex)
 import Data.Bifunctor(bimap)
 
--- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
--- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-umPontoAleatorio :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-umPontoAleatorio pai mae
-  -- Verifica se o tamanho dos genes do pai e da mãe são iguais. Se não forem, lança um erro.
-  | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
-  -- Verifica se a lista de genes do pai é vazia. Se for, lança um erro.
-  | null (genes pai) = error "O numero de genes devem ser maiores que zero"
-  -- Se nenhuma das condições acima for verdadeira, realiza o crossover.
-  | otherwise = umPontoAleatorio'
-    where
-        -- A função 'umPontoAleatorio' não recebe nenhum argumento.
-        -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-        umPontoAleatorio' = do
-            -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
-            numero_aleatorio <- randomInt (0, length (genes pai) - 1)
-            -- Divide a lista de genes do pai no ponto aleatório.
-            let (pai_1, pai_2) = splitAt numero_aleatorio (genes pai)
-            -- Divide a lista de genes da mãe no ponto aleatório.
-            let (mae_1, mae_2) = splitAt numero_aleatorio (genes mae)
-            -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes da mãe e a segunda parte dos genes do pai.
-            -- O segundo indivíduo tem a primeira parte dos genes do pai e a segunda parte dos genes da mãe.
-            return (Individuo (mae_1 ++ pai_2) 0, Individuo (pai_1 ++ mae_2) 0)
-
-crossover :: Ord a => Populacao a -> (Individuo a -> Individuo a -> IO (Individuo a, Individuo a)) -> Float -> IO (Populacao a)
-crossover [] _ _= return []
-crossover [a] _ _= return [a]
-crossover populacao estrategiaCrossover probabilidade  = do
-  -- Escolher um valor aleaorio para avaliar se fazemos crossover
-  valorAleatorio <- randomFloat (0, 1)
-
+crossover :: Ord a => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
+crossover [] _ = return []
+crossover [a] _ = return [a]
+crossover populacao estrategiaCrossover = do
   -- Escolher Pai
   individuoPosicao <- randomInt (0, length populacao - 1)
   let pai = populacao !! individuoPosicao
@@ -51,52 +24,97 @@ crossover populacao estrategiaCrossover probabilidade  = do
   -- Removendo Mãe da População
   let populacao3 = filter (/= mae) populacao
 
-  restante <- crossover populacao3 estrategiaCrossover probabilidade
+  restante <- crossover populacao3 estrategiaCrossover
 
-  if valorAleatorio <= probabilidade then do
-    -- Realiza o crossover entre o pai e a mãe
-    (maisVelho, maisNovo) <- estrategiaCrossover pai mae
+  (maisVelho, maisNovo) <- estrategiaCrossover (pai, mae)
 
+  return $ maisVelho : maisNovo : restante
 
-    return $ maisVelho : maisNovo : restante
-  else
-    return $ pai : mae : restante
+-- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
+-- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
+umPontoAleatorio :: (Individuo a, Individuo a ) -> Float -> IO (Individuo a, Individuo a)
+umPontoAleatorio (pai, mae) probabilidade
+  -- Verifica se o tamanho dos genes do pai e da mãe são iguais. Se não forem, lança um erro.
+  | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
+  -- Verifica se a lista de genes do pai é vazia. Se for, lança um erro.
+  | null (genes pai) = error "O numero de genes devem ser maiores que zero"
+  -- Se nenhuma das condições acima for verdadeira, realiza o crossover.
+  | otherwise = umPontoAleatorio'
+  where
+    -- A função 'umPontoAleatorio' não recebe nenhum argumento.
+    -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
+    umPontoAleatorio' = do
+      -- Gera um número aleatório entre 0 e 1.
+      valorAleatorio <- randomFloat (0, 1)
+
+      -- Chama a função 'mutar' passando o valor aleatório, a lista de genes do pai e a lista de genes da mãe.
+      mutar (valorAleatorio <= probabilidade) (genes pai) (genes mae)
+
+      where 
+        mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
+        mutar False a b = return (Individuo a 0, Individuo b 0)
+        mutar True a b = do
+          -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
+          numero_aleatorio <- randomInt (0, length a - 1)
+          -- Divide a lista de genes do pai no ponto aleatório.
+          let (pai_1, pai_2) = splitAt numero_aleatorio a
+          -- Divide a lista de genes da mãe no ponto aleatório.
+          let (mae_1, mae_2) = splitAt numero_aleatorio b
+          -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes da mãe e a segunda parte dos genes do pai.
+          -- O segundo indivíduo tem a primeira parte dos genes do pai e a segunda parte dos genes da mãe.
+          return (Individuo (mae_1 ++ pai_2) 0, Individuo (pai_1 ++ mae_2) 0)
+
 
 
 -- A função 'doisPontosAleatorios' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de dois pontos aleatórios entre o pai e a mãe.
-doisPontosAleatorios :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-doisPontosAleatorios pai mae
+doisPontosAleatorios :: (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
+doisPontosAleatorios (pai, mae) probabilidade
   | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
   | null (genes pai) = error "O numero de genes devem ser maiores que zero"
   | otherwise = doisPontosAleatorios'
   where
     doisPontosAleatorios' = do
-      -- Gera dois números aleatórios entre as posições válidas dos genes do pai.
-      numero_aleatorio1 <- randomInt (0, length (genes pai) - 1)
-      numero_aleatorio2 <- randomInt (0, length (genes pai) - (numero_aleatorio1 + 1))
+      valorAleatorio <- randomFloat (0, 1) -- Gera um valor aleatório entre 0 e 1
+      
+      mutar (valorAleatorio <= probabilidade) (genes pai) (genes mae)
+      where
+        mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
+        mutar False a b = return (Individuo a 0, Individuo b 0)
+        mutar True a b = do
+          -- Gera dois números aleatórios entre as posições válidas dos genes do pai.
+          numero_aleatorio1 <- randomInt (0, length a - 1)
+          numero_aleatorio2 <- randomInt (0, length a - (numero_aleatorio1 + 1))
 
-      -- Divide a lista de genes do pai nos dois pontos aleatórios.
-      let (pai_1, pai_2) = splitAt numero_aleatorio1 (genes pai)
-          (pai_3, pai_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) pai_2
+          -- Divide a lista de genes do pai nos dois pontos aleatórios.
+          let (pai_1, pai_2) = splitAt numero_aleatorio1 a
+              (pai_3, pai_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) pai_2
 
-      -- Divide a lista de genes da mãe nos dois pontos aleatórios.
-      let (mae_1, mae_2) = splitAt numero_aleatorio1 (genes mae)
-          (mae_3, mae_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) mae_2
+          -- Divide a lista de genes da mãe nos dois pontos aleatórios.
+          let (mae_1, mae_2) = splitAt numero_aleatorio1 b
+              (mae_3, mae_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) mae_2
 
-      -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes do pai, a parte do meio dos genes da mãe e a última parte dos genes do pai.
-      -- O segundo indivíduo tem a primeira parte dos genes da mãe, a parte do meio dos genes do pai e a última parte dos genes da mãe.
-      return (Individuo (pai_1 ++ mae_3 ++ pai_4) 0, Individuo (mae_1 ++ pai_3 ++ mae_4) 0)
+          -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes do pai, a parte do meio dos genes da mãe e a última parte dos genes do pai.
+          -- O segundo indivíduo tem a primeira parte dos genes da mãe, a parte do meio dos genes do pai e a última parte dos genes da mãe.
+          return (Individuo (pai_1 ++ mae_3 ++ pai_4) 0, Individuo (mae_1 ++ pai_3 ++ mae_4) 0)
 
-uniforme :: Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-uniforme (Individuo lista_1 _) (Individuo lista_2 _)
+uniforme :: (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
+uniforme (Individuo lista_1 _, Individuo lista_2 _) probabilidade
   | length lista_1 /= length lista_2 = error "O tamanhos dos genes do pai_1 e da mae devem ser iguais"
   | null lista_1 = error "O numero de genes devem ser maiores que zero"
   | otherwise = do
-    (filho_1, filho_2) <- uniforme' lista_1 lista_2
+    valorAleatorio <- randomFloat (0, 1) -- Gera um valor aleatório entre 0 e 1
 
-    return (Individuo filho_1 0, Individuo filho_2 0)
+    mutar (valorAleatorio <= probabilidade) lista_1 lista_2
+    
     where
+      mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
+      mutar False a b = return (Individuo a 0, Individuo b 0)
+      mutar True a b = do
+        (filho_1, filho_2) <- uniforme' a b
+
+        return (Individuo filho_1 0, Individuo filho_2 0)
+
       uniforme' :: [a] -> [a] -> IO ([a], [a])
       uniforme' [] [] = return ([], [])
       uniforme' a [] = return (a, [])
@@ -113,8 +131,8 @@ uniforme (Individuo lista_1 _) (Individuo lista_2 _)
 
 
 -- Função que realiza o crossover PMX entre dois indivíduos com probabilidade de mutação
-pmx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
-pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
+pmx :: Eq a => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
+pmx (Individuo gene_pai _, Individuo gene_mae _) probabildiade = do
   -- Gera um número aleatório entre 0 e 1 para decidir se a mutação ocorrerá ou não
   chanceMutar <- randomFloat (0, 1)
 
@@ -186,8 +204,8 @@ pmx (Individuo gene_pai _) (Individuo gene_mae _) probabildiade = do
 
 
 -- cx é uma função que recebe dois indivíduos (pai e mãe) e uma probabilidade, e realiza o cruzamento entre eles
-cx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
-cx pai mae probabilidade = do
+cx :: Eq a => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
+cx (pai, mae) probabilidade = do
   chanceMutar <- randomFloat (0, 1) -- gera um número aleatório entre 0 e 1 para decidir se o cruzamento ocorrerá ou não
 
   cx' pai mae (chanceMutar <= probabilidade)
@@ -207,7 +225,7 @@ cx pai mae probabilidade = do
 
       where
         -- função auxiliar que compara as listas de genes e retorna as posições dos genes comuns
-        compararListas :: (Eq a) => [a] -> [a] -> [Int] 
+        compararListas :: (Eq a) => [a] -> [a] -> [Int]
         compararListas xs ys = procurarCompartibilidade  [(i, j) | (i, x) <- zip [0 ..] xs, (j, y) <- zip [0 ..] ys, x == y]
           where
             -- função auxiliar que procura as posições dos genes comuns
@@ -220,7 +238,7 @@ cx pai mae probabilidade = do
               | otherwise = procurarCompartibilidade xs' -- senão, continua procurando
 
         -- função auxiliar que troca as posições dos genes comuns nos indivíduos
-        trocarPosicao :: [a] -> [a] -> [Int] -> Int -> ([a], [a]) 
+        trocarPosicao :: [a] -> [a] -> [Int] -> Int -> ([a], [a])
         trocarPosicao [] _ _ _ = ([], []) -- se uma das listas estiver vazia, retorna duas listas vazias
         trocarPosicao _ [] _ _ = ([], [])
         trocarPosicao _ _ [] _ = ([], [])
