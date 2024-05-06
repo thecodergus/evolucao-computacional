@@ -8,15 +8,16 @@ import System.CPUTime ( getCPUTime )
 import Selecao (roletaViciada)
 import Avaliacoes.NRainhas(avaliacao)
 import Crosssover (umPontoAleatorio)
+import Mutacao (swap, mutacao)
 
 main :: IO ()
 main = do
-  let n = 8
+  let n = 128
   pop_incial <- gerarPopulacaoInteiroPermutado 8 n (1, n)
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada 0.05 (`umPontoAleatorio` 0.9) 0.01 10000
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada (`mutacao` 0.05) (`umPontoAleatorio` 0.9) 0.01 10000
 
   endTime <- getCPUTime
 
