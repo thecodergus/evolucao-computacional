@@ -34,8 +34,8 @@ selecionarPais populacao = do
 
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-umPontoAleatorio :: Float -> Individuo a -> Individuo a ->  IO (Individuo a, Individuo a)
-umPontoAleatorio chanceCrossover pai mae
+umPontoAleatorio :: Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+umPontoAleatorio pai mae chanceCrossover
   -- Verifica se o tamanho dos genes do pai e da mãe são iguais. Se não forem, lança um erro.
   | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
   -- Verifica se a lista de genes do pai é vazia. Se for, lança um erro.
@@ -64,8 +64,8 @@ umPontoAleatorio chanceCrossover pai mae
 
 -- A função 'doisPontosAleatorios' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de dois pontos aleatórios entre o pai e a mãe.
-doisPontosAleatorios :: Float -> Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-doisPontosAleatorios chanceCrossover pai mae
+doisPontosAleatorios :: Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+doisPontosAleatorios pai mae chanceCrossover
   | length (genes pai) /= length (genes mae) = error "O tamanhos dos genes do pai e da mae devem ser iguais"
   | null (genes pai) = error "O numero de genes devem ser maiores que zero"
   | otherwise = doisPontosAleatorios'
@@ -92,8 +92,8 @@ doisPontosAleatorios chanceCrossover pai mae
       else
         return (Individuo (genes pai) 0, Individuo (genes mae) 0)
 
-uniforme :: Float -> Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-uniforme chanceCrossover (Individuo lista_1 _) (Individuo lista_2 _)
+uniforme :: Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+uniforme (Individuo lista_1 _) (Individuo lista_2 _) chanceCrossover
   | length lista_1 /= length lista_2 = error "O tamanhos dos genes do pai_1 e da mae devem ser iguais"
   | null lista_1 = error "O numero de genes devem ser maiores que zero"
   | otherwise = do
@@ -122,8 +122,8 @@ uniforme chanceCrossover (Individuo lista_1 _) (Individuo lista_2 _)
 
 
 -- Função que realiza o crossover PMX entre dois indivíduos com probabilidade de mutação
-pmx :: Eq a => Float -> Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-pmx chanceCrossover  (Individuo gene_pai _) (Individuo gene_mae _) = do
+pmx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+pmx (Individuo gene_pai _) (Individuo gene_mae _) chanceCrossover = do
   -- Gera um número aleatório entre 0 e 1 para decidir se a mutação ocorrerá ou não
   avaliandoChanceCrossover <- randomFloat (0, 1)
 
@@ -197,8 +197,8 @@ pmx chanceCrossover  (Individuo gene_pai _) (Individuo gene_mae _) = do
 
 
 -- cx é uma função que recebe dois indivíduos (pai e mãe) e uma probabilidade, e realiza o cruzamento entre eles
-cx :: Eq a => Float -> Individuo a -> Individuo a -> IO (Individuo a, Individuo a)
-cx chanceCrossover pai mae = do
+cx :: Eq a => Individuo a -> Individuo a -> Float -> IO (Individuo a, Individuo a)
+cx pai mae chanceCrossover = do
   avaliandoChanceCrossover <- randomFloat (0, 1)
 
   if avaliandoChanceCrossover <= chanceCrossover then do
