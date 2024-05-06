@@ -2,8 +2,7 @@ module Crosssover where
 
 
 import Tipos (Individuo(genes, Individuo), Populacao)
-import Utils.Aleatoriedades (randomFloat, randomInt)
-import Utils.Outros (selecionarRemover)
+import Utils.Aleatoriedades (randomFloat, randomInt, selecionarRemoverRandom)
 import Data.List (elemIndex)
 import Data.Bifunctor(bimap)
 
@@ -12,10 +11,10 @@ crossover [] _ = return []
 crossover [a] _ = return [a]
 crossover populacao estrategiaCrossover = do
   -- Escolher Pai
-  (pai, populacao') <- selecionarRemover populacao
+  (pai, populacao') <- selecionarRemoverRandom populacao
 
   -- Escolher mãe
-  (mae, populacao'') <- selecionarRemover populacao'
+  (mae, populacao'') <- selecionarRemoverRandom populacao'
 
   -- Iterar sobre o resto da população
   restante <- crossover populacao'' estrategiaCrossover

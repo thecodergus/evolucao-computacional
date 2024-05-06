@@ -52,3 +52,17 @@ randomBoolLista num = replicateM num randomBool
 -- Função auxiliar para gerar uma matriz de booleanos aleatorios
 randomBoolMatriz :: Int -> Int -> IO [[Bool]]
 randomBoolMatriz num_listas tam_lista = replicateM num_listas (randomBoolLista tam_lista)
+
+
+-- Função auxiliar para selecionar um elemento aleatório de uma lista
+selecionarRemoverRandom :: [a] -> IO (a, [a])
+selecionarRemoverRandom itens = do
+  random <- randomInt (0, tam - 1)
+
+  return (itens !! random, removeAt random itens)
+  where
+    tam :: Int
+    tam = length itens
+
+    removeAt :: Int -> [a] -> [a]
+    removeAt n xs = let (as, bs) = splitAt n xs in as ++ tail bs
