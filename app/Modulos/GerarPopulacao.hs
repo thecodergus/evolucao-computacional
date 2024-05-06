@@ -5,6 +5,7 @@ import Tipos (Populacao, Individuo (Individuo))
 import GerarIndividuos (gerarIndividuoBooleano, gerarIndividuoInteiroBound, gerarIndividuoFlutuante, gerarIndividuoInteiroForSAT)
 import Control.Monad (replicateM)
 import Data.List (permutations)
+import Utils.Outros (shuffle)
 
 
 -- Função para gerar uma população de indivíduos booleanos
@@ -16,16 +17,15 @@ gerarPopulacaoInteiroBound :: Int -> Int -> (Int, Int) -> IO (Populacao Int)
 gerarPopulacaoInteiroBound num_individuos num_genes intervalo = replicateM num_individuos (gerarIndividuoInteiroBound num_genes intervalo)
 
 -- Função para gerar uma população de indivíduos inteiros permutados
-gerarPopulacaoInteiroPermutado :: Int -> Int -> IO (Populacao Int)
-gerarPopulacaoInteiroPermutado num_individuos num_genes | num_individuos > num_genes =  error "Número de indivíduos deve ser menor ou igual ao número de genes"
-                                                        | num_individuos < 0 = error "Número de indivíduos deve ser maior que zero"
-                                                        | num_genes < 0 = error "Número de genes deve ser maior que zero"
-                                                        | otherwise = do
-  let por_entre = (1, num_genes)
-  let inteiros = permutations [fst por_entre .. snd por_entre]
-  let elementos = take num_individuos inteiros
+gerarPopulacaoInteiroPermutado :: Int -> Int -> (Int, Int) -> IO (Populacao Int)
+gerarPopulacaoInteiroPermutado num_individuos num_genes intervalo
+  | num_individuos > num_genes =  error "Número de indivíduos deve ser menor ou igual ao número de genes"
+  | num_individuos < 0 = error "Número de indivíduos deve ser maior que zero"
+  | num_genes < 0 = error "Número de genes deve ser maior que zero"
+  | otherwise = do
+    inteiros <- shuffle $ permutations [fst intervalo .. snd intervalo]
 
-  return $ map (`Individuo` 0) elementos
+    return $ map (`Individuo` 0) (take num_individuos inteiros)
 
 
 -- Função para gerar uma população de indivíduos flutuantes
