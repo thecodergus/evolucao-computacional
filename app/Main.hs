@@ -1,22 +1,21 @@
 module Main where
 
 import Utils.Arquivo (fileToIntLists)
-import GerarPopulacao (gerarPopulacaoBooleana)
+import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
-import Avaliacoes.Sat (avaliarSAT)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
 import Selecao (roletaViciada)
-
+import Avaliacoes.NRainhas(avaliacao)
 
 main :: IO ()
 main = do
-  arquivo <- fileToIntLists "arquivoSAT.cnf"
-  pop_incial <- gerarPopulacaoBooleana 50 100
+  let n = 8
+  pop_incial <- gerarPopulacaoInteiroPermutado 8 n (1, n)
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`avaliarSAT` arquivo) roletaViciada 0.05 0.8 0.1 10000
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roletaViciada 0.05 0.9 0.01 10000
 
   endTime <- getCPUTime
 
