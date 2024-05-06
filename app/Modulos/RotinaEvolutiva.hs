@@ -9,9 +9,9 @@ import Utils.Avaliacoes (melhorIndividuo)
 import Utils.Outros (shuffle)
 
 -- Retorna a ultima População e o historico de melhores individuos
-loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> (Individuo a -> IO (Individuo a)) -> (Individuo a -> Individuo a -> IO (Individuo a, Individuo a)) -> Float -> Int -> IO (GeracaoInfo a)
-loopEvolutivoEnumerado _ _ _ _ _ _  0 = return (GeracaoInfo [] [])
-loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaoMutacao funcaoCrossover generatioGap contador = do
+loopEvolutivoEnumerado :: Ord a => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> (Individuo a -> IO (Individuo a)) -> (Individuo a -> Individuo a -> IO (Individuo a, Individuo a)) -> Float -> Float -> Int -> IO (GeracaoInfo a)
+loopEvolutivoEnumerado _ _ _ _ _ _ _ 0 = return (GeracaoInfo [] [])
+loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaoMutacao funcaoCrossover probabilidadeCrossover generatioGap contador = do
     print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
 
     -- Avaliacao
@@ -36,7 +36,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaoMutacao fun
     novaPopulacao' <- mutarPopulacao (concatMap (\(pai, mae) -> [pai, mae]) novaPopulacao)
 
     -- Ordernar nova interação no Loop evolutivo
-    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao funcaoSelecao funcaoMutacao funcaoCrossover generatioGap (contador - 1)
+    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao funcaoSelecao funcaoMutacao funcaoCrossover probabilidadeCrossover generatioGap (contador - 1)
 
     -- Retornando valores
     return $ GeracaoInfo (individuoEletista ++ veios ++ elitistas proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaFitness proximaGeracao)
