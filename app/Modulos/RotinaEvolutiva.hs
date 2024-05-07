@@ -69,11 +69,11 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         crossover pop estrategiaCrossover = do
             resultPai <- selecionarRemoverRandom pop
             case resultPai of
-                Nothing -> error "Erro ao selecionar pai"
+                Nothing -> error "Erro ao selecionar pai durante o crossover"
                 Just (pai, pop') -> do
                     resultMae <- selecionarRemoverRandom pop'
                     case resultMae of
-                        Nothing -> error "Erro ao selecionar mae"
+                        Nothing -> error "Erro ao selecionar mae durante o crossover"
                         Just (mae, pop'') -> do
                             restante <- crossover pop'' estrategiaCrossover
                             (maisVelho, maisNovo) <- estrategiaCrossover (pai, mae)
