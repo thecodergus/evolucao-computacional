@@ -9,12 +9,14 @@ import Data.Maybe (maybeToList)
 import Utils.Avaliacoes (melhorIndividuo)
 import Utils.Outros (shuffle)
 import Utils.Aleatoriedades (selecionarRemoverRandom)
+import Debug.Trace(trace)
 
 -- Retorna a ultima População e o historico de melhores individuos
 loopEvolutivoEnumerado :: (Ord a) => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> (Individuo a -> IO (Individuo a)) -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Float -> Int -> IO (GeracaoInfo a)
 loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador = do
     print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
+    print $ "Tamanho da populacao => " ++ show (length populacao)
 
     -- Avaliacao
     let populacaoAvaliada = avaliarPopoulacao populacao
@@ -24,15 +26,15 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
 
     -- Ativando a questão do generatioGap
     (veios, novinhos) <- selecionarQuemFica generatioGap populacaoAvaliada
-    
+
     -- Selecao
-    individuosSelecionados <- funcaoSelecao novinhos
+    individuosSelecionados <- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $ funcaoSelecao novinhos
 
     -- Crossover
-    novaPopulacao <- crossover individuosSelecionados funcaoCrossover
+    novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover
 
     -- Mutacao
-    novaPopulacao' <- mutarPopulacao novaPopulacao
+    novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao
 
     -- Ordernar nova interação no Loop evolutivo
     proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
