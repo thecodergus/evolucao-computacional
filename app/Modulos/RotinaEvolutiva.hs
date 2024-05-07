@@ -67,16 +67,14 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         crossover [] _ = return []
         crossover [a] _ = return [a]
         crossover pop estrategiaCrossover = do
-            -- Escolher Pai
-            (pai, pop') <- selecionarRemoverRandom pop
-
-            -- Escolher mãe
-            (mae, pop'') <- selecionarRemoverRandom pop'
-
-            -- Iterar sobre o resto da população
-            restante <- crossover pop'' estrategiaCrossover
-
-            -- Realizar o crossover entre o pai e a mãe
-            (maisVelho, maisNovo) <- estrategiaCrossover (pai, mae)
-
-            return $ maisVelho : maisNovo : restante
+            resultPai <- selecionarRemoverRandom pop
+            case resultPai of
+                Nothing -> error "Erro ao selecionar pai"
+                Just (pai, pop') -> do
+                    resultMae <- selecionarRemoverRandom pop'
+                    case resultMae of
+                        Nothing -> error "Erro ao selecionar mae"
+                        Just (mae, pop'') -> do
+                            restante <- crossover pop'' estrategiaCrossover
+                            (maisVelho, maisNovo) <- estrategiaCrossover (pai, mae)
+                            return $ maisVelho : maisNovo : restante

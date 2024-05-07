@@ -55,15 +55,18 @@ randomBoolMatriz num_listas tam_lista = replicateM num_listas (randomBoolLista t
 
 
 -- Função auxiliar para selecionar um elemento aleatório de uma lista
-selecionarRemoverRandom :: [a] -> IO (a, [a])
-selecionarRemoverRandom [] = error "Lista de entrada esta vazia"
+selecionarRemoverRandom :: [a] -> IO (Maybe (a, [a]))
+selecionarRemoverRandom [] = return Nothing
 selecionarRemoverRandom itens = do
-  random <- randomInt (0, tam - 1)
-
-  return (itens !! random, removeAt random itens)
+  random <- randomRIO (0, tam - 1)
+  let result = (itens !! random, removeAt random itens)
+  return $ case result of
+    (_, Nothing) -> Nothing
+    (selected, Just newList) -> Just (selected, newList)
   where
-    tam :: Int
     tam = length itens
 
-    removeAt :: Int -> [a] -> [a]
-    removeAt n xs = let (as, bs) = splitAt n xs in as ++ tail bs
+    removeAt :: Int -> [a] -> Maybe [a]
+    removeAt n xs
+      | n < 0 || n >= length xs = Nothing
+      | otherwise = Just $ let (as, bs) = splitAt n xs in as ++ tail bs
