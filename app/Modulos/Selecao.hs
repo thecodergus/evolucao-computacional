@@ -6,8 +6,8 @@ import Utils.Avaliacoes (vencedorDoTorneio)
 import Tipos (Populacao, Individuo (fitness))
 
 
-roletaViciada :: Eq a => Populacao a -> IO (Populacao a)
-roletaViciada populacao = do
+roleta :: Eq a => Populacao a -> IO (Populacao a)
+roleta populacao = do
     -- Gerando valor limite 1
     valorAleatorio <- randomFloat (0, 1)
     let valorAleatorio' = valorAleatorio * somarFitness
