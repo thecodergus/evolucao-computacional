@@ -1,45 +1,38 @@
 module Selecao where
 
-import Utils.Aleatoriedades (randomFloat, randomInt)
+import Utils.Aleatoriedades (randomInt, randomFloat)
 import Control.Monad (replicateM)
 import Utils.Avaliacoes (vencedorDoTorneio)
-import Tipos (Populacao, Individuo (fitness))
+import Tipos (Populacao, Individuo(fitness, Individuo))
 
 
-roleta :: Eq a => Populacao a -> IO (Populacao a)
-roleta populacao = do
-    -- Gerando valor limite 1
-    valorAleatorio <- randomFloat (0, 1)
-    let valorAleatorio' = valorAleatorio * somarFitness
+roletaComReposicao :: Populacao a -> IO (Populacao a)
+roletaComReposicao pop = girarRoleta (fitnessRelativo pop (fitnessTotal pop)) (length pop)
+  where
+    fitnessTotal :: Populacao a -> Float
+    fitnessTotal pop' = sum $ map fitness pop'
 
-    -- Criando população Intermediária
-    popIntermediaria <- selecao valorAleatorio' 0 populacao
+    fitnessRelativo :: Populacao a -> Float -> Populacao a
+    fitnessRelativo pop' total = map (\(Individuo g fit) -> Individuo g (fit / total)) pop'
 
-    -- Gerando valor limite 2
-    valorAleatorio'' <- randomFloat (0, 1)
-    let valorAleatorio''' = valorAleatorio'' * somarFitness
+    selecionarIndividuo :: Populacao a -> Float -> Maybe (Individuo a)
+    selecionarIndividuo [] _ = Nothing
+    selecionarIndividuo (individuo@(Individuo _ fit) : pop') valorSorteado
+      | fit <= valorSorteado = Just individuo
+      | otherwise = selecionarIndividuo pop' valorSorteado
 
-    -- Criando população final
-    selecao valorAleatorio''' 0 popIntermediaria
-    where
-        -- Função que soma o fitness de todos os indivíduos
-        somarFitness :: Float
-        somarFitness = foldl (\b acc -> b + fitness acc) 0.0 populacao
+    girarRoleta :: Populacao a -> Int -> IO (Populacao a)
+    girarRoleta [] _ = return []
+    girarRoleta pop' 0 = return pop'
+    girarRoleta pop' numVezes = do
+      jogarBolinha <- randomFloat (0, 1)
 
-        -- Função que seleciona os indivíduos que irão para a próxima geração
-        selecao :: Eq a => Float -> Float -> Populacao a -> IO (Populacao a)
-        selecao _ _ [] = return []
-        selecao valorLimite contador pop
-            | contador > valorLimite = return []
-            | otherwise = do
-                individuoAleatorio <- randomInt (0, length pop - 1)
+      case selecionarIndividuo pop' jogarBolinha of
+        Nothing -> girarRoleta pop' numVezes
+        Just individuo -> do
+          restante <- girarRoleta pop' (numVezes - 1)
 
-                let individuo = pop !! individuoAleatorio
-
-                restante <- selecao valorLimite (contador + fitness individuo) (filter (/= individuo) pop)
-
-                return (individuo : restante)
-
+          return $ individuo : restante
 
 -- A função torneioEstocastico recebe o tamanho do torneio (k), a taxa de seleção (kp) e uma população como parâmetros
 torneioEstocastico :: (Eq a, Ord a) => Int -> Float -> Populacao a -> IO (Populacao a)
