@@ -16,7 +16,7 @@ import Tipos (Populacao, Individuo(fitness, Individuo))
 --     fitnessRelativo :: Populacao a -> Float -> Populacao a
 --     fitnessRelativo pop' total = map (\(Individuo g fit) -> Individuo g (fit / total)) pop'
 
-    
+
 --     girarRoleta :: Populacao a -> Int -> IO (Populacao a)
 --     girarRoleta [] _ = return []
 --     girarRoleta pop' numVezes = do
@@ -33,7 +33,7 @@ import Tipos (Populacao, Individuo(fitness, Individuo))
 --           | fit <= valorSorteado = Just individuo
 --           | otherwise = selecionarIndividuo todos valorSorteado
 
-    
+
 
 -- roletaSemReposicao :: Eq a => Populacao a -> IO (Populacao a)
 -- roletaSemReposicao populacao = do 
@@ -81,25 +81,30 @@ import Tipos (Populacao, Individuo(fitness, Individuo))
 roletaSemReposicao :: Populacao a -> IO (Populacao a)
 roletaSemReposicao populacao = do
   -- Gerar valor aleatorio da roleta para a população intermediaria
-  valorAleatorio' <- randomFloat (0, populacao)
+  valorAleatorio' <- randomFloat (0, fitnessTotal populacao)
+
+  -- Calcular fitness Relativo
+  let populacao' = calcularFitnessRelativo populacao
 
   -- Procurar pela população intermediaria
-  populacaoIntermediaria <- girarRoleta populacao valorAleatorio'
+  populacaoIntermediaria <- girarRoleta populacao' valorAleatorio'
+
+  let populacao'' = calcularFitnessRelativo populacaoIntermediaria
 
   -- Gerar o valor aleatorio da role para a população final
-  valorAleatorio'' <- randomFloat (0, fitnessTotal)
+  valorAleatorio'' <- randomFloat (0, fitnessTotal populacao'')
 
   -- Procurando pela populacao final
-  girarRoleta populacaoIntermediaria valorAleatorio''
+  girarRoleta populacao'' valorAleatorio''
 
     where
       -- Função auxiliar para calcular o fitness total da população
       fitnessTotal :: Populacao a -> Float
-      fitnessTotal pop = sum $ map fitness pop 
+      fitnessTotal pop = sum $ map fitness pop
 
       -- Função auxiliar para calcular o fitness relativo de cada individuo
       calcularFitnessRelativo :: Populacao a -> Populacao a
-      calcularFitnessRelativo pop = map (\(Individuo gene fit) -> Individuo gene (fit / fitnessTotal pop))
+      calcularFitnessRelativo pop = map (\(Individuo gene fit) -> Individuo gene (fit / fitnessTotal pop)) pop
 
       -- Função auxiliar que gira roleta da sorte
       girarRoleta :: Populacao a -> Float -> IO (Populacao a)
@@ -110,9 +115,9 @@ roletaSemReposicao populacao = do
             -- Função auxiliar para encontra os individuos que serão selecionados na roleta
             encontrarIndividuos :: Populacao a -> Float -> Populacao a
             encontrarIndividuos [] _ = []
-            encontrarIndividuos (p : ps) valor
-              | (fitness p) <= valor = p : encontrarIndividuos ps (valor - (fitness p))
-              | otherwise = p
+            encontrarIndividuos (p : ps) valor'
+              | fitness p <= valor' = p : encontrarIndividuos ps (valor' - fitness p)
+              | otherwise = [p]
 
 
 
