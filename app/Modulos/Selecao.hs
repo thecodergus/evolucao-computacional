@@ -6,33 +6,74 @@ import Utils.Avaliacoes (vencedorDoTorneio)
 import Tipos (Populacao, Individuo(fitness, Individuo))
 
 
-roletaComReposicao :: Populacao a -> IO (Populacao a)
-roletaComReposicao pop = girarRoleta (fitnessRelativo pop (fitnessTotal pop)) (length pop)
-  where
-    fitnessTotal :: Populacao a -> Float
-    fitnessTotal pop' = sum $ map fitness pop'
+-- roletaComReposicao :: Populacao a -> IO (Populacao a)
+-- roletaComReposicao pop = girarRoleta (fitnessRelativo pop (fitnessTotal pop)) (length pop)
+--   where
+--     fitnessTotal :: Populacao a -> Float
+--     fitnessTotal pop' = sum $ map fitness pop'
 
-    fitnessRelativo :: Populacao a -> Float -> Populacao a
-    fitnessRelativo pop' total = map (\(Individuo g fit) -> Individuo g (fit / total)) pop'
+--     fitnessRelativo :: Populacao a -> Float -> Populacao a
+--     fitnessRelativo pop' total = map (\(Individuo g fit) -> Individuo g (fit / total)) pop'
 
-    selecionarIndividuo :: Populacao a -> Float -> Maybe (Individuo a)
-    selecionarIndividuo [] _ = Nothing
-    selecionarIndividuo (individuo@(Individuo _ fit) : pop') valorSorteado
-      | fit <= valorSorteado = Just individuo
-      | otherwise = selecionarIndividuo pop' valorSorteado
+    
+--     girarRoleta :: Populacao a -> Int -> IO (Populacao a)
+--     girarRoleta [] _ = return []
+--     girarRoleta pop' numVezes = do
+--       jogarBolinha <- randomFloat (0, 1)
 
-    girarRoleta :: Populacao a -> Int -> IO (Populacao a)
-    girarRoleta [] _ = return []
-    girarRoleta pop' 0 = return pop'
-    girarRoleta pop' numVezes = do
-      jogarBolinha <- randomFloat (0, 1)
+--       case selecionarIndividuo pop' jogarBolinha of
+--         Nothing -> girarRoleta pop' numVezes
+--         Just individuo -> do
+--           restante <- girarRoleta pop' (numVezes - 1)
 
-      case selecionarIndividuo pop' jogarBolinha of
-        Nothing -> girarRoleta pop' numVezes
-        Just individuo -> do
-          restante <- girarRoleta pop' (numVezes - 1)
+--           return $ individuo : restante
+--       where
+--         selecionarIndividuo :: Populacao a -> Float -> Maybe (Individuo a)
+--         selecionarIndividuo [] _ = Nothing
+--         selecionarIndividuo todos@(individuo@(Individuo _ fit) : pop') valorSorteado
+--           | fit <= valorSorteado = Just individuo
+--           | otherwise = selecionarIndividuo todos valorSorteado
 
-          return $ individuo : restante
+    
+
+roletaSemReposicao :: Eq a => Populacao a -> IO (Populacao a)
+roletaSemReposicao populacao = do 
+  poulacaoIntermediaria <- girarRoleta (fitnessRelativo populacao (fitnessTotal populacao)) (length  populacao)
+
+  girarRoleta (fitnessRelativo poulacaoIntermediaria (fitnessTotal poulacaoIntermediaria)) (length poulacaoIntermediaria)
+    where
+      fitnessTotal :: Populacao a -> Float
+      fitnessTotal populacao' = sum $ map fitness populacao'
+
+      fitnessRelativo :: Populacao a -> Float -> Populacao a
+      fitnessRelativo populacao' totalFitness = map (`calcularFitnessRelativo` totalFitness) populacao'
+        where
+          calcularFitnessRelativo (Individuo gene fit) totalFitness' = Individuo gene (fit / totalFitness')
+
+      girarRoleta :: Eq a => Populacao a -> Int -> IO (Populacao a)
+      girarRoleta [] _ = return []
+      girarRoleta pop contador = do
+        jogarBolinha <- randomFloat (0, 1)
+        case selecionarIndividuo pop jogarBolinha of
+          Nothing -> girarRoleta pop contador
+          Just individuo -> do
+            if contador > 0 then do
+              restante <- girarRoleta (filter (/= individuo) pop) (contador - 1)
+              return $ individuo : restante
+            else
+              return [individuo]
+
+          where
+            selecionarIndividuo :: Populacao a -> Float -> Maybe (Individuo a)
+            selecionarIndividuo [] _ = Nothing
+            selecionarIndividuo (individuo@(Individuo _ fit) : pop') valorSorteado
+              | fit <= valorSorteado = Just individuo
+              | otherwise = selecionarIndividuo pop' valorSorteado
+
+
+
+
+
 
 -- A função torneioEstocastico recebe o tamanho do torneio (k), a taxa de seleção (kp) e uma população como parâmetros
 torneioEstocastico :: (Eq a, Ord a) => Int -> Float -> Populacao a -> IO (Populacao a)
