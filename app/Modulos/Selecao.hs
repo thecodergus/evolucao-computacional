@@ -1,6 +1,7 @@
 module Selecao where
 
 import Utils.Aleatoriedades (randomInt, randomFloat)
+import Utils.Outros(shuffle)
 import Control.Monad (replicateM)
 import Utils.Avaliacoes (vencedorDoTorneio)
 import Tipos (Populacao, Individuo(fitness, Individuo))
@@ -28,47 +29,90 @@ import Tipos (Populacao, Individuo(fitness, Individuo))
 
 --           return $ individuo : restante
 --       where
---         selecionarIndividuo :: Populacao a -> Float -> Maybe (Individuo a)
---         selecionarIndividuo [] _ = Nothing
---         selecionarIndividuo todos@(individuo@(Individuo _ fit) : pop') valorSorteado
+--         selecionarIndshuffleividuo todos@(individuo@(Individuo _ fit) : pop') valorSorteado
 --           | fit <= valorSorteado = Just individuo
 --           | otherwise = selecionarIndividuo todos valorSorteado
 
     
 
-roletaSemReposicao :: Eq a => Populacao a -> IO (Populacao a)
-roletaSemReposicao populacao = do 
-  poulacaoIntermediaria <- girarRoleta (fitnessRelativo populacao (fitnessTotal populacao)) (length  populacao)
+-- roletaSemReposicao :: Eq a => Populacao a -> IO (Populacao a)
+-- roletaSemReposicao populacao = do 
+--   poulacaoIntermediaria <- girarRoleta (fitnessRelativo populacao (fitnessTotal populacao)) (length  populacao)
 
-  girarRoleta (fitnessRelativo poulacaoIntermediaria (fitnessTotal poulacaoIntermediaria)) (length poulacaoIntermediaria)
+--   girarRoleta (fitnessRelativo poulacaoIntermediaria (fitnessTotal poulacaoIntermediaria)) (length poulacaoIntermediaria)
+--     where
+--       fitnessTotal :: Populacao a -> Float
+--       fitnessTotal populacao' = sum $ map fitness populacao'
+
+--       fitnessRelativo :: Populacao a -> Float -> Populacao a
+--       fitnessRelativo populacao' totalFitness = map (`calcularFitnessRelativo` totalFitness) populacao'
+--         where
+--           calcularFitnessRelativo (Individuo gene fit) totalFitness' = Individuo gene (fit / totalFitness')
+
+--       girarRoleta :: Eq a => Populacao a -> Int -> IO (Populacao a)
+--       girarRoleta [] _ = return []
+--       girarRoleta pop contador = do
+--         jogarBolinha <- randomFloat (0, 1)
+--         case selecionarIndividuo pop jogarBolinha of
+--           Nothing -> girarRoleta pop contador
+--           Just individuo -> do
+--             if contador > 0 then do
+--               restante <- girarRoleta (filter (/= individuo) pop) (contador - 1)
+--               return $ individuo : restante
+--             else
+--               return [individuo]
+
+--           where
+--             selecionarIndividuo :: Populacao a -> Float -> Maybe (Individuo a)
+--             selecionarIndividuo [] _ = Nothing
+--             selecionarIndividuo (individuo@(Individuo _ fit) : pop') valorSorteado
+--               | fit <= valorSorteado = Just individuo
+--               | otherwise = selecionarIndividuo pop' valorSorteado
+
+
+-- Algoritmo:
+-- 1. Calcular o fitness total
+-- 2. Calcular o fitness relativo sobre cada Individuo da população
+-- 3. Calcular um valor aleatorio entre 0 e fitness total
+-- 4. Embaralhar a lista de Individuos (População)
+-- 5. Interar sobre a lista indo somando os fitness relativos a partir de zero até que o acumulador seja igual ou superior ao valor aleatorio
+-- 6. Sobre a nova população aplicar os passos 1 ao 5 novamente. Pois essa primeira população é a população intermediaria
+-- 7. Retornar a população final
+roletaSemReposicao :: Populacao a -> IO (Populacao a)
+roletaSemReposicao populacao = do
+  -- Gerar valor aleatorio da roleta para a população intermediaria
+  valorAleatorio' <- randomFloat (0, populacao)
+
+  -- Procurar pela população intermediaria
+  populacaoIntermediaria <- girarRoleta populacao valorAleatorio'
+
+  -- Gerar o valor aleatorio da role para a população final
+  valorAleatorio'' <- randomFloat (0, fitnessTotal)
+
+  -- Procurando pela populacao final
+  girarRoleta populacaoIntermediaria valorAleatorio''
+
     where
+      -- Função auxiliar para calcular o fitness total da população
       fitnessTotal :: Populacao a -> Float
-      fitnessTotal populacao' = sum $ map fitness populacao'
+      fitnessTotal pop = sum $ map fitness pop 
 
-      fitnessRelativo :: Populacao a -> Float -> Populacao a
-      fitnessRelativo populacao' totalFitness = map (`calcularFitnessRelativo` totalFitness) populacao'
-        where
-          calcularFitnessRelativo (Individuo gene fit) totalFitness' = Individuo gene (fit / totalFitness')
+      -- Função auxiliar para calcular o fitness relativo de cada individuo
+      calcularFitnessRelativo :: Populacao a -> Populacao a
+      calcularFitnessRelativo pop = map (\(Individuo gene fit) -> Individuo gene (fit / fitnessTotal pop))
 
-      girarRoleta :: Eq a => Populacao a -> Int -> IO (Populacao a)
-      girarRoleta [] _ = return []
-      girarRoleta pop contador = do
-        jogarBolinha <- randomFloat (0, 1)
-        case selecionarIndividuo pop jogarBolinha of
-          Nothing -> girarRoleta pop contador
-          Just individuo -> do
-            if contador > 0 then do
-              restante <- girarRoleta (filter (/= individuo) pop) (contador - 1)
-              return $ individuo : restante
-            else
-              return [individuo]
-
+      -- Função auxiliar que gira roleta da sorte
+      girarRoleta :: Populacao a -> Float -> IO (Populacao a)
+      girarRoleta pop valor = do
+        pop' <- shuffle pop
+        return $ encontrarIndividuos pop' valor
           where
-            selecionarIndividuo :: Populacao a -> Float -> Maybe (Individuo a)
-            selecionarIndividuo [] _ = Nothing
-            selecionarIndividuo (individuo@(Individuo _ fit) : pop') valorSorteado
-              | fit <= valorSorteado = Just individuo
-              | otherwise = selecionarIndividuo pop' valorSorteado
+            -- Função auxiliar para encontra os individuos que serão selecionados na roleta
+            encontrarIndividuos :: Populacao a -> Float -> Populacao a
+            encontrarIndividuos [] _ = []
+            encontrarIndividuos (p : ps) valor
+              | (fitness p) <= valor = p : encontrarIndividuos ps (valor - (fitness p))
+              | otherwise = p
 
 
 
