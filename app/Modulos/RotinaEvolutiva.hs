@@ -19,10 +19,10 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     print $ "Tamanho da populacao => " ++ show (length populacao)
 
     -- Avaliacao
-    let populacaoAvaliada = avaliarPopoulacao populacao
+    let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
 
     -- Encontrar o melhor individuo
-    let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada
+    let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada 
 
     -- Ativando a questão do generatioGap
     (veios, novinhos) <- selecionarQuemFica generatioGap populacaoAvaliada
@@ -34,7 +34,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
 
     -- Mutacao
-    novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao
+    novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao funcaMutacao
 
     -- Ordernar nova interação no Loop evolutivo
     proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao') funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
@@ -49,11 +49,12 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         calcularMediaFitness pop = foldl (\acc (Individuo _ fitness') -> acc + fitness' ) 0.0 pop / fromIntegral (length pop)
 
         -- Função auxiliar para calcular o fitness de uma população de forma paralela
-        avaliarPopoulacao = parMap rpar funcaoAvaliacao
+        avaliarPopoulacao :: Populacao a -> (Individuo a -> Individuo a) -> Populacao a
+        avaliarPopoulacao pop funcaoAvaliacao' = parMap rpar funcaoAvaliacao' pop
 
         -- Função auxliar para realizar a mutação em uma determinada população
-        -- mutarPopulacao :: Populacao a -> IO (Populacao a)
-        mutarPopulacao pop = sequence $ parMap rpar funcaMutacao pop
+        mutarPopulacao :: Populacao a -> (Individuo a -> IO (Individuo a)) -> IO (Populacao a)
+        mutarPopulacao pop funcaMutacao' = sequence $ parMap rpar funcaMutacao' pop
 
 
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
