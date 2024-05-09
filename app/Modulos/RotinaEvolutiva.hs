@@ -31,7 +31,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     individuosSelecionados <- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $ funcaoSelecao novinhos
 
     -- Crossover
-    novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover
+    novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover [] contador
 
     -- Mutacao
     novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao
@@ -54,29 +54,35 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         -- Função auxliar para realizar a mutação em uma determinada população
         -- mutarPopulacao :: Populacao a -> IO (Populacao a)
         mutarPopulacao pop = sequence $ parMap rpar funcaMutacao pop
-            
+
 
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
         selecionarQuemFica :: Float -> Populacao a -> IO (Populacao a, Populacao a)
         selecionarQuemFica 1 pop = return ([], pop)
         selecionarQuemFica gap pop = do
             pop' <- shuffle pop
-            
+
             return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
 
         -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
-        crossover :: Ord a => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
-        crossover [] _ = return []
-        crossover [a] _ = return [a]
-        crossover pop estrategiaCrossover = do
-            resultPai <- selecionarRemoverRandom pop
-            case resultPai of
-                Nothing -> error "Erro ao selecionar pai durante o crossover"
+        crossover :: (Ord a, Eq a) => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> [(Individuo a, Individuo a)] -> Int -> IO (Populacao a)
+        crossover [] _ _ _ = return []
+        crossover [a] _ _ _ = return [a]
+        crossover _ _ _ 0 = return []
+        crossover pop funcaoCrossover' listaDePais contador' = do
+            resultadoPai <- selecionarRemoverRandom pop
+            case resultadoPai of
+                Nothing -> return []
                 Just (pai, pop') -> do
-                    resultMae <- selecionarRemoverRandom pop'
-                    case resultMae of
-                        Nothing -> error "Erro ao selecionar mae durante o crossover"
-                        Just (mae, pop'') -> do
-                            restante <- crossover pop'' estrategiaCrossover
-                            (maisVelho, maisNovo) <- estrategiaCrossover (pai, mae)
-                            return $ maisVelho : maisNovo : restante
+                    resultadoMae <- selecionarRemoverRandom pop'
+                    case resultadoMae of
+                        Nothing -> return []
+                        Just (mae, _) -> do
+                            if any (\a -> a == (pai, mae) || a == (mae, pai)) listaDePais then do
+                                -- Vou matar o pai para evitar que ele pegue a mãe de novo
+                                crossover (filter (/=pai) pop) funcaoCrossover' listaDePais contador'
+                            else do
+                                (maisVelho, maisNovo) <- funcaoCrossover' (pai, mae)
+                                restante <- crossover pop funcaoCrossover' ((pai, mae) : listaDePais) (contador' - 1)
+
+                                return $ maisVelho : maisNovo : restante
