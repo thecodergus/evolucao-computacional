@@ -117,7 +117,8 @@ roletaSemReposicao populacao = do
             encontrarIndividuos [] _ = []
             encontrarIndividuos (p : ps) valor'
               | fitness p <= valor' = p : encontrarIndividuos ps (valor' - fitness p)
-              | otherwise = [p]
+              | fitness p > valor' && valor' > 0 = [p]
+              | otherwise = []
 
 
 
