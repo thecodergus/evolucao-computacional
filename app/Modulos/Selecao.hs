@@ -69,7 +69,7 @@ import Tipos (Populacao, Individuo(fitness, Individuo))
 --               | fit <= valorSorteado = Just individuo
 --               | otherwise = selecionarIndividuo pop' valorSorteado
 
-
+-- Codigo do Kawan: https://github.dev/Dwahgon/ocev-ga
 -- Algoritmo:
 -- 1. Calcular o fitness total
 -- 2. Calcular o fitness relativo sobre cada Individuo da população
