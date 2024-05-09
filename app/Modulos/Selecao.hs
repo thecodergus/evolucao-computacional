@@ -73,7 +73,7 @@ import Tipos (Populacao, Individuo(fitness, Individuo))
 -- Algoritmo:
 -- 1. Calcular o fitness total
 -- 2. Calcular o fitness relativo sobre cada Individuo da população
--- 3. Calcular um valor aleatorio entre 0 e fitness total
+-- 3. Sortear um valor aleatorio entre 0 e fitness total
 -- 4. Embaralhar a lista de Individuos (População)
 -- 5. Interar sobre a lista indo somando os fitness relativos a partir de zero até que o acumulador seja igual ou superior ao valor aleatorio
 -- 6. Sobre a nova população aplicar os passos 1 ao 5 novamente. Pois essa primeira população é a população intermediaria
