@@ -5,7 +5,7 @@ import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
-import Selecao (roletaSemReposicao)
+import Selecao (roleta)
 import Avaliacoes.NRainhas(avaliacao)
 import Crosssover (pmx)
 import Mutacao (swap, mutacao)
@@ -15,20 +15,15 @@ main = do
   let n = 128
   pop_incial <- gerarPopulacaoInteiroPermutado 20 n (1, n)
 
-  let pop_avaliada = map (n `avaliacao`) pop_incial
 
-  individuosSelecionados <- roletaSemReposicao pop_avaliada
+  startTime <- getCPUTime
 
-  print $ length individuosSelecionados
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roleta (`mutacao` 0.05) (`pmx` 0.9) 0.01 20
 
-  -- startTime <- getCPUTime
+  endTime <- getCPUTime
 
-  -- geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roleta (`mutacao` 0.05) (`pmx` 0.9) 0.01 20
+  let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
 
-  -- endTime <- getCPUTime
+  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
-  -- let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
-
-  -- print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
-
-  -- gravarHistorico geracaoInfo "Grafico.png"
+  gravarHistorico geracaoInfo "Grafico.png"

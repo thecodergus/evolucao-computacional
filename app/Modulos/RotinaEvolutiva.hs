@@ -31,7 +31,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     individuosSelecionados <- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $ funcaoSelecao novinhos
 
     -- Crossover
-    novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover [] contador
+    novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
 
     -- Mutacao
     novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao
@@ -65,24 +65,24 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
             return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
 
         -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
-        crossover :: (Ord a, Eq a) => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> [(Individuo a, Individuo a)] -> Int -> IO (Populacao a)
-        crossover [] _ _ _ = return []
-        crossover [a] _ _ _ = return [a]
-        crossover _ _ _ 0 = return []
-        crossover pop funcaoCrossover' listaDePais contador' = do
-            resultadoPai <- selecionarRemoverRandom pop
-            case resultadoPai of
-                Nothing -> return []
-                Just (pai, pop') -> do
-                    resultadoMae <- selecionarRemoverRandom pop'
-                    case resultadoMae of
-                        Nothing -> return []
-                        Just (mae, _) -> do
-                            if any (\a -> a == (pai, mae) || a == (mae, pai)) listaDePais then do
-                                -- Vou matar o pai para evitar que ele pegue a mãe de novo
-                                crossover (filter (/=pai) pop) funcaoCrossover' listaDePais contador'
-                            else do
-                                (maisVelho, maisNovo) <- funcaoCrossover' (pai, mae)
-                                restante <- crossover pop funcaoCrossover' ((pai, mae) : listaDePais) (contador' - 1)
+        crossover :: Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Int -> IO (Populacao a)
+        crossover [] _  _ = return []
+        crossover _ _  0 = return []
+        crossover _ _  1 = return []
+        crossover [x] _  _ = return [x]
+        crossover pop funcaoCrossover' cont = do
+            -- Selecionando pai
+            Just (pai, pop') <- selecionarRemoverRandom pop
 
-                                return $ maisVelho : maisNovo : restante
+            -- Selecionando mae
+            Just (mae, _) <- selecionarRemoverRandom pop'
+
+            -- Realizando o crossover
+            (filho1, filho2) <- funcaoCrossover' (pai, mae)
+
+            -- Chamando recursivamente
+            proximosFilhos <- crossover pop funcaoCrossover' (cont - 2)
+
+            -- Retornando valores
+            return $ filho1 : filho2 : proximosFilhos
+            
