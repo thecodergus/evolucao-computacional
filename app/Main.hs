@@ -18,13 +18,11 @@ import Data.Maybe (maybeToList, fromMaybe)
 
 nRainhas :: IO ()
 nRainhas = do
-  let n = 32
-  let numIndividuos = 30
+  let n = 1024
+  let numIndividuos = 900
   let numGeracoes = 100
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
-
-  print $ "Populacao inicial: " ++ show pop_incial
 
   startTime <- getCPUTime
 
