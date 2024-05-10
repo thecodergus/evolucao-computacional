@@ -19,8 +19,8 @@ import Data.Maybe (maybeToList, fromMaybe)
 nRainhas :: IO ()
 nRainhas = do
   let n = 1024
-  let numIndividuos = 900
-  let numGeracoes = 100
+  let numIndividuos = 100
+  let numGeracoes = 2000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
 
