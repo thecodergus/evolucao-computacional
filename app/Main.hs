@@ -6,18 +6,29 @@ import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
 import Selecao (roleta)
-import Avaliacoes.NRainhas(avaliacao)
-import Crosssover (pmx)
-import Mutacao (swap, mutacao)
+import qualified Avaliacoes.Radio as Radio
+import qualified Avaliacoes.NRainhas as Rainhas
+import Crosssover (pmx, doisPontosAleatorios)
+import Mutacao (bitflip, mutacao, swap)
+import Tipos (Individuo(fitness, genes, Individuo))
+import Data.Maybe (maybeToList, fromMaybe)
 
-main :: IO ()
-main = do
-  let n = 1024
-  pop_incial <- gerarPopulacaoInteiroPermutado 1000 n (1, n)
+-- radios :: IO ()
+-- radios = do
+
+nRainhas :: IO ()
+nRainhas = do
+  let n = 32
+  let numIndividuos = 30
+  let numGeracoes = 100
+
+  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
+
+  print $ "Populacao inicial: " ++ show pop_incial
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `avaliacao`) roleta (`mutacao` 0.05) (`pmx` 0.9) 0.01 100
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `Rainhas.avaliacao`) roleta (`swap` 0.05) (`doisPontosAleatorios` 0.9) 0.01 numGeracoes
 
   endTime <- getCPUTime
 
@@ -25,4 +36,11 @@ main = do
 
   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
-  gravarHistorico geracaoInfo "Grafico.png"
+  gravarHistorico geracaoInfo "Grafico-NRainhas.png"
+
+
+
+main :: IO ()
+main = nRainhas
+  
+
