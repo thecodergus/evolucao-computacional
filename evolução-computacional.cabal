@@ -79,7 +79,7 @@ executable evolução-computacional
         Crosssover
         Mutacao
         Selecao
-        Radio
+        Avaliacoes.Radio
         RotinaEvolutiva
         Outros
         Utils.Outros

@@ -1,4 +1,4 @@
-module Radio where
+module Avaliacoes.Radio where 
 import Tipos (Individuo (Individuo))
 
 
