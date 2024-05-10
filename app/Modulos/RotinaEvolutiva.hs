@@ -8,8 +8,10 @@ import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 import Utils.Avaliacoes (melhorIndividuo)
 import Utils.Outros (shuffle)
-import Utils.Aleatoriedades (selecionarRemoverRandom)
+import Utils.Aleatoriedades (selecionarRemoverRandom, randomIntLista)
 import Debug.Trace(trace)
+import Data.List (sort)
+import Data.Either (partitionEithers)
 
 -- Retorna a ultima População e o historico de melhores individuos
 loopEvolutivoEnumerado :: (Ord a, Show a) => 
@@ -69,9 +71,18 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         selecionarQuemFica :: Float -> Populacao a -> IO (Populacao a, Populacao a)
         selecionarQuemFica 1 pop = return ([], pop)
         selecionarQuemFica gap pop = do
-            pop' <- shuffle pop
+            quemFica <- randomIntLista (0, length pop - 1) (round $ gap * fromIntegral (length pop))
 
-            return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
+
+            return $ partitionEithers $ selecionar quemFica (zip pop [0 ..])
+                where
+                -- Função que seleciona elementos com base em índices
+                selecionar :: [Int] -> [(Individuo a, Int)] -> [Either (Individuo a) (Individuo a)]
+                selecionar [] _ = []
+                selecionar _ [] = []
+                selecionar indices ((individuo, index) : xs)
+                    | index `elem` indices = Left individuo : selecionar indices xs
+                    | otherwise = Right individuo : selecionar indices xs
 
         -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
         crossover :: Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Int -> IO (Populacao a)
