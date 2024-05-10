@@ -26,7 +26,10 @@ avaliacao n (Individuo gene _) = Individuo gene fitness
                 linhaColuna a'@(x', y') b'@(x'', y'') = (x' == x'' || y' == y'') && (a' /= b')
 
                 diagonal :: (Int, Int) -> (Int, Int) -> Bool
-                diagonal a'@(x', y') b'@(x'', y'') = (abs (x' - x'') /= abs (y' - y'')) && a' /= b'
+                diagonal a'@(x', y') b'@(x'', y'') = a' /= b' && (b_growing || b_shrinking)
+                  where
+                    b_growing = x' - y' == x'' - y''
+                    b_shrinking = x' + y' == x'' + y''
             
 
     tranformarCoordenadaCartesiana' :: [Int] -> [(Int, Int)]
