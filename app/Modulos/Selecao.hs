@@ -7,6 +7,7 @@ import Utils.Avaliacoes (vencedorDoTorneio)
 import Tipos (Populacao, Individuo(fitness, Individuo))
 import Data.List (sort)
 import Debug.Trace(trace)
+import Control.Parallel.Strategies (parMap, rpar)
 
 
 roleta :: (Ord a, Show a) => Populacao a -> IO (Populacao a)
@@ -15,7 +16,7 @@ roleta populacao = girarRoleta (fitnessRelativo populacao) (length populacao)
     fitnessTotal :: Populacao a -> Float
     fitnessTotal pop = sum $ map fitness pop
     
-    fitnessRelativo pop = sort $ map calcularFitnessRelativo pop
+    fitnessRelativo pop = sort $ parMap rpar calcularFitnessRelativo pop
       where
         calcularFitnessRelativo :: Individuo a -> Individuo a
         calcularFitnessRelativo individuo = individuo {fitness = 360 * (fitness individuo / (if fitnessTotal pop /= 0 then fitnessTotal pop else 1))}
