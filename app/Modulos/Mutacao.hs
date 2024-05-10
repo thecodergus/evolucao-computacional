@@ -68,24 +68,28 @@ swap (Individuo gene _) probabilidade = do
   -- Gera uma lista de chances aleatórias entre 0 e 1 para cada gene
   chances <- randomFloatLista (0, 1) (length gene)
   -- Verifica se cada chance é menor ou igual à probabilidade de swap
-  let chances' = map (<= probabilidade) chances
+  let chancesIndices = zip (map (<= probabilidade) chances) [0..]
 
   -- Realiza o swap em cada gene com base nas chances
-  novo_gene <- swap' gene chances' 0
+  novo_gene <- swap' gene chancesIndices
 
   -- Retorna o novo individuo com o gene alterado
   return (Individuo novo_gene 0)
-  where
-    -- Função auxiliar que realiza o swap recursivamente
-    swap' :: [a] -> [Bool] -> Int -> IO [a]
-    swap' [] _ _ = return []
-    swap' _ [] _ = return []
-    swap' itens (b : bs) contador
-      -- Se a chance for verdadeira, realiza o swap de dois elementos aleatórios da lista
-      | b = do
-          indice_a <- randomInt (0, length itens - 1)
-          indice_b <- randomInt (0, length itens - 1)
+    where
+      swap' :: [a] -> [(Bool, Int)]  -> IO [a]
+      swap' [] _  = return []
+      swap' lista []  = return lista
+      swap' lista ((True, i) : xs) = do
+        outroIndice <- randomInt (0, length lista - 1)
 
-          swap' (swapElementsAt indice_a indice_b itens) bs (contador + 1)
-      -- Se a chance for falsa, passa para o próximo elemento da lista
-      | otherwise = swap' itens bs (contador + 1)
+        let novoGene = swap'' i outroIndice lista
+
+        swap' novoGene xs
+      swap' lista ((False, _) : xs) = swap' lista xs
+
+      swap'' :: Int -> Int -> [a] -> [a]
+      swap'' i j lst = replace i (lst !! j) $ replace j (lst !! i) $ lst
+
+      replace :: Int -> a -> [a] -> [a]
+      replace i x lst = take i lst ++ [x] ++ drop (i+1) lst
+    
