@@ -12,7 +12,15 @@ import Utils.Aleatoriedades (selecionarRemoverRandom)
 import Debug.Trace(trace)
 
 -- Retorna a ultima População e o historico de melhores individuos
-loopEvolutivoEnumerado :: (Ord a) => Populacao a -> (Individuo a -> Individuo a) -> (Populacao a -> IO (Populacao a)) -> (Individuo a -> IO (Individuo a)) -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Float -> Int -> IO (GeracaoInfo a)
+loopEvolutivoEnumerado :: (Ord a, Show a) => 
+    Populacao a -> 
+    (Individuo a -> Individuo a) -> 
+    (Populacao a -> IO (Populacao a)) -> 
+    (Individuo a -> IO (Individuo a)) -> 
+    ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) ->
+    Float -> 
+    Int -> 
+    IO (GeracaoInfo a)
 loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador = do
     print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
@@ -37,7 +45,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao funcaMutacao
 
     -- Ordernar nova interação no Loop evolutivo
-    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
+    proximaGeracao <- trace ("Populacao Mutada => " ++ show novaPopulacao')$ loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
 
     -- Retornando valores
     return $ GeracaoInfo (individuoEletista ++ elitistas proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaFitness proximaGeracao)
