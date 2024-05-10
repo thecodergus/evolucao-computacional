@@ -25,8 +25,8 @@ loopEvolutivoEnumerado :: (Ord a, Show a) =>
     IO (GeracaoInfo a)
 loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador = do
-    print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
-    print $ "Tamanho da populacao => " ++ show (length populacao)
+    -- print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
+    -- print $ "Tamanho da populacao => " ++ show (length populacao)
 
     -- Avaliacao
     let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
@@ -38,16 +38,20 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     (veios, novinhos) <- selecionarQuemFica generatioGap populacaoAvaliada
 
     -- Selecao
-    individuosSelecionados <- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $ funcaoSelecao novinhos
+    -- individuosSelecionados <- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $ funcaoSelecao novinhos
+    individuosSelecionados <- funcaoSelecao novinhos
 
     -- Crossover
-    novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
+    -- novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
+    novaPopulacao <- crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
 
     -- Mutacao
-    novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao funcaMutacao
+    -- novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao funcaMutacao
+    novaPopulacao' <- mutarPopulacao novaPopulacao funcaMutacao
 
     -- Ordernar nova interação no Loop evolutivo
-    proximaGeracao <- trace ("Populacao Mutada => " ++ show (length novaPopulacao'))$ loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
+    -- proximaGeracao <- trace ("Populacao Mutada => " ++ show (length novaPopulacao')) $ loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
+    proximaGeracao <- loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
 
     -- Retornando valores
     return $ GeracaoInfo (individuoEletista ++ elitistas proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaFitness proximaGeracao)
