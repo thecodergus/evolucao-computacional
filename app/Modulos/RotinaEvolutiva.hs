@@ -76,22 +76,22 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
         crossover :: Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Int -> IO (Populacao a)
         crossover [] _  _ = return []
-        crossover _ _  0 = return []
-        crossover _ _  1 = return []
         crossover [x] _  _ = return [x]
         crossover pop funcaoCrossover' cont = do
-            -- Selecionando pai
-            Just (pai, pop') <- selecionarRemoverRandom pop
+            pais <- selecionarPais pop cont
+            filhos <- sequence $ parMap rpar funcaoCrossover' pais
+            
+            return $ concatMap (\(filho1, filho2) -> [filho1, filho2]) filhos
 
-            -- Selecionando mae
-            Just (mae, _) <- selecionarRemoverRandom pop'
+        selecionarPais :: Populacao a -> Int -> IO [(Individuo a, Individuo a)]
+        selecionarPais [] _ = return []
+        selecionarPais [x] _ = return []
+        selecionarPais (pai : mae : pop) numPais 
+            | numPais == 0 = return []
+            | otherwise = do
+                
+                proximosPais <- selecionarPais pop (numPais - 1)
+                
+                return $ (pai, mae) : proximosPais
 
-            -- Realizando o crossover
-            (filho1, filho2) <- funcaoCrossover' (pai, mae)
-
-            -- Chamando recursivamente
-            proximosFilhos <- crossover pop funcaoCrossover' (cont - 2)
-
-            -- Retornando valores
-            return $ filho1 : filho2 : proximosFilhos
             
