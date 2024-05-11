@@ -13,13 +13,13 @@ import Debug.Trace(trace)
 
 -- Retorna a ultima População e o historico de melhores individuos
 loopEvolutivoEnumerado :: (Ord a, Show a) => 
-    Populacao a -> 
-    (Individuo a -> Individuo a) -> 
-    (Populacao a -> IO (Populacao a)) -> 
-    (Individuo a -> IO (Individuo a)) -> 
-    ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) ->
-    Float -> 
-    Int -> 
+    Populacao a -> -- População inicial
+    (Individuo a -> Individuo a) -> -- Função de avaliação
+    (Populacao a -> IO (Populacao a)) -> -- Função de seleção
+    (Individuo a -> IO (Individuo a)) ->  -- Função de mutação
+    ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> -- Função de crossover
+    Float -> -- Generatio Gap
+    Int -> -- Numero de interações
     IO (GeracaoInfo a)
 loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador = do
