@@ -79,13 +79,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         crossover _ _  0 = return []
         crossover _ _  1 = return []
         crossover [x] _  _ = return [x]
-        crossover pop funcaoCrossover' cont = do
-            -- Selecionando pai
-            Just (pai, pop') <- selecionarRemoverRandom pop
-
-            -- Selecionando mae
-            Just (mae, _) <- selecionarRemoverRandom pop'
-
+        crossover (pai : mae : pop) funcaoCrossover' cont = do
             -- Realizando o crossover
             (filho1, filho2) <- funcaoCrossover' (pai, mae)
 
