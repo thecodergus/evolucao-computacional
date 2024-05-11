@@ -8,13 +8,52 @@ import System.CPUTime ( getCPUTime )
 import Selecao (roleta)
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
+import qualified Avaliacoes.Sat as Sat
 import Crosssover (pmx, doisPontosAleatorios, cx)
 import Mutacao (bitflip, mutacao, swap)
 import Tipos (Individuo(fitness, genes, Individuo))
 import Data.Maybe (maybeToList, fromMaybe)
 
--- radios :: IO ()
--- radios = do
+
+sat :: IO ()
+sat = do
+  let numIndividuos = 10
+  let numGeracoes = 2000
+
+  disjuncao <- fileToIntLists "data/sat.cnf"
+
+  pop_incial <- gerarPopulacaoBooleana numIndividuos 100
+
+  startTime <- getCPUTime
+
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`Sat.avaliacao` disjuncao) roleta (`swap` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
+
+  endTime <- getCPUTime
+
+  let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
+
+  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+
+  gravarHistorico geracaoInfo "Grafico-Sat.png"
+
+radios :: IO ()
+radios = do
+  let numIndividuos = 10
+  let numGeracoes = 2000
+
+  pop_incial <- gerarPopulacaoBooleana numIndividuos 10
+
+  startTime <- getCPUTime
+
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (fromMaybe (error "Invalid individual") . Radio.avaliacao) roleta (`bitflip` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
+
+  endTime <- getCPUTime
+
+  let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
+
+  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+
+  gravarHistorico geracaoInfo "Grafico-Radios.png"
 
 nRainhas :: IO ()
 nRainhas = do
@@ -40,5 +79,5 @@ nRainhas = do
 
 main :: IO ()
 main = nRainhas
-  
+
 
