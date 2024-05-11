@@ -20,7 +20,7 @@ sat = do
   let numIndividuos = 10
   let numGeracoes = 2000
 
-  disjuncao <- fileToIntLists "data/sat.cnf"
+  disjuncao <- fileToIntLists "arquivoSAT.cnf"
 
   pop_incial <- gerarPopulacaoBooleana numIndividuos 100
 
