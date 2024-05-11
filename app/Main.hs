@@ -11,8 +11,9 @@ import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Sat as Sat
 import Crosssover (pmx, doisPontosAleatorios, cx)
 import Mutacao (bitflip, mutacao, swap)
-import Tipos (Individuo(fitness, genes, Individuo))
+import Tipos (Individuo(fitness, genes, Individuo), GeracaoInfo (melhorIndividuo))
 import Data.Maybe (maybeToList, fromMaybe)
+import qualified Utils.Avaliacoes as Avaliacoes
 
 
 sat :: IO ()
@@ -34,6 +35,8 @@ sat = do
 
   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
+  print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
+
   gravarHistorico geracaoInfo "Grafico-Sat.png"
 
 radios :: IO ()
@@ -52,6 +55,8 @@ radios = do
   let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
 
   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+
+  print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
   gravarHistorico geracaoInfo "Grafico-Radios.png"
 
@@ -72,6 +77,8 @@ nRainhas = do
   let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
 
   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+
+  print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
   gravarHistorico geracaoInfo "Grafico-NRainhas.png"
 
