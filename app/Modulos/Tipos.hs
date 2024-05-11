@@ -21,6 +21,7 @@ type Populacao a = [Individuo a]
 
 
 data GeracaoInfo a = GeracaoInfo {
-  elitistas :: [Individuo a],
-  mediaFitness :: [Float]
+  melhorIndividuo :: [Individuo a],
+  mediaPopulacao :: [Float],
+  piorIndividuo :: [Individuo a]
 } deriving Show

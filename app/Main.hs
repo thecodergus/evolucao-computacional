@@ -18,15 +18,15 @@ import Data.Maybe (maybeToList, fromMaybe)
 
 nRainhas :: IO ()
 nRainhas = do
-  let n = 1024
-  let numIndividuos = 100
-  let numGeracoes = 2000
+  let n = 128
+  let numIndividuos = 10
+  let numGeracoes = 100000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `Rainhas.avaliacao`) roleta (`swap` 0.05) (`doisPontosAleatorios` 0.9) 0.01 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `Rainhas.avaliacao`) roleta (`swap` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
 
   endTime <- getCPUTime
 

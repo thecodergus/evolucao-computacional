@@ -13,21 +13,20 @@ import Graphics.Rendering.Chart.Easy
       Default(def) )
 import Graphics.Rendering.Chart.Backend.Cairo ( toFile )
 import Graphics.Rendering.Chart (laxis_title, layout_x_axis)
-import Tipos (GeracaoInfo (GeracaoInfo, elitistas), Individuo (fitness))
-import Control.Parallel.Strategies (parMap, rpar)
-
+import Tipos (GeracaoInfo (GeracaoInfo), Individuo (fitness))
 
 gravarHistorico :: GeracaoInfo a -> String -> IO ()
-gravarHistorico (GeracaoInfo historicoMelhorIndividuo mediaFitnees) nomeArquivo =
+gravarHistorico (GeracaoInfo historicoMelhorIndividuo mediaPopulacao historicoPiorIndividuo) nomeArquivo =
   toFile def nomeArquivo $ do
     layout_title .= "Historico"
     layout_y_axis . laxis_override .= axisGridHide
     layout_y_axis . laxis_title .= "Valor fitness"
     layout_x_axis . laxis_title .= "Geração"
-    plot (line "Melhor individuo" [zip [1 .. length historicoMelhorIndividuo] (extrairDadosMelhorIndividuo historicoMelhorIndividuo)])
-    plot (line "Media Fitness" [zip [1 .. length historicoMelhorIndividuo] mediaFitnees])
+    plot (line "Melhor individuo" [zip [1 .. length historicoMelhorIndividuo] (extrairDados historicoMelhorIndividuo)])
+    plot (line "Media Populacao" [zip [1 .. length mediaPopulacao] mediaPopulacao])
+    plot (line "Pior individuo" [zip [1 .. length historicoPiorIndividuo] (extrairDados historicoPiorIndividuo)])
 
     where
       -- Função auxiliar para extrair os valores de fitness dos individuos elitistas
-      extrairDadosMelhorIndividuo :: [Individuo a] -> [Float]
-      extrairDadosMelhorIndividuo = parMap rpar fitness
+      extrairDados :: [Individuo a] -> [Float]
+      extrairDados = map fitness

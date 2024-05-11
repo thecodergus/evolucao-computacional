@@ -3,16 +3,16 @@ module RotinaEvolutiva where
 
 import Mutacao(mutacao)
 import Crosssover(umPontoAleatorio)
-import Tipos (GeracaoInfo (GeracaoInfo, elitistas, mediaFitness), Individuo (Individuo), Populacao)
+import Tipos (GeracaoInfo (GeracaoInfo, mediaPopulacao, melhorIndividuo, piorIndividuo), Individuo (Individuo), Populacao)
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
-import Utils.Avaliacoes (melhorIndividuo)
+import qualified Utils.Avaliacoes as Utils
 import Utils.Outros (shuffle)
 import Utils.Aleatoriedades (selecionarRemoverRandom)
 import Debug.Trace(trace)
 
 -- Retorna a ultima População e o historico de melhores individuos
-loopEvolutivoEnumerado :: (Ord a, Show a) => 
+loopEvolutivoEnumerado :: (Ord a, Show a) =>
     Populacao a -> -- População inicial
     (Individuo a -> Individuo a) -> -- Função de avaliação
     (Populacao a -> IO (Populacao a)) -> -- Função de seleção
@@ -21,7 +21,7 @@ loopEvolutivoEnumerado :: (Ord a, Show a) =>
     Float -> -- Generatio Gap
     Int -> -- Numero de interações
     IO (GeracaoInfo a)
-loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [])
+loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [] [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador = do
     print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
     print $ "Tamanho da populacao => " ++ show (length populacao)
@@ -30,7 +30,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
 
     -- Encontrar o melhor individuo
-    let individuoEletista = maybeToList $ melhorIndividuo populacaoAvaliada 
+    let individuoEletista = maybeToList $ Utils.melhorIndividuo populacaoAvaliada
 
     -- Ativando a questão do generatioGap
     (veios, novinhos) <- selecionarQuemFica generatioGap populacaoAvaliada
@@ -48,7 +48,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     proximaGeracao <- trace ("Populacao Mutada => " ++ show (length novaPopulacao'))$ loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
 
     -- Retornando valores
-    return $ GeracaoInfo (individuoEletista ++ elitistas proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaFitness proximaGeracao)
+    return $ GeracaoInfo (individuoEletista ++ melhorIndividuo proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaPopulacao proximaGeracao) (maybeToList (Utils.piorIndividuo populacaoAvaliada) ++ piorIndividuo proximaGeracao)
 
 
     where
@@ -88,4 +88,4 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
 
             -- Retornando valores
             return $ filho1 : filho2 : proximosFilhos
-            
+
