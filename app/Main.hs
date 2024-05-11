@@ -17,7 +17,7 @@ import Data.Maybe (maybeToList, fromMaybe)
 
 sat :: IO ()
 sat = do
-  let numIndividuos = 10
+  let numIndividuos = 30
   let numGeracoes = 2000
 
   disjuncao <- fileToIntLists "arquivoSAT.cnf"
@@ -38,14 +38,14 @@ sat = do
 
 radios :: IO ()
 radios = do
-  let numIndividuos = 10
-  let numGeracoes = 2000
+  let numIndividuos = 30
+  let numGeracoes = 100
 
   pop_incial <- gerarPopulacaoBooleana numIndividuos 10
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (fromMaybe (error "Invalid individual") . Radio.avaliacao) roleta (`bitflip` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (fromMaybe (error "Invalid individual") . Radio.avaliacao) roleta (`bitflip` 0.05) (`cx` 0.8) 0.2 numGeracoes
 
   endTime <- getCPUTime
 
@@ -78,6 +78,6 @@ nRainhas = do
 
 
 main :: IO ()
-main = nRainhas
+main = radios
 
 
