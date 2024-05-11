@@ -5,7 +5,9 @@ import Tipos (Individuo (Individuo))
 -- Esta função avalia um individuo no problema das N rainhas,
 -- onde 'n' é o tamanho do tabuleiro de xadrez e 'Individuo Int' é a representação do tabuleiro.
 avaliacao :: Int -> Individuo Int -> Individuo Int
-avaliacao n (Individuo gene _) = Individuo gene fitness
+avaliacao n (Individuo gene _) 
+  | length gene /= n = error "O tamanho do gene é diferente do tamanho do tabuleiro."
+  | otherwise = Individuo gene fitness
   where
     -- A aptidão (fitness) é calculada a partir da quantidade de rainhas não atacando entre si.
     fitness :: Float
