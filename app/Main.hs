@@ -8,7 +8,7 @@ import System.CPUTime ( getCPUTime )
 import Selecao (roleta)
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
-import Crosssover (pmx, doisPontosAleatorios)
+import Crosssover (pmx, doisPontosAleatorios, cx)
 import Mutacao (bitflip, mutacao, swap)
 import Tipos (Individuo(fitness, genes, Individuo))
 import Data.Maybe (maybeToList, fromMaybe)
@@ -20,7 +20,7 @@ nRainhas :: IO ()
 nRainhas = do
   let n = 128
   let numIndividuos = 10
-  let numGeracoes = 100000
+  let numGeracoes = 2000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
 
