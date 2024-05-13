@@ -5,11 +5,11 @@ import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
-import Selecao (roleta, torneio, torneioEstocastico)
+import Selecao (roletaComReposicao, torneio, torneioEstocastico)
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Sat as Sat
-import Crosssover (pmx, doisPontosAleatorios, cx)
+import Crosssover (pmx, doisPontosAleatorios, cx, umPontoAleatorio)
 import Mutacao (bitflip, mutacao, swap)
 import Tipos (Individuo(fitness, genes, Individuo), GeracaoInfo (melhorIndividuo))
 import Data.Maybe (maybeToList, fromMaybe)
@@ -21,13 +21,13 @@ sat = do
   let numIndividuos = 30
   let numGeracoes = 2000
 
-  disjuncao <- fileToIntLists "arquivoSAT.cnf"
+  disjuncao <- fileToIntLists "/home/udesc/Documentos/evolucao-computacional-main/arquivoSAT.cnf"
 
   pop_incial <- gerarPopulacaoBooleana numIndividuos 100
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`Sat.avaliacao` disjuncao) roleta (`swap` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`Sat.avaliacao` disjuncao) roletaComReposicao (`bitflip` 0.05) (`umPontoAleatorio` 0.9) 0.2 numGeracoes
 
   endTime <- getCPUTime
 
@@ -48,7 +48,7 @@ radios = do
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (fromMaybe (error "Invalid individual") . Radio.avaliacao) roleta (`bitflip` 0.05) (`cx` 0.8) 0.2 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (fromMaybe (error "Invalid individual") . Radio.avaliacao) (torneioEstocastico 3 0.41) (`bitflip` 0.05) (`cx` 0.8) 0.2 numGeracoes
 
   endTime <- getCPUTime
 
@@ -70,7 +70,7 @@ nRainhas = do
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `Rainhas.avaliacao`) roleta (`swap` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `Rainhas.avaliacao`) roletaComReposicao (`swap` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
 
   endTime <- getCPUTime
 
@@ -84,17 +84,17 @@ nRainhas = do
 
 
 
--- main :: IO ()
--- main = nRainhas
-
 main :: IO ()
-main = do
-  pop_incial <- gerarPopulacaoBooleana 20 10
+main = sat
 
-  let pop_avaliada = map (fromMaybe (error "Invalid individual") . Radio.avaliacao) pop_incial
+-- main :: IO ()
+-- main = do
+--   pop_incial <- gerarPopulacaoBooleana 20 10
 
-  pop_selecionada <- torneioEstocastico 2 0.3 pop_avaliada
+--   let pop_avaliada = map (fromMaybe (error "Invalid individual") . Radio.avaliacao) pop_incial
 
-  print $ pop_selecionada
+--   pop_selecionada <- torneioEstocastico 2 0.3 pop_avaliada
+
+--   print $ pop_selecionada
 
 

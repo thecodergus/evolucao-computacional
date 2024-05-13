@@ -14,8 +14,8 @@ import Data.Maybe (fromMaybe)
 import Control.Monad
 
 
-roleta :: (Ord a, Show a) => Populacao a -> IO (Populacao a)
-roleta populacao = girarRoleta (fitnessRelativo populacao) (length populacao)
+roletaComReposicao :: (Ord a, Show a) => Populacao a -> IO (Populacao a)
+roletaComReposicao populacao = girarRoleta (fitnessRelativo populacao) (length populacao)
   where
     fitnessTotal :: Populacao a -> Float
     fitnessTotal pop = sum $ map fitness pop
