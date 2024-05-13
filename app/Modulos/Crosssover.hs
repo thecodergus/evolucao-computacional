@@ -26,10 +26,10 @@ umPontoAleatorio (pai, mae) probabilidade
       -- Chama a função 'mutar' passando o valor aleatório, a lista de genes do pai e a lista de genes da mãe.
       mutar (valorAleatorio <= probabilidade) (genes pai) (genes mae)
 
-      where 
+      where
         mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
         mutar False a b = return (Individuo a 0, Individuo b 0)
-        mutar True a b = 
+        mutar True a b =
           -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
           randomInt (0, length a - 1) >>= \numero_aleatorio ->
           -- Divide a lista de genes do pai no ponto aleatório.
@@ -51,10 +51,10 @@ doisPontosAleatorios (pai, mae) probabilidade
   | null (genes pai) = error "O numero de genes devem ser maiores que zero"
   | otherwise = doisPontosAleatorios'
   where
-    doisPontosAleatorios' = 
+    doisPontosAleatorios' =
        -- Gera um valor aleatório entre 0 e 1
       randomFloat (0, 1) >>= \valorAleatorio ->
-      
+
       mutar (valorAleatorio <= probabilidade) (genes pai) (genes mae)
       where
         mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
@@ -85,7 +85,7 @@ uniforme (Individuo lista_1 _, Individuo lista_2 _) probabilidade
     randomFloat (0, 1) >>= \valorAleatorio ->
 
     mutar (valorAleatorio <= probabilidade) lista_1 lista_2
-    
+
     where
       mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
       mutar False a b = return (Individuo a 0, Individuo b 0)
@@ -100,10 +100,10 @@ uniforme (Individuo lista_1 _, Individuo lista_2 _) probabilidade
       uniforme' [] b = return ([], b)
       uniforme' (x:xs) (y:ys) =
         -- Gera um valor aleatório entre 0 e 1
-        randomInt (0, 1)  >>= 
+        randomInt (0, 1)  >>=
           \valorAleatorio ->
           -- Realiza o crossover uniforme nas caudas das listas
-          uniforme' xs ys  >>= 
+          uniforme' xs ys  >>=
             \ (filho_1, filho_2) ->
             -- Decide quais elementos serão adicionados aos filhos com base no valor aleatório
             let filho_1' = if valorAleatorio == 1 then x : filho_1 else y : filho_1
@@ -114,82 +114,24 @@ uniforme (Individuo lista_1 _, Individuo lista_2 _) probabilidade
 
 -- Função que realiza o crossover PMX entre dois indivíduos com probabilidade de mutação
 pmx :: Eq a => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
-pmx (Individuo gene_pai _, Individuo gene_mae _) probabildiade = do
-  -- Gera um número aleatório entre 0 e 1 para decidir se a mutação ocorrerá ou não
-  chanceMutar <- randomFloat (0, 1)
+pmx (Individuo gene_pai _, Individuo gene_mae _) probabildiade
+  | length gene_pai < 3 || length gene_mae < 3 = error "Os genes precisam ter tamanho minimo de 3"
+  | otherwise =
+    randomInt (1,  length gene_pai `div` 2) >>=
+      \casa_1 -> randomInt ((length gene_pai `div` 2) + 1, length gene_pai- 1) >>=
+        \casa_2 -> return (Individuo gene_pai 0, Individuo gene_mae 0)
 
-  -- Realiza a mutação dos genes dos pais para gerar os filhos, caso a chance gerada seja menor ou igual à probabilidade
-  (gene_filho_mais_velho, gene_filho_mais_novo) <- mutar (chanceMutar <= probabildiade) gene_pai gene_mae
+        where
+          fazerAsTrocas :: Eq a => ([a], [a], [a]) -> ([a], [a], [a]) -> [a]
+          fazerAsTrocas (pa, pb, pc) (ma, mb, mc) = pa
 
-  -- Retorna os filhos gerados
-  return (Individuo gene_filho_mais_velho 0, Individuo gene_filho_mais_novo 0)
-  where
-    -- Função que realiza a mutação dos genes dos pais para gerar os filhos
-    mutar :: Eq a => Bool -> [a] -> [a] -> IO ([a], [a])
-    mutar False gene_pai' gene_mae' = return (gene_pai', gene_mae') -- Se a mutação não ocorrer, retorna os pais como filhos
-    mutar True gene_pai' gene_mae' = do
-      -- Gera dois pontos de corte aleatórios para a realização do crossover
-      pontos_corte <- gerarNumeroAleatorio 0 (length gene_pai' - 1)
-
-      -- Realiza o crossover PMX entre os pais e retorna os filhos gerados
-      return $ mutar' pontos_corte gene_pai' gene_mae'
-      where
-        -- Função que realiza o crossover PMX entre os pais
-        mutar' :: Eq a => (Int, Int) -> [a] -> [a] -> ([a], [a])
-        mutar' pontos pai mae = do
-          -- Corta as listas dos pais em três partes cada uma com base nos pontos de corte
-          let (pai_parte_1, pai_matching_section, pai_parte_2) = cortarLista pontos pai
-          let (mae_parte_1, mae_matching_section, mae_parte_2) = cortarLista pontos mae
-
-          -- Realiza o matching das seções dos pais e gera os filhos
-          (fazerMatching (pai_parte_1, mae_matching_section, pai_parte_2) pai_matching_section, fazerMatching (mae_parte_1, pai_matching_section, mae_parte_2) mae_matching_section)
-          where
-            -- Função que corta uma lista em três partes com base nos pontos de corte
-            cortarLista :: (Int, Int) -> [a] -> ([a], [a], [a])
-            cortarLista (a, b) lista = do
-              let (parte_1, resto) = splitAt a lista
-                  (parte_2, parte_3) = splitAt (b - a) resto
-
-              (parte_1, parte_2, parte_3)
-
-            -- Função que realiza o matching das seções dos pais para gerar os filhos
-            fazerMatching :: Eq a => ([a], [a], [a]) -> [a] -> [a]
-            fazerMatching (parte_1, match, parte_2) matchSection = fazerMatching' parte_1 matchSection ++ match ++ fazerMatching' parte_2 matchSection
-              where
-                -- Função auxiliar para realizar o matching das seções dos pais
-                fazerMatching' :: Eq a => [a] -> [a] -> [a]
-                fazerMatching' [] _ = []
-                fazerMatching' (a : as) matchSection'
-                  | Just i <- elemIndex a matchSection' = [matchSection' !! i]
-                  | otherwise = a : fazerMatching' as matchSection'
-
-    -- Função que gera dois números aleatórios diferentes entre si para os pontos de corte
-    gerarNumeroAleatorio :: Int -> Int -> IO (Int, Int)
-    gerarNumeroAleatorio a b
-      | a == b = error "Ta de sacanagem mane, dois numeros iguais?"
-      | otherwise = gerarNumeroAleatorio' a b
-      where
-        gerarNumeroAleatorio' :: Int -> Int -> IO (Int, Int)
-        gerarNumeroAleatorio' a' b' = do
-          a'' <- randomInt (a', b')
-          b'' <- randomInt (a', b')
-
-          if a'' == b''
-            then gerarNumeroAleatorio' a b
-            else return $ retornarMaior a'' b''
-
-        -- Função auxiliar que retorna os dois números gerados em ordem decrescente
-        retornarMaior :: Int -> Int -> (Int, Int)
-        retornarMaior a' b'
-          | a' > b' = (b', a')
-          | otherwise = (a', b')
 
 
 -- cx é uma função que recebe dois indivíduos (pai e mãe) e uma probabilidade, e realiza o cruzamento entre eles
 cx :: Eq a => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
 cx (pai, mae) probabilidade =
    -- gera um número aleatório entre 0 e 1 para decidir se o cruzamento ocorrerá ou não
-  randomFloat (0, 1) >>= 
+  randomFloat (0, 1) >>=
     \chanceMutar ->  cx' pai mae (chanceMutar <= probabilidade)
   where
     -- cx' é uma função auxiliar que realiza o cruzamento em si, caso a chance de mutar seja menor ou igual à probabilidade
@@ -198,12 +140,12 @@ cx (pai, mae) probabilidade =
     cx' (Individuo [] _) (Individuo [] _) _ = return (Individuo [] 0, Individuo [] 0) -- se ambos os indivíduos estiverem vazios, retorna dois indivíduos vazios
     cx' (Individuo [] _) (Individuo mae' _) True = return (Individuo mae' 0, Individuo mae' 0) -- se o pai estiver vazio, retorna dois indivíduos idênticos à mãe
     cx' (Individuo pai' _) (Individuo [] _) True = return (Individuo pai' 0, Individuo pai' 0) -- se a mãe estiver vazia, retorna dois indivíduos idênticos ao pai
-    cx' (Individuo (p:ps) _) (Individuo (m:ms) _) True = 
+    cx' (Individuo (p:ps) _) (Individuo (m:ms) _) True =
       -- compara as listas de genes dos indivíduos para encontrar os genes comuns
       -- troca a posição dos genes comuns nos indivíduos
       let (filho_mais_velho, filho_mais_novo) = trocarPosicao ps ms (compararListas ps ms ) 0 in
       -- retorna os dois novos indivíduos resultantes do cruzamento
-      return (Individuo  (p : filho_mais_velho) 0, Individuo (m : filho_mais_novo) 0) 
+      return (Individuo  (p : filho_mais_velho) 0, Individuo (m : filho_mais_novo) 0)
 
       where
         -- função auxiliar que compara as listas de genes e retorna as posições dos genes comuns

@@ -36,3 +36,18 @@ shuffle xs =
     -- Cria um array com os elementos da lista
     newArray :: Int -> [a] -> IO (IOArray Int a)
     newArray n' = newListArray (1,n')
+
+-- Função que divide uma lista em 3 com base nos dois inputs de inteiros
+splitListAtTwoIndices :: [a] -> Int -> Int -> ([a], [a], [a])
+splitListAtTwoIndices xs i j
+  | i < 0 || j < 0 || i > length xs || j > length xs || i > j = error "Invalid indices"
+  | otherwise = (take i xs, mid, drop (j + 1) xs)
+  where
+    mid = drop (i + 1) $ take (j + 1) xs
+
+-- Função que verifica se determinado item pertence a lista
+ifIn :: Eq a => a -> [a] -> Bool
+ifIn _ [] = False
+ifIn a (b : bs) 
+  | a == b = True
+  | otherwise = ifIn a bs 
