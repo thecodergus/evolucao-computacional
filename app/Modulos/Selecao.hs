@@ -33,6 +33,7 @@ roletaComReposicao populacao = girarRoleta (fitnessRelativo populacao) (length p
         where
           encontrarIndividuo :: Populacao a -> Float -> Float -> Individuo a
           encontrarIndividuo [] _ _ = error "Individuo nao encontrado"
+          encontrarIndividuo [p] _ _ = p
           encontrarIndividuo (p : ps) sorteio acc
             | sorteio <= acc + fitness p = p
             | otherwise = encontrarIndividuo ps sorteio (acc + fitness p)
@@ -52,11 +53,12 @@ roletaSemReposicao populacao = girarRoleta populacao (length populacao) Nothing
     girarRoleta [] _ _ = return []
     girarRoleta _ 0 _ = return []
     girarRoleta pop n indi =
-      randomFloat (0, 360) >>= 
+      randomFloat (0, 360) >>=
         \sorteio -> let individuoSelecionado = encontrarIndividuo (fitnessRelativo (removerAntigoIndividuoSelecionado pop indi)) sorteio 0 in (individuoSelecionado :) <$> girarRoleta pop (n - 1) (Just individuoSelecionado)
       where
         encontrarIndividuo :: Populacao a -> Float -> Float -> Individuo a
         encontrarIndividuo [] _ _ = error "Individuo nao encontrado"
+        encontrarIndividuo [p] _ _ = p
         encontrarIndividuo (p : ps) sorteio acc
           | sorteio <= acc + fitness p = p
           | otherwise = encontrarIndividuo ps sorteio (acc + fitness p)
@@ -80,7 +82,7 @@ torneioEstocastico k kp populacao
         | otherwise =
           escolherRandoms k' pop >>=
             \escolhidos -> randomFloat (0, 1) >>=
-              \chance -> 
+              \chance ->
                   case if chance <= kp' then melhorCampeao escolhidos else piorCampeao escolhidos of
                     Nothing -> return []
                     Just campeao -> campeonato (cont - 1) k' kp' pop >>= \restante -> return $ campeao : restante
@@ -89,7 +91,7 @@ torneioEstocastico k kp populacao
           melhorCampeao :: Populacao a -> Maybe (Individuo a)
           melhorCampeao [] = Nothing
           melhorCampeao pop' = Just $ maximumBy (comparing fitness) pop'
-          
+
           piorCampeao :: Populacao a -> Maybe (Individuo a)
           piorCampeao [] = Nothing
           piorCampeao pop' = Just $ minimumBy (comparing fitness) pop'
@@ -104,8 +106,8 @@ torneio k populacao
         | cont <= 0 = return []
         | otherwise =
           escolherRandoms k pop >>=
-            \escolhidos -> 
-              case lutar escolhidos of 
+            \escolhidos ->
+              case lutar escolhidos of
                 Nothing -> return []
                 Just campeao -> campeonato (cont - 1) k' pop >>= \restante -> return $ campeao : restante
 
