@@ -3,6 +3,7 @@ module Utils.Aleatoriedades where
 
 import System.Random ( randomRIO )
 import Control.Monad (replicateM)
+import Tipos (Populacao)
 
 -- Função auxiliar para gerar um valor inteiro aleatório entre dois valores
 randomInt :: (Int, Int) -> IO Int
@@ -65,3 +66,14 @@ selecionarRemoverRandom itens =
     removeAt n xs
       | n < 0 || n >= length xs = Nothing
       | otherwise = Just $ let (as, bs) = splitAt n xs in as ++ tail bs
+
+escolherRandoms :: Int -> Populacao a -> IO (Populacao a)
+escolherRandoms 0 _ = return []
+escolherRandoms _ [] = return []
+escolherRandoms contador pop =
+  selecionarRemoverRandom pop >>=
+    \ret -> case ret of
+      Nothing -> return []
+      Just (indi, pop')
+        -> escolherRandoms (contador - 1) pop'
+            >>= \ retorno' -> return $ indi : retorno'

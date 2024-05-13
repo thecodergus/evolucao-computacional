@@ -1,12 +1,11 @@
-{-# LANGUAGE LambdaCase #-}
 module Selecao where
 
-import Utils.Aleatoriedades (randomInt, randomFloat, selecionarRemoverRandom)
+import Utils.Aleatoriedades (randomInt, randomFloat, selecionarRemoverRandom, escolherRandoms)
 import Utils.Outros(shuffle)
 import Control.Monad (replicateM)
 import Utils.Avaliacoes (vencedorDoTorneio)
 import Tipos (Populacao, Individuo(fitness, Individuo))
-import Data.List (sort)
+import Data.List (sort, minimumBy)
 import Debug.Trace(trace)
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Foldable (maximumBy)
@@ -45,16 +44,28 @@ torneioEstocastico :: (Eq a, Ord a) => Int -> Float -> Populacao a -> IO (Popula
 torneioEstocastico k kp populacao
   -- Se k for menor que 2, retorna um erro informando que o valor mínimo é 2
   | k < 2 = error "O valor minimo de k eh igual a 2"
-  | otherwise = do
-    -- Calcula o tamanho da população e a quantidade de indivíduos a serem selecionados com base na taxa de seleção
-    let tamanhoPopulacao = length populacao
-        qtdSelecionados = ceiling (fromIntegral tamanhoPopulacao * kp)
+  | kp < 0 || kp > 1 = error "O valor de kp deve estar entre 0 e 1"
+  | otherwise = campeonato (length populacao) k kp populacao
+    where
+      campeonato :: Int -> Int -> Float -> Populacao a -> IO (Populacao a)
+      campeonato cont k' kp' pop
+        | cont <= 0 = return []
+        | otherwise =
+          escolherRandoms k' pop >>=
+            \escolhidos -> randomFloat (0, 1) >>=
+              \chance -> 
+                  case if chance <= kp' then melhorCampeao escolhidos else piorCampeao escolhidos of
+                    Nothing -> return []
+                    Just campeao -> campeonato (cont - 1) k' kp' pop >>= \restante -> return $ campeao : restante
 
-    -- Para cada indivíduo a ser selecionado, seleciona k índices aleatoriamente para formar um torneio
-    torneios <- replicateM qtdSelecionados (replicateM k (randomInt (0, tamanhoPopulacao - 1)))
-
-    -- Realiza o torneio para cada grupo de índices selecionados e retorna a lista de vencedores
-    mapM (vencedorDoTorneio populacao) torneios
+        where
+          melhorCampeao :: Populacao a -> Maybe (Individuo a)
+          melhorCampeao [] = Nothing
+          melhorCampeao pop' = Just $ maximumBy (comparing fitness) pop'
+          
+          piorCampeao :: Populacao a -> Maybe (Individuo a)
+          piorCampeao [] = Nothing
+          piorCampeao pop' = Just $ minimumBy (comparing fitness) pop'
 
 torneio :: (Ord a) => Int -> Populacao a -> IO (Populacao a)
 torneio k populacao
@@ -65,22 +76,11 @@ torneio k populacao
       campeonato cont k' pop
         | cont <= 0 = return []
         | otherwise =
-          escolher k pop >>=
+          escolherRandoms k pop >>=
             \escolhidos -> 
               case lutar escolhidos of 
                 Nothing -> return []
                 Just campeao -> campeonato (cont - 1) k' pop >>= \restante -> return $ campeao : restante
-
-      escolher :: Int -> Populacao a -> IO (Populacao a)
-      escolher 0 _ = return []
-      escolher _ [] = return []
-      escolher contador pop =
-        selecionarRemoverRandom pop >>=
-          \case
-            Nothing -> return []
-            Just (indi, pop')
-              -> escolher (contador - 1) pop'
-                  >>= \ retorno' -> return $ indi : retorno'
 
       lutar :: Populacao a -> Maybe (Individuo a)
       lutar [] = Nothing

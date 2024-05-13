@@ -5,7 +5,7 @@ import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
-import Selecao (roleta)
+import Selecao (roleta, torneio, torneioEstocastico)
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Sat as Sat
@@ -84,7 +84,17 @@ nRainhas = do
 
 
 
+-- main :: IO ()
+-- main = nRainhas
+
 main :: IO ()
-main = nRainhas
+main = do
+  pop_incial <- gerarPopulacaoBooleana 20 10
+
+  let pop_avaliada = map (fromMaybe (error "Invalid individual") . Radio.avaliacao) pop_incial
+
+  pop_selecionada <- torneioEstocastico 2 0.3 pop_avaliada
+
+  print $ pop_selecionada
 
 
