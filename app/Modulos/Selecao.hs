@@ -1,6 +1,7 @@
+{-# LANGUAGE LambdaCase #-}
 module Selecao where
 
-import Utils.Aleatoriedades (randomInt, randomFloat)
+import Utils.Aleatoriedades (randomInt, randomFloat, selecionarRemoverRandom)
 import Utils.Outros(shuffle)
 import Control.Monad (replicateM)
 import Utils.Avaliacoes (vencedorDoTorneio)
@@ -8,6 +9,10 @@ import Tipos (Populacao, Individuo(fitness, Individuo))
 import Data.List (sort)
 import Debug.Trace(trace)
 import Control.Parallel.Strategies (parMap, rpar)
+import Data.Foldable (maximumBy)
+import Data.Ord (comparing)
+import Data.Maybe (fromMaybe)
+import Control.Monad
 
 
 roleta :: (Ord a, Show a) => Populacao a -> IO (Populacao a)
@@ -54,12 +59,29 @@ torneioEstocastico k kp populacao
 torneio :: (Ord a) => Int -> Populacao a -> IO (Populacao a)
 torneio k populacao
   | k < 2 = error "O valor minimo de k eh igual a 2"
-  | otherwise = do
-    -- Calcula o tamanho da população
-    let tamanhoPopulacao = length populacao
+  | otherwise = campeonato (length populacao) k populacao
+    where
+      campeonato :: Int -> Int -> Populacao a -> IO (Populacao a)
+      campeonato cont k' pop
+        | cont <= 0 = return []
+        | otherwise =
+          escolher k pop >>=
+            \escolhidos -> 
+              case lutar escolhidos of 
+                Nothing -> return []
+                Just campeao -> campeonato (cont - 1) k' pop >>= \restante -> return $ campeao : restante
 
-    -- Para cada indivíduo da população, seleciona k índices aleatoriamente para formar um torneio
-    torneios <- replicateM tamanhoPopulacao (replicateM k (randomInt (0, tamanhoPopulacao - 1)))
+      escolher :: Int -> Populacao a -> IO (Populacao a)
+      escolher 0 _ = return []
+      escolher _ [] = return []
+      escolher contador pop =
+        selecionarRemoverRandom pop >>=
+          \case
+            Nothing -> return []
+            Just (indi, pop')
+              -> escolher (contador - 1) pop'
+                  >>= \ retorno' -> return $ indi : retorno'
 
-    -- Realiza o torneio para cada grupo de índices selecionados e retorna a lista de vencedores
-    mapM (vencedorDoTorneio populacao) torneios
+      lutar :: Populacao a -> Maybe (Individuo a)
+      lutar [] = Nothing
+      lutar pop = Just $ maximumBy (comparing fitness) pop
