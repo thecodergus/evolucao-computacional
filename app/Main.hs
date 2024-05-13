@@ -5,7 +5,7 @@ import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
-import Selecao (roletaComReposicao, torneio, torneioEstocastico)
+import Selecao (roletaComReposicao, roletaSemReposicao, torneio, torneioEstocastico)
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Sat as Sat
@@ -27,7 +27,7 @@ sat = do
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`Sat.avaliacao` disjuncao) roletaComReposicao (`bitflip` 0.05) (`umPontoAleatorio` 0.9) 0.2 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`Sat.avaliacao` disjuncao) roletaSemReposicao (`bitflip` 0.05) (`doisPontosAleatorios` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 
