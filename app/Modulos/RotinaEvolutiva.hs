@@ -63,7 +63,8 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
         selecionarQuemFica :: Float -> Populacao a -> IO (Populacao a, Populacao a)
         selecionarQuemFica 1 pop = return ([], pop)
-        selecionarQuemFica gap pop = shuffle pop >>= \pop' -> return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
+        selecionarQuemFica gap pop = shuffle pop >>= 
+            \pop' -> return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
 
         -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
         crossover :: Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Int -> IO (Populacao a)
@@ -73,11 +74,11 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         crossover [x] _  _ = return [x]
         crossover (pai : mae : pop) funcaoCrossover' cont =
             -- Realizando o crossover
-            funcaoCrossover' (pai, mae) >>= \(filho1, filho2) ->
-
-            -- Chamando recursivamente
-            crossover pop funcaoCrossover' (cont - 2) >>= \proximosFilhos ->
-
-            -- Retornando valores
-            return $ filho1 : filho2 : proximosFilhos
+            funcaoCrossover' (pai, mae) >>= 
+                \(filho1, filho2) ->
+                -- Chamando recursivamente
+                crossover pop funcaoCrossover' (cont - 2) >>= 
+                    \proximosFilhos ->
+                    -- Retornando valores
+                    return $ filho1 : filho2 : proximosFilhos
 
