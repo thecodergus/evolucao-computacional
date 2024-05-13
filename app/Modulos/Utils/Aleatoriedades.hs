@@ -18,16 +18,11 @@ randomIntMatriz range num_listas tam_lista = replicateM num_listas (randomIntLis
 
 -- Função auxliar para gear uma lista de listas com elementos aleatorios
 randomSublistas :: (Int, Int) -> Int -> IO [[Int]]
-randomSublistas range num_sublistas = do
-  num_elementos <- randomRIO (1, num_sublistas)
-  replicateM num_sublistas (randomIntLista range num_elementos)
+randomSublistas range num_sublistas = randomRIO (1, num_sublistas) >>= \num_elementos -> replicateM num_sublistas (randomIntLista range num_elementos)
 
 -- Função auxliar para gear uma lista de listas com tamanhos variaveis e elementos aleatorios
 randomSublistas' :: (Int, Int) -> Int -> IO [[Int]]
-randomSublistas' range num_sublistas = do
-  replicateM num_sublistas $ do
-    num_elementos <- randomRIO (1, num_sublistas)
-    randomIntLista range num_elementos
+randomSublistas' range num_sublistas = replicateM num_sublistas $ randomRIO (1, num_sublistas) >>= \num_elementos -> randomIntLista range num_elementos
 
 -- Função auxiliar para gerar um valor float aleatório entre dois valores
 randomFloat :: (Float, Float) -> IO Float
@@ -57,15 +52,15 @@ randomBoolMatriz num_listas tam_lista = replicateM num_listas (randomBoolLista t
 -- Função auxiliar para selecionar um elemento aleatório de uma lista
 selecionarRemoverRandom :: [a] -> IO (Maybe (a, [a]))
 selecionarRemoverRandom [] = return Nothing
-selecionarRemoverRandom itens = do
-  random <- randomRIO (0, tam - 1)
-  let result = (itens !! random, removeAt random itens)
-  return $ case result of
-    (_, Nothing) -> Nothing
-    (selected, Just newList) -> Just (selected, newList)
+selecionarRemoverRandom itens =
+  let tam = length itens
+   in randomRIO (0, tam - 1)
+        >>= \random ->
+          let result = (itens !! random, removeAt random itens)
+           in return $ case result of
+                (_, Nothing) -> Nothing
+                (selected, Just newList) -> Just (selected, newList)
   where
-    tam = length itens
-
     removeAt :: Int -> [a] -> Maybe [a]
     removeAt n xs
       | n < 0 || n >= length xs = Nothing

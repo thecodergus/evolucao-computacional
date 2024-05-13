@@ -62,9 +62,9 @@ radios = do
 
 nRainhas :: IO ()
 nRainhas = do
-  let n = 128
+  let n = 32
   let numIndividuos = 10
-  let numGeracoes = 2000
+  let numGeracoes = 20000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
 
@@ -85,6 +85,6 @@ nRainhas = do
 
 
 main :: IO ()
-main = radios
+main = nRainhas
 
 

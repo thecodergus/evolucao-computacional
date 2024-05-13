@@ -22,34 +22,29 @@ loopEvolutivoEnumerado :: (Ord a, Show a) =>
     Int -> -- Numero de interações
     IO (GeracaoInfo a)
 loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [] [])
-loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador = do
-    print $ "----------- Loop Evolutivo Enumerado numero " ++ show contador ++ "-----------"
-    print $ "Tamanho da populacao => " ++ show (length populacao)
-
-    -- Avaliacao
+loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador =
     let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
-
-    -- Encontrar o melhor individuo
-    let individuoEletista = maybeToList $ Utils.melhorIndividuo populacaoAvaliada
-
-    -- Ativando a questão do generatioGap
-    (veios, novinhos) <- selecionarQuemFica generatioGap populacaoAvaliada
-
-    -- Selecao
-    individuosSelecionados <- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $ funcaoSelecao novinhos
-
-    -- Crossover
-    novaPopulacao <- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $ crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
-
-    -- Mutacao
-    novaPopulacao' <- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $ mutarPopulacao novaPopulacao funcaMutacao
-
-    -- Ordernar nova interação no Loop evolutivo
-    proximaGeracao <- trace ("Populacao Mutada => " ++ show (length novaPopulacao'))$ loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
-
-    -- Retornando valores
-    return $ GeracaoInfo (individuoEletista ++ melhorIndividuo proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaPopulacao proximaGeracao) (maybeToList (Utils.piorIndividuo populacaoAvaliada) ++ piorIndividuo proximaGeracao)
-
+        individuoEletista = maybeToList $ Utils.melhorIndividuo populacaoAvaliada
+    in  trace ("-------- Loop Evolutivo Geracao " ++ show contador ++ "-------") $ selecionarQuemFica generatioGap populacaoAvaliada
+        -- Selecionando os individuos que ficam e os que morrem
+        >>= \(veios, novinhos) ->
+            trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $
+            -- Selecionando os individuos que ficam
+            funcaoSelecao novinhos
+                >>= \individuosSelecionados ->
+                trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $
+                -- Realizando o crossover
+                    crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
+                    >>= \novaPopulacao ->
+                        trace ("Nova Populacao => " ++ show (length novaPopulacao)) $
+                        -- Realizando a mutação
+                        mutarPopulacao novaPopulacao funcaMutacao
+                            >>= \novaPopulacao' ->
+                            trace ("Populacao Mutada => " ++ show (length novaPopulacao')) $
+                            -- Chamando recursivamente a proxima interação
+                                loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
+                                >>= \proximaGeracao ->
+                                    return $ GeracaoInfo (individuoEletista ++ melhorIndividuo proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaPopulacao proximaGeracao) (maybeToList (Utils.piorIndividuo populacaoAvaliada) ++ piorIndividuo proximaGeracao)
 
     where
         -- Função auxiliar para calcular a media de fitness de cada geração
@@ -68,10 +63,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         -- Função auxiliar para selecionar os ficaram e os que morreram de uma determinada população na virada geracional
         selecionarQuemFica :: Float -> Populacao a -> IO (Populacao a, Populacao a)
         selecionarQuemFica 1 pop = return ([], pop)
-        selecionarQuemFica gap pop = do
-            pop' <- shuffle pop
-
-            return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
+        selecionarQuemFica gap pop = shuffle pop >>= \pop' -> return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
 
         -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
         crossover :: Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Int -> IO (Populacao a)
@@ -79,12 +71,12 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
         crossover _ _  0 = return []
         crossover _ _  1 = return []
         crossover [x] _  _ = return [x]
-        crossover (pai : mae : pop) funcaoCrossover' cont = do
+        crossover (pai : mae : pop) funcaoCrossover' cont =
             -- Realizando o crossover
-            (filho1, filho2) <- funcaoCrossover' (pai, mae)
+            funcaoCrossover' (pai, mae) >>= \(filho1, filho2) ->
 
             -- Chamando recursivamente
-            proximosFilhos <- crossover pop funcaoCrossover' (cont - 2)
+            crossover pop funcaoCrossover' (cont - 2) >>= \proximosFilhos ->
 
             -- Retornando valores
             return $ filho1 : filho2 : proximosFilhos
