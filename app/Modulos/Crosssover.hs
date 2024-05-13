@@ -29,13 +29,14 @@ umPontoAleatorio (pai, mae) probabilidade
       where 
         mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
         mutar False a b = return (Individuo a 0, Individuo b 0)
-        mutar True a b = do
+        mutar True a b = 
           -- Gera um número aleatório entre 0 e o tamanho dos genes do pai menos 1.
-          numero_aleatorio <- randomInt (0, length a - 1)
+          randomInt (0, length a - 1) >>= \numero_aleatorio ->
           -- Divide a lista de genes do pai no ponto aleatório.
           let (pai_1, pai_2) = splitAt numero_aleatorio a
           -- Divide a lista de genes da mãe no ponto aleatório.
-          let (mae_1, mae_2) = splitAt numero_aleatorio b
+              (mae_1, mae_2) = splitAt numero_aleatorio b
+              in
           -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes da mãe e a segunda parte dos genes do pai.
           -- O segundo indivíduo tem a primeira parte dos genes do pai e a segunda parte dos genes da mãe.
           return (Individuo (mae_1 ++ pai_2) 0, Individuo (pai_1 ++ mae_2) 0)
@@ -58,18 +59,18 @@ doisPontosAleatorios (pai, mae) probabilidade
       where
         mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
         mutar False a b = return (Individuo a 0, Individuo b 0)
-        mutar True a b = do
+        mutar True a b =
           -- Gera dois números aleatórios entre as posições válidas dos genes do pai.
-          numero_aleatorio1 <- randomInt (0, length a - 1)
-          numero_aleatorio2 <- randomInt (0, length a - (numero_aleatorio1 + 1))
+          randomInt (0, length a - 1) >>= \numero_aleatorio1 ->
+            randomInt (0, length a - (numero_aleatorio1 + 1)) >>= \numero_aleatorio2 ->
 
           -- Divide a lista de genes do pai nos dois pontos aleatórios.
           let (pai_1, pai_2) = splitAt numero_aleatorio1 a
               (pai_3, pai_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) pai_2
-
           -- Divide a lista de genes da mãe nos dois pontos aleatórios.
-          let (mae_1, mae_2) = splitAt numero_aleatorio1 b
+              (mae_1, mae_2) = splitAt numero_aleatorio1 b
               (mae_3, mae_4) = splitAt (numero_aleatorio2 - numero_aleatorio1) mae_2
+              in
 
           -- Retorna um par de novos indivíduos. O primeiro indivíduo tem a primeira parte dos genes do pai, a parte do meio dos genes da mãe e a última parte dos genes do pai.
           -- O segundo indivíduo tem a primeira parte dos genes da mãe, a parte do meio dos genes do pai e a última parte dos genes da mãe.
