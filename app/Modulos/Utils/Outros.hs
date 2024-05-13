@@ -24,14 +24,12 @@ swapElementsAt i j xs =
 -- Função que embaralha uma lista qualquer
 shuffle :: [a] -> IO [a]
 shuffle [] = return []
-shuffle xs = do
-        ar <- newArray n xs
-        forM [1..n] $ \i -> do
-            j <- randomRIO (i,n)
-            vi <- readArray ar i
-            vj <- readArray ar j
-            writeArray ar j vi
-            return vj
+shuffle xs = 
+  newArray n xs >>= 
+    \ar -> forM [1..n] $ \i -> randomRIO (i,n) >>= 
+      \j -> readArray ar i >>= 
+        \vi -> readArray ar j >>= 
+          \vj -> writeArray ar j vi >> return vj
   where
     n = length xs
 

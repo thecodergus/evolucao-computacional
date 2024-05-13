@@ -19,9 +19,9 @@ umPontoAleatorio (pai, mae) probabilidade
   where
     -- A função 'umPontoAleatorio' não recebe nenhum argumento.
     -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
-    umPontoAleatorio' = do
+    umPontoAleatorio' =
       -- Gera um número aleatório entre 0 e 1.
-      valorAleatorio <- randomFloat (0, 1)
+      randomFloat (0, 1) >>= \valorAleatorio ->
 
       -- Chama a função 'mutar' passando o valor aleatório, a lista de genes do pai e a lista de genes da mãe.
       mutar (valorAleatorio <= probabilidade) (genes pai) (genes mae)
@@ -50,8 +50,9 @@ doisPontosAleatorios (pai, mae) probabilidade
   | null (genes pai) = error "O numero de genes devem ser maiores que zero"
   | otherwise = doisPontosAleatorios'
   where
-    doisPontosAleatorios' = do
-      valorAleatorio <- randomFloat (0, 1) -- Gera um valor aleatório entre 0 e 1
+    doisPontosAleatorios' = 
+       -- Gera um valor aleatório entre 0 e 1
+      randomFloat (0, 1) >>= \valorAleatorio ->
       
       mutar (valorAleatorio <= probabilidade) (genes pai) (genes mae)
       where
@@ -78,16 +79,17 @@ uniforme :: (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
 uniforme (Individuo lista_1 _, Individuo lista_2 _) probabilidade
   | length lista_1 /= length lista_2 = error "O tamanhos dos genes do pai_1 e da mae devem ser iguais"
   | null lista_1 = error "O numero de genes devem ser maiores que zero"
-  | otherwise = do
-    valorAleatorio <- randomFloat (0, 1) -- Gera um valor aleatório entre 0 e 1
+  | otherwise =
+    -- Gera um valor aleatório entre 0 e 1
+    randomFloat (0, 1) >>= \valorAleatorio ->
 
     mutar (valorAleatorio <= probabilidade) lista_1 lista_2
     
     where
       mutar :: Bool -> [a] -> [a] -> IO (Individuo a, Individuo a)
       mutar False a b = return (Individuo a 0, Individuo b 0)
-      mutar True a b = do
-        (filho_1, filho_2) <- uniforme' a b
+      mutar True a b =
+        uniforme' a b >>= \ (filho_1, filho_2) ->
 
         return (Individuo filho_1 0, Individuo filho_2 0)
 
@@ -95,15 +97,18 @@ uniforme (Individuo lista_1 _, Individuo lista_2 _) probabilidade
       uniforme' [] [] = return ([], [])
       uniforme' a [] = return (a, [])
       uniforme' [] b = return ([], b)
-      uniforme' (x:xs) (y:ys) = do
-        valorAleatorio <- randomInt (0, 1) -- Gera um valor aleatório entre 0 e 1
-        (filho_1, filho_2) <- uniforme' xs ys -- Realiza o crossover uniforme nas caudas das listas
+      uniforme' (x:xs) (y:ys) =
+        -- Gera um valor aleatório entre 0 e 1
+        randomInt (0, 1)  >>= 
+          \valorAleatorio ->
+          -- Realiza o crossover uniforme nas caudas das listas
+          uniforme' xs ys  >>= 
+            \ (filho_1, filho_2) ->
+            -- Decide quais elementos serão adicionados aos filhos com base no valor aleatório
+            let filho_1' = if valorAleatorio == 1 then x : filho_1 else y : filho_1
+                filho_2' = if valorAleatorio == 1 then y : filho_2 else x : filho_2 in
 
-        -- Decide quais elementos serão adicionados aos filhos com base no valor aleatório
-        let filho_1' = if valorAleatorio == 1 then x : filho_1 else y : filho_1
-        let filho_2' = if valorAleatorio == 1 then y : filho_2 else x : filho_2
-
-        return (filho_1', filho_2')
+            return (filho_1', filho_2')
 
 
 -- Função que realiza o crossover PMX entre dois indivíduos com probabilidade de mutação
@@ -181,10 +186,10 @@ pmx (Individuo gene_pai _, Individuo gene_mae _) probabildiade = do
 
 -- cx é uma função que recebe dois indivíduos (pai e mãe) e uma probabilidade, e realiza o cruzamento entre eles
 cx :: Eq a => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
-cx (pai, mae) probabilidade = do
-  chanceMutar <- randomFloat (0, 1) -- gera um número aleatório entre 0 e 1 para decidir se o cruzamento ocorrerá ou não
-
-  cx' pai mae (chanceMutar <= probabilidade)
+cx (pai, mae) probabilidade =
+   -- gera um número aleatório entre 0 e 1 para decidir se o cruzamento ocorrerá ou não
+  randomFloat (0, 1) >>= 
+    \chanceMutar ->  cx' pai mae (chanceMutar <= probabilidade)
   where
     -- cx' é uma função auxiliar que realiza o cruzamento em si, caso a chance de mutar seja menor ou igual à probabilidade
     cx' :: Eq a => Individuo a -> Individuo a -> Bool -> IO (Individuo a, Individuo a)
@@ -192,12 +197,12 @@ cx (pai, mae) probabilidade = do
     cx' (Individuo [] _) (Individuo [] _) _ = return (Individuo [] 0, Individuo [] 0) -- se ambos os indivíduos estiverem vazios, retorna dois indivíduos vazios
     cx' (Individuo [] _) (Individuo mae' _) True = return (Individuo mae' 0, Individuo mae' 0) -- se o pai estiver vazio, retorna dois indivíduos idênticos à mãe
     cx' (Individuo pai' _) (Individuo [] _) True = return (Individuo pai' 0, Individuo pai' 0) -- se a mãe estiver vazia, retorna dois indivíduos idênticos ao pai
-    cx' (Individuo (p:ps) _) (Individuo (m:ms) _) True = do
-      let comparacoes = compararListas ps ms -- compara as listas de genes dos indivíduos para encontrar os genes comuns
-
-      let (filho_mais_velho, filho_mais_novo) = trocarPosicao ps ms comparacoes 0 -- troca a posição dos genes comuns nos indivíduos
-
-      return (Individuo  (p : filho_mais_velho) 0, Individuo (m : filho_mais_novo) 0) -- retorna os dois novos indivíduos resultantes do cruzamento
+    cx' (Individuo (p:ps) _) (Individuo (m:ms) _) True = 
+      -- compara as listas de genes dos indivíduos para encontrar os genes comuns
+      -- troca a posição dos genes comuns nos indivíduos
+      let (filho_mais_velho, filho_mais_novo) = trocarPosicao ps ms (compararListas ps ms ) 0 in
+      -- retorna os dois novos indivíduos resultantes do cruzamento
+      return (Individuo  (p : filho_mais_velho) 0, Individuo (m : filho_mais_novo) 0) 
 
       where
         -- função auxiliar que compara as listas de genes e retorna as posições dos genes comuns

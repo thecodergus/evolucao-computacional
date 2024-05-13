@@ -77,7 +77,7 @@ swap (Individuo gene _) probabilidade =
         f lista' _ = return lista'
 
     swap'' :: Int -> Int -> [a] -> [a]
-    swap'' i j lst = replace i (lst !! j) $ replace j (lst !! i) $ lst
+    swap'' i j lst = replace i (lst !! j) $ replace j (lst !! i) lst
 
     replace :: Int -> a -> [a] -> [a]
     replace i x lst = take i lst ++ [x] ++ drop (i + 1) lst

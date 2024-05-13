@@ -15,7 +15,7 @@ roleta populacao = girarRoleta (fitnessRelativo populacao) (length populacao)
   where
     fitnessTotal :: Populacao a -> Float
     fitnessTotal pop = sum $ map fitness pop
-    
+
     fitnessRelativo pop = sort $ parMap rpar calcularFitnessRelativo pop
       where
         calcularFitnessRelativo :: Individuo a -> Individuo a
@@ -24,23 +24,14 @@ roleta populacao = girarRoleta (fitnessRelativo populacao) (length populacao)
     girarRoleta :: (Ord a, Show a) => Populacao a -> Int -> IO (Populacao a)
     girarRoleta [] _ = return []
     girarRoleta _ 0 = return []
-    girarRoleta pop n = do
-      sorteio <- randomFloat (0, 360)
-
-      let individuo = encontrarIndividuo pop sorteio 0
-
-      (individuo :) <$> girarRoleta pop (n - 1)
+    girarRoleta pop n =
+      randomFloat (0, 360) >>= \sorteio -> (encontrarIndividuo pop sorteio 0 :) <$> girarRoleta pop (n - 1)
         where
           encontrarIndividuo :: Populacao a -> Float -> Float -> Individuo a
           encontrarIndividuo [] _ _ = error "Individuo nao encontrado"
-          encontrarIndividuo (p : ps) sorteio acc 
+          encontrarIndividuo (p : ps) sorteio acc
             | sorteio <= acc + fitness p = p
             | otherwise = encontrarIndividuo ps sorteio (acc + fitness p)
-
-
-
-
-
 
 
 
