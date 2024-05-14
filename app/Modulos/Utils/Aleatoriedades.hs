@@ -77,3 +77,10 @@ escolherRandoms contador pop =
       Just (indi, pop')
         -> escolherRandoms (contador - 1) pop'
             >>= \ retorno' -> return $ indi : retorno'
+
+
+gerarParInteirosAleatorios :: (Int, Int) -> IO (Int, Int)
+gerarParInteirosAleatorios range = 
+  randomInt range >>= 
+    \a -> randomInt range >>= 
+      \b -> return $ if a < b then (a, b) else (b, a)

@@ -43,7 +43,7 @@ splitListAtTwoIndices xs i j
   | i < 0 || j < 0 || i > length xs || j > length xs || i > j = error "Invalid indices"
   | otherwise = (take i xs, mid, drop (j + 1) xs)
   where
-    mid = drop (i + 1) $ take (j + 1) xs
+    mid = drop i $ take (j+ 1)  xs
 
 -- Função que verifica se determinado item pertence a lista
 ifIn :: Eq a => a -> [a] -> Bool
