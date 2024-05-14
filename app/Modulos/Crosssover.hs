@@ -5,6 +5,9 @@ import Tipos (Individuo(genes, Individuo), Populacao)
 import Utils.Aleatoriedades (randomFloat, randomInt, selecionarRemoverRandom)
 import Data.List (elemIndex)
 import Data.Bifunctor(bimap)
+import Data.Maybe
+import Utils.Outros (splitListAtTwoIndices)
+import Debug.Trace (traceMarker, trace)
 
 -- A função 'umPontoAleatorio' recebe dois indivíduos (pai e mãe) como entrada.
 -- Ela retorna um par de novos indivíduos que são o resultado do crossover de um ponto aleatório entre o pai e a mãe.
@@ -117,14 +120,27 @@ pmx :: Eq a => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo
 pmx (Individuo gene_pai _, Individuo gene_mae _) probabildiade
   | length gene_pai < 3 || length gene_mae < 3 = error "Os genes precisam ter tamanho minimo de 3"
   | otherwise =
-    randomInt (1,  length gene_pai `div` 2) >>=
-      \casa_1 -> randomInt ((length gene_pai `div` 2) + 1, length gene_pai- 1) >>=
-        \casa_2 -> return (Individuo gene_pai 0, Individuo gene_mae 0)
+    randomFloat (0, 1) >>=
+      \chanceMutar -> 
+      if chanceMutar <= probabildiade then
+        randomInt (1,  length gene_pai `div` 2) >>=
+          \casa_1 -> randomInt (casa_1 + 1, length gene_pai- 1) >>=
+            \casa_2 ->trace ("Casa 1: " ++ show casa_1 ++ "\nCasa 2: " ++ show casa_2) $ return $ let (filho_1, filho_2) = fazerAsTrocas (splitListAtTwoIndices gene_pai casa_1 casa_2) (splitListAtTwoIndices gene_mae casa_1 casa_2) 
+                                in (Individuo filho_1 0, Individuo filho_2 0)
+      else return (Individuo gene_pai 0, Individuo gene_mae 0)
+            where
+              fazerAsTrocas :: Eq a => ([a], [a], [a]) -> ([a], [a], [a]) -> ([a], [a])
+              fazerAsTrocas (pa, pb, pc) (ma, mb, mc) = (
+                map (\x -> encontrarElementoInverso x mb pb) pa ++ mb ++ map (\x -> encontrarElementoInverso x mb pb) pc,
+                map (\x -> encontrarElementoInverso x pb mb) ma ++ pb ++ map (\x -> encontrarElementoInverso x pb mb) mc
+                )
 
-        where
-          fazerAsTrocas :: Eq a => ([a], [a], [a]) -> ([a], [a], [a]) -> [a]
-          fazerAsTrocas (pa, pb, pc) (ma, mb, mc) = pa
-
+              encontrarElementoInverso :: Eq a => a -> [a] -> [a] -> a
+              encontrarElementoInverso x' [] _ = x'
+              encontrarElementoInverso x' _ [] = x'
+              encontrarElementoInverso x' (y:ys') (z:zs')
+                | x' == y = z
+                | otherwise = encontrarElementoInverso x' ys' zs'
 
 
 -- cx é uma função que recebe dois indivíduos (pai e mãe) e uma probabilidade, e realiza o cruzamento entre eles
