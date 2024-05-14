@@ -125,7 +125,7 @@ pmx (Individuo gene_pai _, Individuo gene_mae _) probabildiade
       if chanceMutar <= probabildiade then
         randomInt (1,  length gene_pai `div` 2) >>=
           \casa_1 -> randomInt (casa_1 + 1, length gene_pai- 1) >>=
-            \casa_2 ->trace ("Casa 1: " ++ show casa_1 ++ "\nCasa 2: " ++ show casa_2) $ return $ let (filho_1, filho_2) = fazerAsTrocas (splitListAtTwoIndices gene_pai casa_1 casa_2) (splitListAtTwoIndices gene_mae casa_1 casa_2) 
+            \casa_2 -> return $ let (filho_1, filho_2) = fazerAsTrocas (splitListAtTwoIndices gene_pai casa_1 casa_2) (splitListAtTwoIndices gene_mae casa_1 casa_2) 
                                 in (Individuo filho_1 0, Individuo filho_2 0)
       else return (Individuo gene_pai 0, Individuo gene_mae 0)
             where
