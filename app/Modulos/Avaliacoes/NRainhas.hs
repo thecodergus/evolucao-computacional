@@ -1,5 +1,6 @@
 module Avaliacoes.NRainhas where
 import Tipos (Individuo (Individuo))
+import Debug.Trace (trace)
 
 
 -- Esta função avalia um individuo no problema das N rainhas,

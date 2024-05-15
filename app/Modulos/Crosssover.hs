@@ -2,7 +2,7 @@ module Crosssover where
 
 
 import Tipos (Individuo(genes, Individuo), Populacao)
-import Utils.Aleatoriedades (randomFloat, randomInt, selecionarRemoverRandom)
+import Utils.Aleatoriedades (randomFloat, randomInt, selecionarRemoverRandom, gerarParInteirosAleatorios)
 import Data.List (elemIndex)
 import Data.Bifunctor(bimap)
 import Data.Maybe
@@ -116,23 +116,21 @@ uniforme (Individuo lista_1 _, Individuo lista_2 _) probabilidade
 
 
 -- Função que realiza o crossover PMX entre dois indivíduos com probabilidade de mutação
-pmx :: Eq a => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
+pmx :: (Eq a, Show a) => (Individuo a, Individuo a) -> Float -> IO (Individuo a, Individuo a)
 pmx (Individuo gene_pai _, Individuo gene_mae _) probabildiade
   | length gene_pai < 3 || length gene_mae < 3 = error "Os genes precisam ter tamanho minimo de 3"
   | otherwise =
     randomFloat (0, 1) >>=
       \chanceMutar -> 
       if chanceMutar <= probabildiade then
-        randomInt (1,  length gene_pai `div` 2) >>=
-          \casa_1 -> randomInt (casa_1 + 1, length gene_pai- 1) >>=
-            \casa_2 -> return $ let (filho_1, filho_2) = fazerAsTrocas (splitListAtTwoIndices gene_pai casa_1 casa_2) (splitListAtTwoIndices gene_mae casa_1 casa_2) 
-                                in (Individuo filho_1 0, Individuo filho_2 0)
+        gerarParInteirosAleatorios (0, length gene_pai - 1) >>=
+          \(casa_1, casa_2) -> return $ let (filho_1, filho_2) = fazerAsTrocas (splitListAtTwoIndices gene_pai casa_1 casa_2) (splitListAtTwoIndices gene_mae casa_1 casa_2) in (Individuo filho_1 0, Individuo filho_2 0)
       else return (Individuo gene_pai 0, Individuo gene_mae 0)
             where
-              fazerAsTrocas :: Eq a => ([a], [a], [a]) -> ([a], [a], [a]) -> ([a], [a])
+              fazerAsTrocas :: (Eq a, Show a) => ([a], [a], [a]) -> ([a], [a], [a]) -> ([a], [a])
               fazerAsTrocas (pa, pb, pc) (ma, mb, mc) = (
-                map (\x -> encontrarElementoInverso x mb pb) pa ++ mb ++ map (\x -> encontrarElementoInverso x mb pb) pc,
-                map (\x -> encontrarElementoInverso x pb mb) ma ++ pb ++ map (\x -> encontrarElementoInverso x pb mb) mc
+                  map (\x -> encontrarElementoInverso x mb pb) pa ++ mb ++ map (\x -> encontrarElementoInverso x mb pb) pc,
+                  map (\x -> encontrarElementoInverso x pb mb) ma ++ pb ++ map (\x -> encontrarElementoInverso x pb mb) mc
                 )
 
               encontrarElementoInverso :: Eq a => a -> [a] -> [a] -> a
