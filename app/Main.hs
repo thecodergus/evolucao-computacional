@@ -43,7 +43,7 @@ sat = do
 radios :: IO ()
 radios = do
   let numIndividuos = 30
-  let numGeracoes = 100
+  let numGeracoes = 1
 
   pop_incial <- gerarPopulacaoBooleana numIndividuos 10
 
@@ -65,13 +65,13 @@ nRainhas :: IO ()
 nRainhas = do
   let n = 16
   let numIndividuos = 30
-  let numGeracoes = 10000
+  let numGeracoes = 1000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
-
+  
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `NRainhasOtmizado.avaliacao`) (4 `torneioEstocastico` 0.2) (`swap` 0.05) (`cx` 1) 0 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `NRainhasOtmizado.avaliacao`) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 
@@ -81,7 +81,7 @@ nRainhas = do
 
   print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
-  gravarHistorico geracaoInfo "Grafico-NRainhas.torneioEstocastico.swap.cx.png"
+  gravarHistorico geracaoInfo "Grafico-NRainhas.roletaSemReposicao.swap.cx.png"
 
 
 

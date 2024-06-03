@@ -1,6 +1,7 @@
 module Avaliacoes.NRainhasOtmizado where
 import Tipos (Individuo(Individuo))
 import qualified Avaliacoes.NRainhas as NRainhas
+import Debug.Trace(trace)
 
 
 avaliacao :: Int -> Individuo Int -> Individuo Int
@@ -9,7 +10,7 @@ avaliacao n (Individuo gene _)
   | otherwise = NRainhas.avaliacao n (Individuo (tratamento n gene) 0)
   where
     tratamento :: Int -> [Int] -> [Int]
-    tratamento n' vetor = zipWith (curry (n' `transformar`)) vetor [0 ..]
+    tratamento n' vetor =  zipWith (curry (n' `transformar`)) vetor [0 ..]
         where
             transformar :: Int -> (Int, Int) -> Int
             transformar n'' (a, b)
