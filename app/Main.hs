@@ -66,7 +66,7 @@ nRainhas :: IO ()
 nRainhas = do
   let n = 16
   let numIndividuos = 30
-  let numGeracoes = 5000
+  let numGeracoes = 10
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n * n)
   
