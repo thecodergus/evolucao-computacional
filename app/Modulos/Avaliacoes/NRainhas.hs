@@ -7,11 +7,11 @@ import Debug.Trace (trace)
 -- onde 'n' é o tamanho do tabuleiro de xadrez e 'Individuo Int' é a representação do tabuleiro.
 avaliacao :: Bool -> Int -> Individuo Int -> Individuo Int
 avaliacao True n (Individuo gene _) = Individuo gene 0
-avaliacao False n (Individuo gene _) = Individuo gene fitness
+avaliacao False n (Individuo gene _) = Individuo gene (fitness gene)
   where
     -- A aptidão (fitness) é calculada a partir da quantidade de rainhas não atacando entre si.
-    fitness :: Float
-    fitness = 1 - (fromIntegral (length (rainhasAtacando gene)) / fromIntegral  n)
+    fitness :: [Int] -> Float
+    fitness vetor = 1 - (fromIntegral (length (rainhasAtacando vetor)) / fromIntegral n)
 
     -- Esta função verifica as rainhas que estão se atacando no tabuleiro.
     rainhasAtacando :: [Int] -> [(Int, Int)]
