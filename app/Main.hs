@@ -9,12 +9,12 @@ import Selecao (roletaComReposicao, roletaSemReposicao, torneio, torneioEstocast
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Sat as Sat
-import qualified Avaliacoes.NRainhasOtmizado as NRainhasOtmizado
 import Crosssover (pmx, doisPontosAleatorios, cx, umPontoAleatorio)
 import Mutacao (bitflip, mutacao, swap)
 import Tipos (Individuo(fitness, genes, Individuo), GeracaoInfo (melhorIndividuo))
 import Data.Maybe (maybeToList, fromMaybe)
 import qualified Utils.Avaliacoes as Avaliacoes
+import Utils.Outros (tratamento)
 
 
 sat :: IO ()
@@ -65,13 +65,13 @@ nRainhas :: IO ()
 nRainhas = do
   let n = 16
   let numIndividuos = 30
-  let numGeracoes = 1000
+  let numGeracoes = 5000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
   
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `NRainhasOtmizado.avaliacao`) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado (map (\(Individuo gene _) -> Individuo (tratamento gene) 0) pop_incial) (n `Rainhas.avaliacao`) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 

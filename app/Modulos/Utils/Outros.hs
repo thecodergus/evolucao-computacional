@@ -24,11 +24,11 @@ swapElementsAt i j xs =
 -- Função que embaralha uma lista qualquer
 shuffle :: [a] -> IO [a]
 shuffle [] = return []
-shuffle xs = 
-  newArray n xs >>= 
-    \ar -> forM [1..n] $ \i -> randomRIO (i,n) >>= 
-      \j -> readArray ar i >>= 
-        \vi -> readArray ar j >>= 
+shuffle xs =
+  newArray n xs >>=
+    \ar -> forM [1..n] $ \i -> randomRIO (i,n) >>=
+      \j -> readArray ar i >>=
+        \vi -> readArray ar j >>=
           \vj -> writeArray ar j vi >> return vj
   where
     n = length xs
@@ -48,6 +48,14 @@ splitListAtTwoIndices xs i j
 -- Função que verifica se determinado item pertence a lista
 ifIn :: Eq a => a -> [a] -> Bool
 ifIn _ [] = False
-ifIn a (b : bs) 
+ifIn a (b : bs)
   | a == b = True
-  | otherwise = ifIn a bs 
+  | otherwise = ifIn a bs
+
+tratamento :: [Int] -> [Int]
+tratamento vetor =  zipWith (curry (length vetor `transformar`)) vetor [0 ..]
+    where
+        transformar :: Int -> (Int, Int) -> Int
+        transformar n'' (a, b)
+            | even (b `mod` n'') = (round . sqrt ) (fromIntegral a :: Double)
+            | otherwise = (round . (10 `logBase`)) (fromIntegral a :: Double)

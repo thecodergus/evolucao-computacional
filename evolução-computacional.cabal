@@ -84,7 +84,6 @@ executable evolução-computacional
         Outros
         Utils.Outros
         Avaliacoes.NRainhas
-        Avaliacoes.NRainhasOtmizado
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
