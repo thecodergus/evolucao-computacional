@@ -8,7 +8,6 @@ import System.CPUTime ( getCPUTime )
 import Selecao (roletaComReposicao, roletaSemReposicao, torneio, torneioEstocastico)
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
-import qualified Avaliacoes.NRainhasValorada as NRainhasValorada
 import qualified Avaliacoes.Sat as Sat
 import Crosssover (pmx, doisPontosAleatorios, cx, umPontoAleatorio)
 import Mutacao (bitflip, mutacao, swap)
