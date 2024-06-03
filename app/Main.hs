@@ -1,7 +1,7 @@
 module Main where
 
 import Utils.Arquivo (fileToIntLists)
-import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado)
+import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado, gerarPopulacaoInteiroBound)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime ( getCPUTime )
@@ -9,6 +9,7 @@ import Selecao (roletaComReposicao, roletaSemReposicao, torneio, torneioEstocast
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Sat as Sat
+import qualified Avaliacoes.NRainhasOtmizado as NRainhasOtmizado
 import Crosssover (pmx, doisPontosAleatorios, cx, umPontoAleatorio)
 import Mutacao (bitflip, mutacao, swap)
 import Tipos (Individuo(fitness, genes, Individuo), GeracaoInfo (melhorIndividuo))
@@ -62,15 +63,15 @@ radios = do
 
 nRainhas :: IO ()
 nRainhas = do
-  let n = 32
-  let numIndividuos = 10
-  let numGeracoes = 20000
+  let n = 16
+  let numIndividuos = 30
+  let numGeracoes = 10000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `Rainhas.avaliacao`) roletaComReposicao (`swap` 0.05) (`doisPontosAleatorios` 0.8) 0.2 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (n `NRainhasOtmizado.avaliacao`) (4 `torneioEstocastico` 0.2) (`swap` 0.05) (`cx` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 
@@ -80,12 +81,12 @@ nRainhas = do
 
   print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
-  gravarHistorico geracaoInfo "Grafico-NRainhas.png"
+  gravarHistorico geracaoInfo "Grafico-NRainhas.torneioEstocastico.swap.cx.png"
 
 
 
 main :: IO ()
-main = sat
+main = nRainhas
 
 -- main :: IO ()
 -- main = do
