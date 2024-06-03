@@ -5,8 +5,9 @@ import Debug.Trace (trace)
 
 -- Esta função avalia um individuo no problema das N rainhas,
 -- onde 'n' é o tamanho do tabuleiro de xadrez e 'Individuo Int' é a representação do tabuleiro.
-avaliacao :: Int -> Individuo Int -> Individuo Int
-avaliacao n (Individuo gene _) = Individuo gene fitness
+avaliacao :: Bool -> Int -> Individuo Int -> Individuo Int
+avaliacao True n (Individuo gene _) = Individuo gene 0
+avaliacao False n (Individuo gene _) = Individuo gene fitness
   where
     -- A aptidão (fitness) é calculada a partir da quantidade de rainhas não atacando entre si.
     fitness :: Float

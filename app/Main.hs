@@ -72,7 +72,7 @@ nRainhas = do
   
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado (otimizacao pop_incial) (n `Rainhas.avaliacao`) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado (otimizacao pop_incial) (Rainhas.avaliacao False n) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 
