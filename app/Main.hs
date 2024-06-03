@@ -8,6 +8,7 @@ import System.CPUTime ( getCPUTime )
 import Selecao (roletaComReposicao, roletaSemReposicao, torneio, torneioEstocastico)
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
+import qualified Avaliacoes.NRainhasValorada as NRainhasValorada
 import qualified Avaliacoes.Sat as Sat
 import Crosssover (pmx, doisPontosAleatorios, cx, umPontoAleatorio)
 import Mutacao (bitflip, mutacao, swap)
@@ -88,9 +89,35 @@ nRainhas = do
     otimizacao :: Populacao Int -> Populacao Int
     otimizacao pop = parMap rpar (\(Individuo gene _) -> Individuo (tratamento gene) 0) pop
 
+nRainhasValorada :: IO ()
+nRainhasValorada = do
+  let n = 8
+  let numIndividuos = 30
+  let numGeracoes = 100
+
+  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos (n * n) (1, n * n)
+  
+  startTime <- getCPUTime
+
+  geracaoInfo <- loopEvolutivoEnumerado (otimizacao pop_incial) NRainhasValorada.avaliacao roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
+
+  endTime <- getCPUTime
+
+  let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
+
+  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+
+  print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
+
+  gravarHistorico geracaoInfo "Grafico-NRainhas.roletaSemReposicao.swap.cx.png"
+
+  where
+    otimizacao :: Populacao Int -> Populacao Int
+    otimizacao pop = parMap rpar (\(Individuo gene _) -> Individuo (tratamento gene) 0) pop
+
 
 main :: IO ()
-main = nRainhas
+main = nRainhasValorada
 
 -- main :: IO ()
 -- main = do
