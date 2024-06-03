@@ -68,7 +68,7 @@ nRainhas = do
   let numIndividuos = 30
   let numGeracoes = 10
 
-  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n * n)
+  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
   
   startTime <- getCPUTime
 
