@@ -9,9 +9,9 @@ avaliacao n (Individuo gene _)
   | otherwise = NRainhas.avaliacao n (Individuo (tratamento gene) 0)
   where
     tratamento :: [Int] -> [Int]
-    tratamento vetor = zipWith (curry transformar) vetor [0 ..]
+    tratamento vetor = zipWith (curry (length vetor `transformar`)) vetor [0 ..]
         where
-            transformar :: (Int, Int) -> Int
-            transformar (a, b)
-                | even (b `mod` 2) = (round . sqrt ) (fromIntegral a :: Double)
+            transformar :: Int -> (Int, Int) -> Int
+            transformar n (a, b)
+                | even (b `mod` n) = (round . sqrt ) (fromIntegral a :: Double)
                 | otherwise = (round . (10 `logBase`)) (fromIntegral a :: Double)
