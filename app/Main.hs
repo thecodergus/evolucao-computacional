@@ -11,10 +11,11 @@ import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Sat as Sat
 import Crosssover (pmx, doisPontosAleatorios, cx, umPontoAleatorio)
 import Mutacao (bitflip, mutacao, swap)
-import Tipos (Individuo(fitness, genes, Individuo), GeracaoInfo (melhorIndividuo))
+import Tipos (Individuo(fitness, genes, Individuo), GeracaoInfo (melhorIndividuo), Populacao)
 import Data.Maybe (maybeToList, fromMaybe)
 import qualified Utils.Avaliacoes as Avaliacoes
 import Utils.Outros (tratamento)
+import Control.Parallel.Strategies (parMap, rpar)
 
 
 sat :: IO ()
@@ -67,11 +68,11 @@ nRainhas = do
   let numIndividuos = 30
   let numGeracoes = 5000
 
-  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
+  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n * n)
   
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado (map (\(Individuo gene _) -> Individuo (tratamento gene) 0) pop_incial) (n `Rainhas.avaliacao`) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado (otimizacao pop_incial) (n `Rainhas.avaliacao`) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 
@@ -83,6 +84,9 @@ nRainhas = do
 
   gravarHistorico geracaoInfo "Grafico-NRainhas.roletaSemReposicao.swap.cx.png"
 
+  where
+    otimizacao :: Populacao Int -> Populacao Int
+    otimizacao pop = parMap rpar (\(Individuo gene _) -> Individuo (tratamento gene) 0) pop
 
 
 main :: IO ()
