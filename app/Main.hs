@@ -1,22 +1,21 @@
 module Main where
 
-import Utils.Arquivo (fileToIntLists)
-import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroPermutado, gerarPopulacaoInteiroBound)
-import RotinaEvolutiva (loopEvolutivoEnumerado)
-import Utils.Grafico (gravarHistorico)
-import System.CPUTime ( getCPUTime )
-import Selecao (roletaComReposicao, roletaSemReposicao, torneio, torneioEstocastico)
-import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.NRainhas as Rainhas
+import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.Sat as Sat
-import Crosssover (pmx, doisPontosAleatorios, cx, umPontoAleatorio)
-import Mutacao (bitflip, mutacao, swap)
-import Tipos (Individuo(fitness, genes, Individuo), GeracaoInfo (melhorIndividuo), Populacao)
-import Data.Maybe (maybeToList, fromMaybe)
-import qualified Utils.Avaliacoes as Avaliacoes
-import Utils.Outros (tratamento)
 import Control.Parallel.Strategies (parMap, rpar)
-
+import Crosssover (cx, doisPontosAleatorios, pmx, umPontoAleatorio)
+import Data.Maybe (fromMaybe, maybeToList)
+import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroBound, gerarPopulacaoInteiroPermutado)
+import Mutacao (bitflip, mutacao, swap)
+import RotinaEvolutiva (loopEvolutivoEnumerado)
+import Selecao (roletaComReposicao, roletaSemReposicao, torneio, torneioEstocastico)
+import System.CPUTime (getCPUTime)
+import Tipos (GeracaoInfo (melhorIndividuo), Individuo (Individuo, fitness, genes), Populacao)
+import Utils.Arquivo (fileToIntLists)
+import qualified Utils.Avaliacoes as Avaliacoes
+import Utils.Grafico (gravarHistorico)
+import Utils.Outros (tratamento)
 
 sat :: IO ()
 sat = do
@@ -62,17 +61,23 @@ radios = do
 
   gravarHistorico geracaoInfo "Grafico-Radios.png"
 
+tranformarParaValorado :: Int -> [(Int, Int)] -> [Int]
+tranformarParaValorado _ [] = []
+tranformarParaValorado n' ((x, y) : ts) = (n' * x) + y : tranformarParaValorado n' ts
+
 nRainhas :: IO ()
 nRainhas = do
-  let n = 16
-  let numIndividuos = 30
-  let numGeracoes = 10
+  -- print $ tranformarParaValorado 8 (zip [1, 2, 3, 4, 5, 6, 7, 9] [0 ..])
 
-  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (1, n)
-  
+  let n = 8
+  let numIndividuos = 30
+  let numGeracoes = 1000
+
+  pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (0, n - 1)
+
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado (otimizacao pop_incial) (Rainhas.avaliacao False n) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (Rainhas.avaliacao True n) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 
@@ -83,11 +88,6 @@ nRainhas = do
   print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
   gravarHistorico geracaoInfo "Grafico-NRainhas.roletaSemReposicao.swap.cx.png"
-
-  where
-    otimizacao :: Populacao Int -> Populacao Int
-    otimizacao pop = parMap rpar (\(Individuo gene _) -> Individuo (tratamento gene) 0) pop
-
 
 main :: IO ()
 main = nRainhas
@@ -101,5 +101,3 @@ main = nRainhas
 --   pop_selecionada <- torneioEstocastico 2 0.3 pop_avaliada
 
 --   print $ pop_selecionada
-
-
