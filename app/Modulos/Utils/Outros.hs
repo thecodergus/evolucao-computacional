@@ -9,6 +9,7 @@ import Data.Array.IO
   )
 import System.Random (randomRIO)
 import Tipos (Individuo (Individuo))
+import Data.List (intercalate)
 
 -- Função que troca dois elementos de uma lista em posições específicas
 swapElementsAt :: Int -> Int -> [a] -> [a]
@@ -65,6 +66,19 @@ tratamento vetor = zipWith (curry (length vetor `transformar`)) vetor [0 ..]
       | even (b `mod` n'') = (round . sqrt) (fromIntegral a :: Double)
       | otherwise = (round . (10 `logBase`)) (fromIntegral a :: Double)
 
--- exibirTabuleiro :: Int -> Individuo Int -> IO ()
--- exibirTabuleiro n (Individuo gene f) = do
---   putStrLn ("Fitness: " ++ show f)
+exibirTabuleiro :: Int -> Individuo Int -> IO ()
+exibirTabuleiro n (Individuo gene f) = do
+  putStrLn ("Fitness: " ++ show f)
+  let pieces = zip [0 ..] gene
+
+  putStrLn $ drawBoard n pieces
+  where
+    -- Função para desenhar o tabuleiro
+    drawBoard :: Int -> [(Int, Int)] -> String
+    drawBoard n' pieces = intercalate "\n" $ map drawLine [0 .. n' - 1]
+      where
+        drawLine :: Int -> String
+        drawLine x = intercalate "|" $ map drawCell [0 .. n' - 1]
+          where
+            drawCell :: Int -> String
+            drawCell y = if (y, x) `elem` pieces then " X" else "  "
