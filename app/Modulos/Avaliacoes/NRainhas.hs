@@ -18,7 +18,7 @@ avaliacao tipo n (Individuo gene _)
     fitness' :: [Int] -> Int -> Float
     fitness' vetor n' =
       (1 - (fromIntegral (length (rainhasAtacando vetor)) / fromIntegral n'))
-        * let tabuleiro = criarTabuleiro n' in (somarValoresTabuleiroValorado (tranformarParaValorado n' (tranformarCoordenadaCartesiana' vetor)) tabuleiro / realToFrac (sum tabuleiro))
+        * let tabuleiro = criarTabuleiro n' in (1 - (somarValoresTabuleiroValorado (tranformarParaValorado n' (tranformarCoordenadaCartesiana' vetor)) tabuleiro / realToFrac (sum tabuleiro)))
 
     -- Esta função verifica as rainhas que estão se atacando no tabuleiro.
     rainhasAtacando :: [Int] -> [(Int, Int)]

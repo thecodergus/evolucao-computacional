@@ -69,15 +69,15 @@ nRainhas :: IO ()
 nRainhas = do
   -- print $ tranformarParaValorado 8 (zip [1, 2, 3, 4, 5, 6, 7, 9] [0 ..])
 
-  let n = 8
+  let n = 16
   let numIndividuos = 30
-  let numGeracoes = 1000
+  let numGeracoes = 10000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (0, n - 1)
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (Rainhas.avaliacao True n) roletaSemReposicao (`swap` 0.05) (`cx` 1) 0 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (Rainhas.avaliacao True n) roletaSemReposicao (`swap` 0.05) (`pmx` 1) 0 numGeracoes
 
   endTime <- getCPUTime
 
