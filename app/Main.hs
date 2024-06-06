@@ -20,7 +20,7 @@ import Data.Time
 import Data.Time.Format
 import System.IO
 import Avaliacoes.NRainhas (fitness')
-import Control.Parallel.Strategies (parMap, rpar)
+import Control.Parallel.Strategies 
 import Control.Concurrent.Async
 
 sat :: IO ()
@@ -71,9 +71,11 @@ tranformarParaValorado :: Int -> [(Int, Int)] -> [Int]
 tranformarParaValorado _ [] = []
 tranformarParaValorado n' ((x, y) : ts) = (n' * x) + y : tranformarParaValorado n' ts
 
+
+
 nRainhas :: [(Int, Int)] -> IO ()
 nRainhas [] = return ()
-nRainhas ((n, numGeracoes) : xs) = do
+nRainhas ((n, numGeracoes) : ss) = do
   let numIndividuos = 30
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (0, n - 1)
@@ -88,49 +90,49 @@ nRainhas ((n, numGeracoes) : xs) = do
 
   currentTime <- getCurrentTime
 
-  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+  putStrLn $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
-  -- print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
+  gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
 
-  gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
+  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "\nFO=" ++ show (fitness' (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
 
-  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "FO=" ++ show (fitness' (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
+  nRainhas ss >>= \r -> return ()
+    
+
+
 
 main :: IO ()
-main = do
-      _ <- parMap rdeepseq nRainhas [
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              (16, 50000),
-              
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
-              (32, 80000),
+main = nRainhas [
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    (16, 80000),
+    
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
+    (32, 80000),
 
-              (64, 90000),
-              (64, 90000),
-              (64, 90000),
-              (64, 90000),
-              (64, 90000),
-              (64, 90000),
-              (64, 90000),
-              (64, 90000),
-              (64, 90000),
-              (64, 90000)
-        ]   
-
-        print "Opa"
+    (64, 80000),
+    (64, 80000),
+    (64, 80000),
+    (64, 80000),
+    (64, 80000),
+    (64, 80000),
+    (64, 80000),
+    (64, 80000),
+    (64, 80000),
+    (64, 80000)
+  ]
