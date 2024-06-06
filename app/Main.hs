@@ -97,48 +97,40 @@ nRainhas ((n, numGeracoes) : xs) = do
   writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "FO=" ++ show (fitness' (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
 
 main :: IO ()
-main =
-  mapConcurrently_
-    (\(n, numGeracoes) -> nRainhas [(n, numGeracoes)])
-    [ (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      (16, 50000),
-      
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
-      (32, 80000),
+main = do
+      _ <- parMap rdeepseq nRainhas [
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              (16, 50000),
+              
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
+              (32, 80000),
 
-      (64, 90000),
-      (64, 90000),
-      (64, 90000),
-      (64, 90000),
-      (64, 90000),
-      (64, 90000),
-      (64, 90000),
-      (64, 90000),
-      (64, 90000),
-      (64, 90000)
-    ]
--- main :: IO ()
--- main = do
---   pop_incial <- gerarPopulacaoBooleana 20 10
+              (64, 90000),
+              (64, 90000),
+              (64, 90000),
+              (64, 90000),
+              (64, 90000),
+              (64, 90000),
+              (64, 90000),
+              (64, 90000),
+              (64, 90000),
+              (64, 90000)
+        ]   
 
---   let pop_avaliada = map (fromMaybe (error "Invalid individual") . Radio.avaliacao) pop_incial
-
---   pop_selecionada <- torneioEstocastico 2 0.3 pop_avaliada
-
---   print $ pop_selecionada
+        print "Opa"
