@@ -90,7 +90,8 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
 
-  appendFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-NRainhas.csv") (show n ++ ";" ++ show numGeracoes ++ ";" ++ show (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n) ++ ";" ++ show execTime ++ ";" ++ show (Rainhas.rainhasAtacando (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) ++ "\n")
+
+  appendFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-NRainhas.csv") (show n ++ ";" ++ show numGeracoes ++ ";" ++ show (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (fitness $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n) ++ ";" ++ show execTime ++ ";" ++ show (length (Rainhas.rainhasAtacando (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo))) ++ "\n")
 
   void (nRainhas ss)
 
