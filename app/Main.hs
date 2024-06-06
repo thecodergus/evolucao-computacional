@@ -90,7 +90,7 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
 
-  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "\nFO=" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n) ++ "\nTempo: " ++ show execTime ++ "s")
+  appendFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-NRainhas.csv") (show n ++ ";" ++ show numGeracoes ++ ";" ++ show (genes $  head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n) ++ ";" ++ show execTime ++ "\n")
 
   void (nRainhas ss)
 
