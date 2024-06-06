@@ -16,6 +16,12 @@ import Utils.Arquivo (fileToIntLists)
 import qualified Utils.Avaliacoes as Avaliacoes
 import Utils.Grafico (gravarHistorico)
 import Utils.Outros (tratamento)
+import Data.Time
+import Data.Time.Format
+import System.IO
+import Avaliacoes.NRainhas (fitness')
+import Control.Parallel.Strategies (parMap, rpar)
+import Control.Concurrent.Async
 
 sat :: IO ()
 sat = do
@@ -65,13 +71,10 @@ tranformarParaValorado :: Int -> [(Int, Int)] -> [Int]
 tranformarParaValorado _ [] = []
 tranformarParaValorado n' ((x, y) : ts) = (n' * x) + y : tranformarParaValorado n' ts
 
-nRainhas :: IO ()
-nRainhas = do
-  -- print $ tranformarParaValorado 8 (zip [1, 2, 3, 4, 5, 6, 7, 9] [0 ..])
-
-  let n = 16
+nRainhas :: [(Int, Int)] -> IO ()
+nRainhas [] = return ()
+nRainhas ((n, numGeracoes) : xs) = do
   let numIndividuos = 30
-  let numGeracoes = 10000
 
   pop_incial <- gerarPopulacaoInteiroPermutado numIndividuos n (0, n - 1)
 
@@ -83,15 +86,53 @@ nRainhas = do
 
   let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
 
+  currentTime <- getCurrentTime
+
   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
-  print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
+  -- print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
-  gravarHistorico geracaoInfo "Grafico-NRainhas.roletaSemReposicao.swap.cx.png"
+  gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
+
+  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "FO=" ++ show (fitness' (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
 
 main :: IO ()
-main = nRainhas
+main =
+  mapConcurrently_
+    (\(n, numGeracoes) -> nRainhas [(n, numGeracoes)])
+    [ (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      (16, 50000),
+      
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
+      (32, 80000),
 
+      (64, 90000),
+      (64, 90000),
+      (64, 90000),
+      (64, 90000),
+      (64, 90000),
+      (64, 90000),
+      (64, 90000),
+      (64, 90000),
+      (64, 90000),
+      (64, 90000)
+    ]
 -- main :: IO ()
 -- main = do
 --   pop_incial <- gerarPopulacaoBooleana 20 10
