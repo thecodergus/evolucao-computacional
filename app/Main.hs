@@ -89,7 +89,7 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
 
-  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "\nFO=" ++ show (fitness' (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
+  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "\nFO=" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
 
   nRainhas ss >>= \_ -> return ()
     
@@ -98,36 +98,36 @@ nRainhas ((n, numGeracoes) : ss) = do
 
 main :: IO ()
 main = nRainhas [
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
-    (16, 30000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
+    (16, 20000),
     
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
-    (32, 60000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
+    (32, 20000),
 
-    (64, 80000),
-    (64, 80000),
-    (64, 80000),
-    (64, 80000),
-    (64, 80000),
-    (64, 80000),
-    (64, 80000),
-    (64, 80000),
-    (64, 80000),
-    (64, 80000)
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000)
   ]
