@@ -25,22 +25,24 @@ loopEvolutivoEnumerado _ _ _ _ _ _ 0 = return (GeracaoInfo [] [] [])
 loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap contador =
     let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
         individuoEletista = maybeToList $ Utils.melhorIndividuo populacaoAvaliada
-    in  trace ("-------- Loop Evolutivo Geracao " ++ show contador ++ "-------") $ selecionarQuemFica generatioGap populacaoAvaliada
+    in  
+        -- trace ("-------- Loop Evolutivo Geracao " ++ show contador ++ "-------") $ 
+        selecionarQuemFica generatioGap populacaoAvaliada
         -- Selecionando os individuos que ficam e os que morrem
         >>= \(veios, novinhos) ->
-            trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $
+            -- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $
             -- Selecionando os individuos que ficam
             funcaoSelecao novinhos
                 >>= \individuosSelecionados ->
-                trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $
+                -- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $
                 -- Realizando o crossover
                     crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
                     >>= \novaPopulacao ->
-                        trace ("Nova Populacao => " ++ show (length novaPopulacao)) $
+                        -- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $
                         -- Realizando a mutação
                         mutarPopulacao novaPopulacao funcaMutacao
                             >>= \novaPopulacao' ->
-                            trace ("Populacao Mutada => " ++ show (length novaPopulacao')) $
+                            -- trace ("Populacao Mutada => " ++ show (length novaPopulacao')) $
                             -- Chamando recursivamente a proxima interação
                                 loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
                                 >>= \proximaGeracao ->
