@@ -15,6 +15,7 @@ import Tipos (GeracaoInfo (melhorIndividuo), Individuo (Individuo, fitness, gene
 import Utils.Arquivo (fileToIntLists)
 import qualified Utils.Avaliacoes as Avaliacoes
 import Utils.Grafico (gravarHistorico)
+import Control.Monad(void)
 import Data.Time
 import Avaliacoes.NRainhas (fitness')
 
@@ -89,10 +90,10 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
 
-  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "\nFO=" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
+  writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "\nFO=" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n) ++ "\nTempo: " ++ show execTime ++ "s")
 
-  nRainhas ss >>= \_ -> return ()
-    
+  void (nRainhas ss)
+
 
 
 
@@ -108,7 +109,7 @@ main = nRainhas [
     (16, 20000),
     (16, 20000),
     (16, 20000),
-    
+
     (32, 20000),
     (32, 20000),
     (32, 20000),
