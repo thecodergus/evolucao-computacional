@@ -15,13 +15,8 @@ import Tipos (GeracaoInfo (melhorIndividuo), Individuo (Individuo, fitness, gene
 import Utils.Arquivo (fileToIntLists)
 import qualified Utils.Avaliacoes as Avaliacoes
 import Utils.Grafico (gravarHistorico)
-import Utils.Outros (tratamento)
 import Data.Time
-import Data.Time.Format
-import System.IO
 import Avaliacoes.NRainhas (fitness')
-import Control.Parallel.Strategies 
-import Control.Concurrent.Async
 
 sat :: IO ()
 sat = do
@@ -90,13 +85,13 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   currentTime <- getCurrentTime
 
-  putStrLn $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+  putStrLn $ "N" ++ show n ++ "-G" ++ show numGeracoes ++ " Tempo de execucao: " ++ show execTime ++ " segundos"
 
   gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
 
   writeFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-NRainhas.txt") ("N=" ++ show n ++ "\nG=" ++ show numGeracoes ++ "\nMelhor Individuo=" ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ "\nFO=" ++ show (fitness' (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n))
 
-  nRainhas ss >>= \r -> return ()
+  nRainhas ss >>= \_ -> return ()
     
 
 

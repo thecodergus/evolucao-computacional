@@ -96,9 +96,7 @@ executable evolução-computacional
                     Chart >= 1.9.5,
                     Chart-cairo >= 1.9.4.1,
                     array >= 0.5,
-                    time,
-                    async,
-                    deepseq
+                    time
                     
 
     -- Directories containing source files.
