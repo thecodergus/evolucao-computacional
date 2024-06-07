@@ -78,7 +78,7 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (Rainhas.avaliacao True n) roletaSemReposicao (`swap` 0.05) (`pmx` 1) 0 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (Rainhas.avaliacao True n) roletaSemReposicao (`swap` 0.05) (`pmx` 0.8) 0.3 numGeracoes
 
   endTime <- getCPUTime
 
@@ -100,36 +100,14 @@ nRainhas ((n, numGeracoes) : ss) = do
 
 main :: IO ()
 main = nRainhas [
-    (16, 2)
-    -- (16, 20000),
-    -- (16, 20000),
-    -- (16, 20000),
-    -- (16, 20000),
-    -- (16, 20000),
-    -- (16, 20000),
-    -- (16, 20000),
-    -- (16, 20000),
-    -- (16, 20000),
-
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000),
-    -- (32, 20000)
-
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000),
-    -- (64, 20000)
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000),
+    (64, 20000)
   ]
