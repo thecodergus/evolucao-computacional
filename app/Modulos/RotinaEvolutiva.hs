@@ -7,9 +7,10 @@ import Tipos (GeracaoInfo (GeracaoInfo, mediaPopulacao, melhorIndividuo, piorInd
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 import qualified Utils.Avaliacoes as Utils
-import Utils.Outros (shuffle)
+import Utils.Outros (shuffle, pairToList, toPairs)
 import Utils.Aleatoriedades (selecionarRemoverRandom)
 import Debug.Trace(trace)
+import Control.Monad ((>=>))
 
 -- Retorna a ultima População e o historico de melhores individuos
 loopEvolutivoEnumerado :: (Ord a, Show a) =>
@@ -26,6 +27,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
         individuoEletista = maybeToList $ Utils.melhorIndividuo populacaoAvaliada
     in  
+        trace ("Geracao (" ++ show contador ++ ")")
         selecionarQuemFica generatioGap populacaoAvaliada >>= 
         -- Selecionando os individuos que ficam e os que morrem
         \(veios, novinhos) ->
@@ -79,3 +81,6 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
                     -- Retornando valores
                     return $ filho1 : filho2 : proximosFilhos
 
+        -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
+        crossover' :: (Show a) => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
+        crossover' pop f = pairToList . concat <$> sequence (parMap rpar (f >=> return . (: [])) (toPairs pop))
