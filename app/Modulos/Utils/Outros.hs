@@ -82,3 +82,11 @@ exibirTabuleiro n (Individuo gene f) = do
           where
             drawCell :: Int -> String
             drawCell y = if (y, x) `elem` pieces then " X" else "  "
+
+toPairs :: [a] -> [(a, a)]
+toPairs [] = []
+toPairs [x] = [(x, x)]
+toPairs (x : y : xs) = (x, y) : toPairs xs
+
+tuplesToList :: [(a, a)] -> [a]
+tuplesToList = concatMap (\(x, y) -> [x, y])
