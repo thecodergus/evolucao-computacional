@@ -26,26 +26,21 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
         individuoEletista = maybeToList $ Utils.melhorIndividuo populacaoAvaliada
     in  
-        -- trace ("-------- Loop Evolutivo Geracao " ++ show contador ++ "-------") $ 
-        selecionarQuemFica generatioGap populacaoAvaliada
+        selecionarQuemFica generatioGap populacaoAvaliada >>= 
         -- Selecionando os individuos que ficam e os que morrem
-        >>= \(veios, novinhos) ->
-            -- trace ("Velhos | Novos => " ++ show (length veios) ++ " | " ++ show (length novinhos)) $
+        \(veios, novinhos) ->
             -- Selecionando os individuos que ficam
-            funcaoSelecao novinhos
-                >>= \individuosSelecionados ->
-                -- trace ("Individuos Selecionados => " ++ show (length individuosSelecionados)) $
+            funcaoSelecao novinhos >>= 
+                \individuosSelecionados ->
                 -- Realizando o crossover
-                    crossover individuosSelecionados funcaoCrossover (length individuosSelecionados)
-                    >>= \novaPopulacao ->
-                        -- trace ("Nova Populacao => " ++ show (length novaPopulacao)) $
+                    crossover individuosSelecionados funcaoCrossover (length individuosSelecionados) >>=
+                     \novaPopulacao ->
                         -- Realizando a mutação
-                        mutarPopulacao novaPopulacao funcaMutacao
-                            >>= \novaPopulacao' ->
-                            -- trace ("Populacao Mutada => " ++ show (length novaPopulacao')) $
+                        mutarPopulacao novaPopulacao funcaMutacao >>=
+                             \novaPopulacao' ->
                             -- Chamando recursivamente a proxima interação
-                                loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1)
-                                >>= \proximaGeracao ->
+                                loopEvolutivoEnumerado (individuoEletista ++ novaPopulacao' ++ veios) funcaoAvaliacao funcaoSelecao funcaMutacao funcaoCrossover generatioGap (contador - 1) >>=
+                                 \proximaGeracao ->
                                     return $ GeracaoInfo (individuoEletista ++ melhorIndividuo proximaGeracao) (calcularMediaFitness populacaoAvaliada : mediaPopulacao proximaGeracao) (maybeToList (Utils.piorIndividuo populacaoAvaliada) ++ piorIndividuo proximaGeracao)
 
     where
