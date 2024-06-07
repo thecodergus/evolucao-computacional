@@ -27,7 +27,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
     let populacaoAvaliada = avaliarPopoulacao populacao funcaoAvaliacao
         individuoEletista = maybeToList $ Utils.melhorIndividuo populacaoAvaliada
     in  
-        trace ("Geracao (" ++ show contador ++ ")")
+        -- trace ("Geracao (" ++ show contador ++ ")")
         selecionarQuemFica generatioGap populacaoAvaliada >>= 
         -- Selecionando os individuos que ficam e os que morrem
         \(veios, novinhos) ->
