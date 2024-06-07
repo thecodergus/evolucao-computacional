@@ -81,6 +81,7 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
                     -- Retornando valores
                     return $ filho1 : filho2 : proximosFilhos
 
-        -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
+        -- Função auxiliar para selecionar os pais e realizar o crossover entre eles de forma paralela
+        -- Estranhamente esta função é mais lerda do que a primeira
         crossover' :: (Show a) => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> IO (Populacao a)
         crossover' pop f = pairToList . concat <$> sequence (parMap rpar (f >=> return . (: [])) (toPairs pop))
