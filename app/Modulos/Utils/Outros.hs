@@ -88,5 +88,5 @@ toPairs [] = []
 toPairs [x] = [(x, x)]
 toPairs (x : y : xs) = (x, y) : toPairs xs
 
-tuplesToList :: [(a, a)] -> [a]
-tuplesToList = concatMap (\(x, y) -> [x, y])
+pairToList :: [(a, a)] -> [a]
+pairToList = concatMap (\(x, y) -> [x, y])
