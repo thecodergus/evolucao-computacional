@@ -1,11 +1,14 @@
 module Main where
 
+import Avaliacoes.NRainhas (fitness')
 import qualified Avaliacoes.NRainhas as Rainhas
 import qualified Avaliacoes.Radio as Radio
 import qualified Avaliacoes.Sat as Sat
+import Control.Monad (void)
 import Control.Parallel.Strategies (parMap, rpar)
 import Crosssover (cx, doisPontosAleatorios, pmx, umPontoAleatorio)
 import Data.Maybe (fromMaybe, maybeToList)
+import Data.Time
 import GerarPopulacao (gerarPopulacaoBooleana, gerarPopulacaoInteiroBound, gerarPopulacaoInteiroPermutado)
 import Mutacao (bitflip, mutacao, swap)
 import RotinaEvolutiva (loopEvolutivoEnumerado)
@@ -15,9 +18,6 @@ import Tipos (GeracaoInfo (melhorIndividuo), Individuo (Individuo, fitness, gene
 import Utils.Arquivo (fileToIntLists)
 import qualified Utils.Avaliacoes as Avaliacoes
 import Utils.Grafico (gravarHistorico)
-import Control.Monad(void)
-import Data.Time
-import Avaliacoes.NRainhas (fitness')
 
 sat :: IO ()
 sat = do
@@ -67,8 +67,6 @@ tranformarParaValorado :: Int -> [(Int, Int)] -> [Int]
 tranformarParaValorado _ [] = []
 tranformarParaValorado n' ((x, y) : ts) = (n' * x) + y : tranformarParaValorado n' ts
 
-
-
 nRainhas :: [(Int, Int)] -> IO ()
 nRainhas [] = return ()
 nRainhas ((n, numGeracoes) : ss) = do
@@ -90,24 +88,21 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   gravarHistorico geracaoInfo ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-" ++ formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" currentTime ++ "-Grafico-NRainhas.roletaSemReposicao.swap.cx.png")
 
-
-  appendFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-NRainhas.csv") (show n ++ ";" ++ show numGeracoes ++ ";" ++ show (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (fitness $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (Rainhas.fo (genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) n) ++ ";" ++ show execTime ++ ";" ++ show (length (Rainhas.rainhasAtacando (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo))) ++ "\n")
+  appendFile ("N" ++ show n ++ "-G" ++ show numGeracoes ++ "-NRainhas.csv") (show n ++ ";" ++ show numGeracoes ++ ";" ++ show (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (Rainhas.fo $ genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo) ++ ";" ++ show (Rainhas.fo $ genes (fromMaybe (error "Invalid individual") $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) ++ ";" ++ show execTime ++ ";" ++ show (length (Rainhas.rainhasAtacando (genes $ head $ maybeToList $ Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo))) ++ "\n")
 
   void (nRainhas ss)
 
-
-
-
 main :: IO ()
-main = nRainhas [
-    (64, 20000),
-    (64, 20000),
-    (64, 20000),
-    (64, 20000),
-    (64, 20000),
-    (64, 20000),
-    (64, 20000),
-    (64, 20000),
-    (64, 20000),
-    (64, 20000)
-  ]
+main =
+  nRainhas
+    [ (64, 20000),
+      (64, 20000),
+      (64, 20000),
+      (64, 20000),
+      (64, 20000),
+      (64, 20000),
+      (64, 20000),
+      (64, 20000),
+      (64, 20000),
+      (64, 20000)
+    ]

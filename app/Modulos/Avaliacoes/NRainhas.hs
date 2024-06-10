@@ -20,9 +20,8 @@ fitness' vetor n' =
   (1 - (fromIntegral (length (rainhasAtacando vetor)) / fromIntegral n'))
     * (1 - (somarValoresTabuleiroValorado (tranformarParaValorado n' (tranformarCoordenadaCartesiana' vetor)) (criarTabuleiro n') / realToFrac (sum (criarTabuleiro n'))))
 
-
-fo :: [Int] -> Int -> Float
-fo vetor n' = somarValoresTabuleiroValorado (tranformarParaValorado n' (tranformarCoordenadaCartesiana' vetor)) (criarTabuleiro n')
+fo :: [Int] -> Float
+fo vetor = somarValoresTabuleiroValorado (tranformarParaValorado (length vetor) (tranformarCoordenadaCartesiana' vetor)) (criarTabuleiro (length vetor))
 
 -- Esta função verifica as rainhas que estão se atacando no tabuleiro.
 rainhasAtacando :: [Int] -> [(Int, Int)]
