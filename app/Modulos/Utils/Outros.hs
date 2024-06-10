@@ -7,9 +7,9 @@ import Data.Array.IO
     readArray,
     writeArray,
   )
+import Data.List (intercalate)
 import System.Random (randomRIO)
 import Tipos (Individuo (Individuo))
-import Data.List (intercalate)
 
 -- Função que troca dois elementos de uma lista em posições específicas
 swapElementsAt :: Int -> Int -> [a] -> [a]
@@ -90,3 +90,6 @@ toPairs (x : y : xs) = (x, y) : toPairs xs
 
 pairToList :: [(a, a)] -> [a]
 pairToList = concatMap (\(x, y) -> [x, y])
+
+removeElements :: (Eq a) => [a] -> [a] -> [a]
+removeElements xs = filter (`notElem` xs)

@@ -19,49 +19,49 @@ import Utils.Arquivo (fileToIntLists)
 import qualified Utils.Avaliacoes as Avaliacoes
 import Utils.Grafico (gravarHistorico)
 
-sat :: IO ()
-sat = do
-  let numIndividuos = 30
-  let numGeracoes = 2000
+-- sat :: IO ()
+-- sat = do
+--   let numIndividuos = 30
+--   let numGeracoes = 2000
 
-  disjuncao <- fileToIntLists "/home/udesc/Documentos/evolucao-computacional-main/arquivoSAT.cnf"
+--   disjuncao <- fileToIntLists "/home/udesc/Documentos/evolucao-computacional-main/arquivoSAT.cnf"
 
-  pop_incial <- gerarPopulacaoBooleana numIndividuos 100
+--   pop_incial <- gerarPopulacaoBooleana numIndividuos 100
 
-  startTime <- getCPUTime
+--   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (`Sat.avaliacao` disjuncao) roletaSemReposicao (`bitflip` 0.05) (`doisPontosAleatorios` 1) 0 numGeracoes
+--   geracaoInfo <- loopEvolutivoEnumerado pop_incial (`Sat.avaliacao` disjuncao) roletaSemReposicao (`bitflip` 0.05) (`doisPontosAleatorios` 1) 0 numGeracoes
 
-  endTime <- getCPUTime
+--   endTime <- getCPUTime
 
-  let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
+--   let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
 
-  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+--   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
-  print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
+--   print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
-  gravarHistorico geracaoInfo "Grafico-Sat.png"
+--   gravarHistorico geracaoInfo "Grafico-Sat.png"
 
-radios :: IO ()
-radios = do
-  let numIndividuos = 30
-  let numGeracoes = 1
+-- radios :: IO ()
+-- radios = do
+--   let numIndividuos = 30
+--   let numGeracoes = 1
 
-  pop_incial <- gerarPopulacaoBooleana numIndividuos 10
+--   pop_incial <- gerarPopulacaoBooleana numIndividuos 10
 
-  startTime <- getCPUTime
+--   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (fromMaybe (error "Invalid individual") . Radio.avaliacao) (torneioEstocastico 3 0.41) (`bitflip` 0.05) (`cx` 0.8) 0.2 numGeracoes
+--   geracaoInfo <- loopEvolutivoEnumerado pop_incial (fromMaybe (error "Invalid individual") . Radio.avaliacao) (torneioEstocastico 3 0.41) (`bitflip` 0.05) (`cx` 0.8) 0.2 numGeracoes
 
-  endTime <- getCPUTime
+--   endTime <- getCPUTime
 
-  let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
+--   let execTime = fromIntegral (endTime - startTime) / (10 ** 12)
 
-  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
+--   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
 
-  print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
+--   print $ "Melhor individuo: " ++ show (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)
 
-  gravarHistorico geracaoInfo "Grafico-Radios.png"
+--   gravarHistorico geracaoInfo "Grafico-Radios.png"
 
 tranformarParaValorado :: Int -> [(Int, Int)] -> [Int]
 tranformarParaValorado _ [] = []
