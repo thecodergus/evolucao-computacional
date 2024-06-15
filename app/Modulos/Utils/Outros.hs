@@ -7,9 +7,10 @@ import Data.Array.IO
     readArray,
     writeArray,
   )
-import System.Random (randomRIO)
+import System.Random (randomRIO, newStdGen)
 import Tipos (Individuo (Individuo))
-import Data.List (intercalate)
+import Data.List (intercalate, (\\))
+import System.Random.Stateful (Random(randomRs))
 
 -- Função que troca dois elementos de uma lista em posições específicas
 swapElementsAt :: Int -> Int -> [a] -> [a]
@@ -90,3 +91,10 @@ toPairs (x : y : xs) = (x, y) : toPairs xs
 
 pairToList :: [(a, a)] -> [a]
 pairToList = concatMap (\(x, y) -> [x, y])
+
+randomPairAndRest :: Eq a => [a] -> IO ((a, a), [a])
+randomPairAndRest xs = do
+  g <- newStdGen
+  let indices = take 2 $ randomRs (0, length xs - 1) g
+  let pair = map (xs !!) indices
+  return ((head pair, pair !! 1), xs \\ pair)

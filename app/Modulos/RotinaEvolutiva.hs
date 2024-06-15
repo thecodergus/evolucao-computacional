@@ -7,13 +7,13 @@ import Tipos (GeracaoInfo (GeracaoInfo, mediaPopulacao, melhorIndividuo, piorInd
 import Control.Parallel.Strategies (parMap, rpar)
 import Data.Maybe (maybeToList)
 import qualified Utils.Avaliacoes as Utils
-import Utils.Outros (shuffle, pairToList, toPairs)
+import Utils.Outros (shuffle, pairToList, toPairs, randomPairAndRest)
 import Utils.Aleatoriedades (selecionarRemoverRandom)
 import Debug.Trace(trace)
 import Control.Monad ((>=>))
 
 -- Retorna a ultima População e o historico de melhores individuos
-loopEvolutivoEnumerado :: (Ord a, Show a) =>
+loopEvolutivoEnumerado :: (Ord a, Show a, Eq a) =>
     Populacao a -> -- População inicial
     (Individuo a -> Individuo a) -> -- Função de avaliação
     (Populacao a -> IO (Populacao a)) -> -- Função de seleção
@@ -66,17 +66,19 @@ loopEvolutivoEnumerado populacao funcaoAvaliacao funcaoSelecao funcaMutacao func
             \pop' -> return $ splitAt (round $ gap * fromIntegral (length pop)) pop'
 
         -- Função auxiliar para selecionar os pais e realizar o crossover entre eles
-        crossover :: Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Int -> IO (Populacao a)
+        crossover :: Eq a => Populacao a -> ((Individuo a, Individuo a) -> IO (Individuo a, Individuo a)) -> Int -> IO (Populacao a)
         crossover [] _  _ = return []
         crossover _ _  0 = return []
         crossover _ _  1 = return []
         crossover [x] _  _ = return [x]
-        crossover (pai : mae : pop) funcaoCrossover' cont =
+        crossover pop funcaoCrossover' cont =
+          randomPairAndRest pop >>=
+            \(pais, resto) ->
             -- Realizando o crossover
-            funcaoCrossover' (pai, mae) >>= 
+            funcaoCrossover' pais >>= 
                 \(filho1, filho2) ->
                 -- Chamando recursivamente
-                crossover pop funcaoCrossover' (cont - 2) >>= 
+                crossover resto funcaoCrossover' (cont - 2) >>= 
                     \proximosFilhos ->
                     -- Retornando valores
                     return $ filho1 : filho2 : proximosFilhos
