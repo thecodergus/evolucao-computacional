@@ -1,7 +1,7 @@
 module Selecao where
 
 import Utils.Aleatoriedades (randomInt, randomFloat, selecionarRemoverRandom, escolherRandoms)
-import Utils.Outros(shuffle)
+import Utils.Outros(shuffle, normalizar, scoreTotal)
 import Control.Monad (replicateM)
 import Utils.Avaliacoes (vencedorDoTorneio)
 import Tipos (Populacao, Individuo(fitness, Individuo))
@@ -39,7 +39,7 @@ roletaComReposicao populacao = girarRoleta (fitnessRelativo populacao) (length p
             | otherwise = encontrarIndividuo ps sorteio (acc + fitness p)
 
 roletaSemReposicao :: (Ord a, Show a, Eq a) => Populacao a -> IO (Populacao a)
-roletaSemReposicao populacao = girarRoleta populacao (length populacao) Nothing
+roletaSemReposicao populacao = girarRoleta (normalizar populacao) (length populacao) Nothing
   where
     fitnessTotal :: Populacao a -> Float
     fitnessTotal pop = sum $ map fitness pop
@@ -47,20 +47,23 @@ roletaSemReposicao populacao = girarRoleta populacao (length populacao) Nothing
     fitnessRelativo pop = sort $ parMap rpar calcularFitnessRelativo pop
       where
         calcularFitnessRelativo :: Individuo a -> Individuo a
-        calcularFitnessRelativo individuo = individuo {fitness = 360 * (fitness individuo / (if fitnessTotal pop /= 0 then fitnessTotal pop else 1))}
+        calcularFitnessRelativo individuo = individuo {fitness = fitness individuo / (if fitnessTotal pop /= 0 then fitnessTotal pop else 1)}
 
     girarRoleta :: (Ord a, Show a, Eq a) => Populacao a -> Int -> Maybe (Individuo a) -> IO (Populacao a)
     girarRoleta [] _ _ = return []
     girarRoleta _ 0 _ = return []
     girarRoleta pop n indi =
-      randomFloat (0, 360) >>=
-        \sorteio -> let individuoSelecionado = encontrarIndividuo (fitnessRelativo (removerAntigoIndividuoSelecionado pop indi)) sorteio 0 in (individuoSelecionado :) <$> girarRoleta pop (n - 1) (Just individuoSelecionado)
+      randomFloat (0, 1) >>=
+        \sorteio ->
+          let individuoSelecionado = encontrarIndividuo (fitnessRelativo (removerAntigoIndividuoSelecionado pop indi)) sorteio 0
+          in (individuoSelecionado :)
+          <$> girarRoleta pop (n - 1) (Just individuoSelecionado)
       where
         encontrarIndividuo :: Populacao a -> Float -> Float -> Individuo a
         encontrarIndividuo [] _ _ = error "Individuo nao encontrado"
         encontrarIndividuo [p] _ _ = p
         encontrarIndividuo (p : ps) sorteio acc
-          | sorteio <= acc + fitness p = p
+          | sorteio < (acc * (1 / (scoreTotal populacao - fitness (populacao !! (length populacao - length ps))))) = p
           | otherwise = encontrarIndividuo ps sorteio (acc + fitness p)
 
         removerAntigoIndividuoSelecionado :: Eq a =>Populacao a -> Maybe (Individuo a) -> Populacao a
