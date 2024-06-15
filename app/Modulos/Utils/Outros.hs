@@ -8,7 +8,7 @@ import Data.Array.IO
     writeArray,
   )
 import System.Random (randomRIO, newStdGen)
-import Tipos (Individuo (Individuo))
+import Tipos (Individuo (Individuo, fitness), Populacao)
 import Data.List (intercalate, (\\))
 import System.Random.Stateful (Random(randomRs))
 
@@ -98,3 +98,16 @@ randomPairAndRest xs = do
   let indices = take 2 $ randomRs (0, length xs - 1) g
   let pair = map (xs !!) indices
   return ((head pair, pair !! 1), xs \\ pair)
+
+
+normalizar :: (Ord a, Eq a) => Populacao a -> Populacao a
+normalizar pop'' = map (\individuo -> individuo {fitness = (fitness individuo - menorValor pop'') / (maiorValor pop'' - menorValor pop'')}) pop''
+
+maiorValor :: (Ord a, Eq a) => Populacao a -> Float
+maiorValor pop'' = maximum $ map fitness pop''
+
+menorValor :: (Ord a, Eq a) => Populacao a -> Float
+menorValor pop'' = minimum $ map fitness pop''
+
+scoreTotal :: Ord a => Populacao a -> Float
+scoreTotal = foldl (\acc x -> acc + fitness x) 0
