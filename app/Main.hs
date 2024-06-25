@@ -10,7 +10,7 @@ import Complexidade.Parser (parser)
 import GerarPopulacao (gerarPopulacaoInteiroPermutado)
 import Selecao (roletaSemReposicao)
 import Mutacao (swap)
-import Crosssover (pmx)
+import Crosssover (pmx, cx)
 import Utils.Grafico (gravarHistorico)
 import System.CPUTime (getCPUTime)
 import Tipos (Individuo (Individuo, genes), GeracaoInfo (melhorIndividuo))
@@ -25,13 +25,13 @@ main = do
   arquivo <- readFile "distancias.txt"
 
   let trajetos = parser arquivo
-  let num_geracoes = 150
+  let num_geracoes = 500
 
   pop_inicial <- gerarPopulacaoInteiroPermutado 30 244 (1, 244)
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_inicial (trajetos `avaliacao`) roletaSemReposicao (`swap` 0.05) (`pmx` 0.75) 0.2 num_geracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_inicial (trajetos `avaliacao`) roletaSemReposicao (`swap` 0.06) (`cx` 0.8) 0.3 num_geracoes
 
   endTime <- getCPUTime
 
