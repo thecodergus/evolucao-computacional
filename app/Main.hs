@@ -16,18 +16,36 @@ import System.CPUTime (getCPUTime)
 import Tipos (Individuo (Individuo, genes), GeracaoInfo (melhorIndividuo))
 import qualified Utils.Avaliacoes as Avaliacoes
 import Data.Maybe (fromMaybe)
+import Debug.Trace (trace)
+import Control.Parallel
+import Control.Parallel.Strategies
+import Control.Concurrent.ParallelIO.Global
+import System.IO
+import System.Random (randomRIO)
+import Data.Time (formatTime, defaultTimeLocale)
+import Data.Time.Clock (getCurrentTime)
+
+gerarNumeroAleatorio :: IO Int
+gerarNumeroAleatorio = randomRIO (1, 1000)
+
+-- Obtenha o timestamp atual
+obterTimestampAtual :: IO String
+obterTimestampAtual = do
+  formatTime defaultTimeLocale "%Y-%m-%d_%H-%M-%S" <$> getCurrentTime
+
+-- Adicione o número aleatório e o timestamp ao nome do arquivo
+adicionarNumeroETimestamp :: String -> IO String
+adicionarNumeroETimestamp nomeArquivo = do
+  numeroAleatorio <- gerarNumeroAleatorio
+  timestamp <- obterTimestampAtual
+  return $ nomeArquivo ++ "_" ++ show numeroAleatorio ++ "_" ++ timestamp
 
 
-main :: IO ()
-main = do
-  hSetEncoding stdout utf8
-  hSetEncoding stdin utf8
+runs :: (Int, Int) -> IO ()
+runs (tamanho_populacao, num_geracoes) = do
   arquivo <- readFile "distancias.txt"
 
   let trajetos = parser arquivo
-  let num_geracoes = 1000
-  let tamanho_populacao = 30
-
   pop_inicial <- gerarPopulacaoInteiroPermutado tamanho_populacao 244 (1, 244)
 
   startTime <- getCPUTime
@@ -40,11 +58,35 @@ main = do
 
   let melhorCaminho = intParaString (genes $ fromMaybe (error "Problema") (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) trajetos
 
-  escreverFinal ("caminhoFinal."++ show num_geracoes  ++ "." ++ show tamanho_populacao ++ ".txt") melhorCaminho
+  trace ("Tempo de execucao: " ++ show execTime ++ " segundos") (return ())
+  trace ("Menor distancia: " ++ show (somarDistancias melhorCaminho trajetos)) (return ())
 
-  print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
-  print $ "Menor distancia: " ++ show (somarDistancias melhorCaminho trajetos)
+  data_atual <- obterTimestampAtual
+  numero_random <- gerarNumeroAleatorio
+
+  escreverFinal ("caminhoFinal."++ show num_geracoes  ++ "." ++ show tamanho_populacao ++ "." ++ data_atual ++ "." ++ show numero_random ++  ".txt") melhorCaminho
+
+  gravarHistorico geracaoInfo ("Grafico-Trajeto." ++ show num_geracoes ++ "." ++ show tamanho_populacao ++ "." ++ data_atual ++ "." ++ show numero_random ++ ".png")
+
+  return ()
 
 
+main :: IO ()
+main = do
+  hSetEncoding stdout utf8
+  hSetEncoding stdin utf8
 
-  gravarHistorico geracaoInfo ("Grafico-Trajeto." ++ show num_geracoes ++ "." ++ show tamanho_populacao ++ ".png")
+  parallel_ $
+    map
+      runs
+      [ (30, 2000),
+        (30, 2000),
+        (30, 2000),
+        (30, 2000),
+        (30, 2000),
+        (30, 2000),
+        (30, 2000),
+        (30, 2000),
+        (30, 2000),
+        (30, 2000)
+      ]

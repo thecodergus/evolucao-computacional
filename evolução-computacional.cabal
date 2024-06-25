@@ -101,7 +101,8 @@ executable evolução-computacional
                     array >= 0.5,
                     time,
                     parsec,
-                    utf8-string
+                    utf8-string,
+                    parallel-io
                     
 
     -- Directories containing source files.
