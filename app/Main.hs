@@ -64,7 +64,7 @@ runs (tamanho_populacao, num_geracoes) = do
   data_atual <- obterTimestampAtual
   numero_random <- gerarNumeroAleatorio
 
-  escreverFinal ("caminhoFinal."++ show num_geracoes  ++ "." ++ show tamanho_populacao ++ "." ++ data_atual ++ "." ++ show numero_random ++  ".txt") melhorCaminho
+  escreverFinal ("caminhoFinal." ++ show num_geracoes ++ "." ++ show tamanho_populacao ++ "." ++ data_atual ++ "." ++ show numero_random ++ ".txt") (("Tempo de execucao: " ++ show execTime ++ " segundos\nMenor distancia: " ++ show (somarDistancias melhorCaminho trajetos) ++ "\ngi") : melhorCaminho)
 
   gravarHistorico geracaoInfo ("Grafico-Trajeto." ++ show num_geracoes ++ "." ++ show tamanho_populacao ++ "." ++ data_atual ++ "." ++ show numero_random ++ ".png")
 
@@ -79,14 +79,9 @@ main = do
   parallel_ $
     map
       runs
-      [ (30, 2000),
-        (30, 2000),
-        (30, 2000),
-        (30, 2000),
-        (30, 2000),
-        (30, 2000),
-        (30, 2000),
-        (30, 2000),
-        (30, 2000),
-        (30, 2000)
+      [ (30, 1500),
+        (30, 1500),
+        (30, 1500),
+        (30, 1500),
+        (30, 1500)
       ]
