@@ -33,14 +33,17 @@ numeroTotalCidades trajetos = length $ nomesCidades trajetos
 mapearCidadesNumeros :: [Trajeto] -> [(String, Int)]
 mapearCidadesNumeros trajetos = zip (nomesCidades trajetos) [1 ..]
 
-funcaoObjetivo :: [Int] -> [Trajeto] -> Integer
-funcaoObjetivo entrada lista = somarDistancias (map (\x -> procurarPorString x (mapearCidadesNumeros lista)) entrada) lista
+intParaString :: [Int] -> [Trajeto] -> [String]
+intParaString entrada lista = map (\x -> procurarPorString x (mapearCidadesNumeros lista)) entrada
     where
         procurarPorString :: Int -> [(String, Int)] -> String
         procurarPorString _ [] = error "Algo deu ruim"
         procurarPorString n ((a, b) : lista')
             | n == b = a
             | otherwise = procurarPorString n lista'
+
+funcaoObjetivo :: [Int] -> [Trajeto] -> Integer
+funcaoObjetivo entrada lista = somarDistancias (intParaString entrada lista) lista
 
 fitness :: [Int] -> [Trajeto] -> Float
 fitness pop lista
@@ -49,3 +52,10 @@ fitness pop lista
 
 avaliacao :: [Trajeto]  -> Individuo Int -> Individuo Int
 avaliacao lista (Individuo gene _) = Individuo gene (fitness gene lista)
+
+
+-- Função para escrever uma lista de strings em um arquivo
+escreverFinal :: FilePath -> [String] -> IO ()
+escreverFinal filename strings = do
+  let content = unwords (map (++ " -> ") strings)
+  writeFile filename content
