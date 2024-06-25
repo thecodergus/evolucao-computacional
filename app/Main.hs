@@ -25,7 +25,7 @@ main = do
   arquivo <- readFile "distancias.txt"
 
   let trajetos = parser arquivo
-  let num_geracoes = 20
+  let num_geracoes = 150
 
   pop_inicial <- gerarPopulacaoInteiroPermutado 30 244 (1, 244)
 
