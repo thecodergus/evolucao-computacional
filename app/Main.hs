@@ -18,6 +18,9 @@ import Tipos (GeracaoInfo (melhorIndividuo), Individuo (Individuo, fitness, gene
 import Utils.Arquivo (fileToIntLists)
 import qualified Utils.Avaliacoes as Avaliacoes
 import Utils.Grafico (gravarHistorico)
+import Complexidade.Parser(parser)
+import Complexidade.Tipos (Trajeto)
+import System.IO (hSetEncoding, stdin, stdout, utf8)
 
 sat :: IO ()
 sat = do
@@ -76,7 +79,7 @@ nRainhas ((n, numGeracoes) : ss) = do
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_incial (Rainhas.avaliacao True n) roletaSemReposicao (`swap` 0.05) (`pmx` 0.8) 0.3 numGeracoes
+  geracaoInfo <- loopEvolutivoEnumerado pop_incial (Rainhas.avaliacao True n) roletaSemReposicao (`swap` 0.056) (`pmx` 0.78) 0.35 numGeracoes
 
   endTime <- getCPUTime
 
@@ -93,7 +96,12 @@ nRainhas ((n, numGeracoes) : ss) = do
   void (nRainhas ss)
 
 main :: IO ()
-main =
-  nRainhas
-    [ (8, 1000)
-    ]
+main = do
+  hSetEncoding stdout utf8
+  hSetEncoding stdin utf8
+  arquivo <- readFile "distancias.txt"
+
+  let trajetos = parser arquivo
+
+  print trajetos
+  

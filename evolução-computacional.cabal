@@ -84,6 +84,8 @@ executable evolução-computacional
         Outros
         Utils.Outros
         Avaliacoes.NRainhas
+        Complexidade.Parser
+        Complexidade.Tipos
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -96,7 +98,9 @@ executable evolução-computacional
                     Chart >= 1.9.5,
                     Chart-cairo >= 1.9.4.1,
                     array >= 0.5,
-                    time
+                    time,
+                    parsec,
+                    utf8-string
                     
 
     -- Directories containing source files.
@@ -105,6 +109,7 @@ executable evolução-computacional
             app/Modulos 
             app/Modulos/Utils
             app/Modulos/Avaliacoes
+            app/Modulos/Complexidade
 
     -- Base language which the package is written in.
     default-language: Haskell2010
