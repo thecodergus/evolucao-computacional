@@ -2,6 +2,7 @@ module Complexidade.Algoritmos where
 
 import Complexidade.Tipos
 import Data.List (nub)
+import GHC.Base (Int)
 
 nomesCidades :: [Trajeto] -> [String]
 nomesCidades input = nub $ concatTrajeto input
@@ -9,7 +10,6 @@ nomesCidades input = nub $ concatTrajeto input
         concatTrajeto :: [Trajeto] -> [String]
         concatTrajeto [] = [] 
         concatTrajeto ((Trajeto de para _) : xs) = de : para : concatTrajeto xs
-
 
 descobrirDistancia :: String -> String -> [Trajeto] -> Integer
 descobrirDistancia _ _ [] = 999999999
@@ -25,3 +25,9 @@ somarDistancias :: [String] -> [Trajeto] -> Integer
 somarDistancias [] _ = 0
 somarDistancias _ [] = 0
 somarDistancias (a : b : resto) lista = (descobrirDistancia a b lista) + (somarDistancias (b : resto) lista)
+
+numeroTotalCidades :: [Trajeto] -> Int
+numeroTotalCidades trajetos = length $ nomesCidades trajetos
+
+mapearCidadesNumeros :: [Trajeto] -> [(String, Int)]
+mapearCidadesNumeros trajetos = zip (nomesCidades trajetos) [1 ..] 
