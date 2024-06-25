@@ -22,12 +22,13 @@ main = do
   arquivo <- readFile "distancias.txt"
 
   let trajetos = parser arquivo
+  let num_geracoes = 20
 
   pop_inicial <- gerarPopulacaoInteiroPermutado 30 244 (1, 244)
 
   startTime <- getCPUTime
 
-  geracaoInfo <- loopEvolutivoEnumerado pop_inicial (trajetos `avaliacao`) roletaSemReposicao (`swap` 0.05) (`pmx` 0.75) 0.2 5000
+  geracaoInfo <- loopEvolutivoEnumerado pop_inicial (trajetos `avaliacao`) roletaSemReposicao (`swap` 0.05) (`pmx` 0.75) 0.2 num_geracoes
 
   endTime <- getCPUTime
 
