@@ -13,7 +13,7 @@ parserTrajeto = do
     para' <- manyTill anyChar (try (string ") = "))
     Trajeto de' para' <$> parserMetros
 
-parserMetros :: Parsec String () (Maybe Integer)
+parserMetros :: Parsec String () (Maybe Int)
 parserMetros =
   try (Just . read <$> digit `manyTill` try (char '\n'))
     <|> (anyChar `manyTill` try (char '\n') >> return Nothing)

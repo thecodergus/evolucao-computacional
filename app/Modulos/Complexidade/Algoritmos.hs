@@ -1,6 +1,6 @@
 module Complexidade.Algoritmos where
 
-import Complexidade.Tipos
+import Complexidade.Tipos ( Trajeto(Trajeto, distancia) )
 import Data.List (nub)
 import GHC.Base (Int)
 import Tipos (Individuo (Individuo))
@@ -13,7 +13,7 @@ nomesCidades input = nub $ concatTrajeto input
         concatTrajeto [] = []
         concatTrajeto ((Trajeto de' para' _) : xs) = de' : para' : concatTrajeto xs
 
-descobrirDistancia :: String -> String -> [Trajeto] -> Integer
+descobrirDistancia :: String -> String -> [Trajeto] -> Int
 descobrirDistancia _ _ [] = 999999999
 descobrirDistancia a b ((Trajeto de' para' m) : lista)
     | a == de' && b == para' =
@@ -21,7 +21,7 @@ descobrirDistancia a b ((Trajeto de' para' m) : lista)
     | otherwise = descobrirDistancia a b lista
 
 
-somarDistancias :: [String] -> [Trajeto] -> Integer
+somarDistancias :: [String] -> [Trajeto] -> Int
 somarDistancias [] _ = 0
 somarDistancias _ [] = 0
 somarDistancias [_] (_ : _) = 0
@@ -42,13 +42,18 @@ intParaString entrada lista = map (\x -> procurarPorString x (mapearCidadesNumer
             | n == b = a
             | otherwise = procurarPorString n lista'
 
-funcaoObjetivo :: [Int] -> [Trajeto] -> Integer
+funcaoObjetivo :: [Int] -> [Trajeto] -> Int
 funcaoObjetivo entrada lista = somarDistancias (intParaString entrada lista) lista
 
 fitness :: [Int] -> [Trajeto] -> Float
-fitness pop lista
-    | funcaoObjetivo pop lista /= 0 = 1 / fromIntegral (funcaoObjetivo pop lista)
-    | otherwise = 1
+fitness pop lista = 1 - (fromIntegral (funcaoObjetivo pop lista)/ somarTudo lista)
+    where 
+        somarTudo :: [Trajeto] -> Float
+        somarTudo [] = 0
+        somarTudo ((Trajeto _ _ l) : trajetos) =
+            case l of 
+                Just l' -> fromIntegral l' + somarTudo trajetos
+                Nothing -> somarTudo trajetos 
 
 avaliacao :: [Trajeto]  -> Individuo Int -> Individuo Int
 avaliacao lista (Individuo gene _) = Individuo gene (fitness gene lista)
