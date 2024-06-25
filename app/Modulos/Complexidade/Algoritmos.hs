@@ -6,6 +6,9 @@ import GHC.Base (Int)
 import Tipos (Individuo (Individuo))
 import Data.Maybe
 
+punicao :: Integer
+punicao = 1000000
+
 nomesCidades :: [Trajeto] -> [String]
 nomesCidades input = nub $ concatTrajeto input
     where
@@ -14,10 +17,10 @@ nomesCidades input = nub $ concatTrajeto input
         concatTrajeto ((Trajeto de' para' _) : xs) = de' : para' : concatTrajeto xs
 
 descobrirDistancia :: String -> String -> [Trajeto] -> Integer
-descobrirDistancia _ _ [] = 999999
+descobrirDistancia _ _ [] = punicao
 descobrirDistancia a b ((Trajeto de' para' m) : lista)
     | a == de' && b == para' =
-        fromMaybe 999999 m
+        fromMaybe punicao m
     | otherwise = descobrirDistancia a b lista
 
 

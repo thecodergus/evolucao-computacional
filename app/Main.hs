@@ -25,9 +25,10 @@ main = do
   arquivo <- readFile "distancias.txt"
 
   let trajetos = parser arquivo
-  let num_geracoes = 500
+  let num_geracoes = 1000
+  let tamanho_populacao = 30
 
-  pop_inicial <- gerarPopulacaoInteiroPermutado 30 244 (1, 244)
+  pop_inicial <- gerarPopulacaoInteiroPermutado tamanho_populacao 244 (1, 244)
 
   startTime <- getCPUTime
 
@@ -39,11 +40,11 @@ main = do
 
   let melhorCaminho = intParaString (genes $ fromMaybe (error "Problema") (Avaliacoes.melhorIndividuo $ melhorIndividuo geracaoInfo)) trajetos
 
-  escreverFinal "caminhoFinal.txt" melhorCaminho
+  escreverFinal ("caminhoFinal."++ show num_geracoes  ++ "." ++ show tamanho_populacao ++ ".txt") melhorCaminho
 
   print $ "Tempo de execucao: " ++ show execTime ++ " segundos"
   print $ "Menor distancia: " ++ show (somarDistancias melhorCaminho trajetos)
 
 
 
-  gravarHistorico geracaoInfo "Grafico-Trajeto.png"
+  gravarHistorico geracaoInfo ("Grafico-Trajeto." ++ show num_geracoes ++ "." ++ show tamanho_populacao ++ ".png")
