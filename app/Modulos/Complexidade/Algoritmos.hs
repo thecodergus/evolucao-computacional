@@ -12,12 +12,12 @@ nomesCidades input = nub $ concatTrajeto input
 
 
 descobrirDistancia :: String -> String -> [Trajeto] -> Integer
-descobrirDistancia _ _ [] = 9999999
+descobrirDistancia _ _ [] = 999999999
 descobrirDistancia a b ((Trajeto de para m) : lista)
     | a == de && b == para = 
         case m of
             Just x -> x
-            Nothing -> 9999999
+            Nothing -> 999999999
     | otherwise = descobrirDistancia a b lista
 
 
