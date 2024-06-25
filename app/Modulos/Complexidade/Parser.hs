@@ -24,5 +24,5 @@ parserTrajetos = manyTill parserTrajeto eof
 parser :: String -> [Trajeto]
 parser input =
     case parse parserTrajetos "" input of
-        Left x -> trace (show x) []
+        Left _ -> []
         Right x -> x
