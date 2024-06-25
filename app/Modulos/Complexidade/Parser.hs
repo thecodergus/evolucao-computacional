@@ -1,7 +1,7 @@
 module Complexidade.Parser where
 
 import Text.Parsec
-    ( anyChar, char, digit, string, eof, manyTill, parse, try, Parsec, optionMaybe , (<|>))
+    ( anyChar, char, digit, string, eof, manyTill, parse, try, Parsec, (<|>))
 import Complexidade.Tipos
 import Debug.Trace
 
@@ -15,7 +15,7 @@ parserTrajeto = do
 
 parserMetros :: Parsec String () (Maybe Integer)
 parserMetros =
-  try (Just . read <$> manyTill digit (try (char '\n')))
+  try (Just . read <$> digit `manyTill` try (char '\n'))
     <|> (anyChar `manyTill` try (char '\n') >> return Nothing)
 
 parserTrajetos :: Parsec String () [Trajeto]
