@@ -30,4 +30,13 @@ numeroTotalCidades :: [Trajeto] -> Int
 numeroTotalCidades trajetos = length $ nomesCidades trajetos
 
 mapearCidadesNumeros :: [Trajeto] -> [(String, Int)]
-mapearCidadesNumeros trajetos = zip (nomesCidades trajetos) [1 ..] 
+mapearCidadesNumeros trajetos = zip (nomesCidades trajetos) [1 ..]
+
+funcaoObjetivo :: [Int] -> [Trajeto] -> Integer
+funcaoObjetivo entrada lista = somarDistancias (map (\x -> procurarPorString x (mapearCidadesNumeros lista)) entrada) lista
+    where
+        procurarPorString :: Int -> [(String, Int)] -> String
+        procurarPorString _ [] = error "Algo deu ruim"
+        procurarPorString n ((a, b) : lista)
+            | n == b = a
+            | otherwise = procurarPorString n lista
