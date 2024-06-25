@@ -3,6 +3,7 @@ module Complexidade.Algoritmos where
 import Complexidade.Tipos
 import Data.List (nub)
 import GHC.Base (Int)
+import Tipos (Individuo (Individuo))
 
 nomesCidades :: [Trajeto] -> [String]
 nomesCidades input = nub $ concatTrajeto input
@@ -40,3 +41,11 @@ funcaoObjetivo entrada lista = somarDistancias (map (\x -> procurarPorString x (
         procurarPorString n ((a, b) : lista)
             | n == b = a
             | otherwise = procurarPorString n lista
+
+fitness :: [Int] -> [Trajeto] -> Float
+fitness pop lista
+    | (funcaoObjetivo pop lista) /= 0 = 1 / fromIntegral (funcaoObjetivo pop lista)
+    | otherwise = 1
+
+avaliacao :: [Trajeto]  -> Individuo Int -> Individuo Int
+avaliacao lista (Individuo gene _) = Individuo gene (fitness gene lista)
